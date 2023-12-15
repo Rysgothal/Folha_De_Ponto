@@ -1,0 +1,7 @@
+*.dres
+*.local
+*.identcache
+*.res
+*.dcu
+*.exe
+__history
