@@ -14,7 +14,7 @@ type
     tmrHorario: TTimer;
     frmDadosFuncionario: TfrmDadosFuncionario;
     gbxSeg: TGroupBox;
-    frmHorariosDiaUtil1: TfrmHorariosDiaUtil;
+    frmSegunda: TfrmHorariosDiaUtil;
     procedure tmrHorarioTimer(Sender: TObject);
     procedure FormCreate(Sender: TObject);
   private
@@ -30,7 +30,7 @@ var
 implementation
 
 uses
-  System.SysUtils;
+  System.SysUtils, PontoSemanal.Helpers.Enumerados;
 
 {$R *.dfm}
 
@@ -38,6 +38,7 @@ procedure TfrmPrincipal.FormCreate(Sender: TObject);
 begin
   tmrHorario.Enabled := True;
   sttsbarSistemaInfo.Panels[0].Text := FormatDateTime('ddddddd', Date);
+  frmSegunda.FTag := dsSegunda;
 end;
 
 procedure TfrmPrincipal.AtualizarHorarioSistema;

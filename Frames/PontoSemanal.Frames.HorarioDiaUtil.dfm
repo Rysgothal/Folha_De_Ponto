@@ -49,8 +49,11 @@ object frmHorariosDiaUtil: TfrmHorariosDiaUtil
     EditLabel.BiDiMode = bdLeftToRight
     EditLabel.Caption = 'Entrada'
     EditLabel.ParentBiDiMode = False
+    MaxLength = 5
     TabOrder = 0
     Text = ''
+    OnChange = lbeEntradaChange
+    OnExit = lbeEntradaExit
   end
   object edtSaldoHora: TEdit
     Left = 484
@@ -69,7 +72,7 @@ object frmHorariosDiaUtil: TfrmHorariosDiaUtil
     Font.Style = [fsBold]
     ParentFont = False
     ReadOnly = True
-    TabOrder = 1
+    TabOrder = 5
   end
   object edtTotalHora: TEdit
     Left = 385
@@ -88,7 +91,7 @@ object frmHorariosDiaUtil: TfrmHorariosDiaUtil
     Font.Style = [fsBold]
     ParentFont = False
     ReadOnly = True
-    TabOrder = 2
+    TabOrder = 4
     Text = '  :  '
   end
   object lbeSaidaAlmoco: TLabeledEdit
@@ -103,8 +106,11 @@ object frmHorariosDiaUtil: TfrmHorariosDiaUtil
     EditLabel.Caption = 'Sa'#237'da Almo'#231'o'
     EditLabel.ParentBiDiMode = False
     EditLabel.Layout = tlCenter
-    TabOrder = 3
+    MaxLength = 5
+    TabOrder = 1
     Text = ''
+    OnChange = lbeSaidaAlmocoChange
+    OnExit = lbeSaidaAlmocoExit
   end
   object lbeRetornoAlmoco: TLabeledEdit
     Left = 186
@@ -118,8 +124,11 @@ object frmHorariosDiaUtil: TfrmHorariosDiaUtil
     EditLabel.Caption = 'Retorno Almo'#231'o'
     EditLabel.ParentBiDiMode = False
     EditLabel.Layout = tlCenter
-    TabOrder = 4
+    MaxLength = 5
+    TabOrder = 2
     Text = ''
+    OnChange = lbeRetornoAlmocoChange
+    OnExit = lbeRetornoAlmocoExit
   end
   object lbeSaidaFinal: TLabeledEdit
     Left = 278
@@ -133,7 +142,10 @@ object frmHorariosDiaUtil: TfrmHorariosDiaUtil
     EditLabel.Caption = 'Sa'#237'da - Final'
     EditLabel.ParentBiDiMode = False
     EditLabel.Layout = tlCenter
-    TabOrder = 5
+    MaxLength = 5
+    TabOrder = 3
     Text = ''
+    OnChange = lbeSaidaFinalChange
+    OnExit = lbeSaidaFinalExit
   end
 end

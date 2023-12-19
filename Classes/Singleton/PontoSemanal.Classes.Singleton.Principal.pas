@@ -2,6 +2,9 @@ unit PontoSemanal.Classes.Singleton.Principal;
 
 interface
 
+uses
+  PontoSemanal.Classes.Base.Horarios, PontoSemanal.Helpers.Enumerados;
+
 type
   TFolhaPontoSemanalSingleton = class
   private
@@ -11,20 +14,32 @@ type
     FTempoAdmissao: string;
     FJornadaSemanal: string;
     FIntervaloAlmoco: string;
+    FSegunda: THorariosDia;
+    FTerca: THorariosDia;
+    FQuarta: THorariosDia;
+    FQuinta: THorariosDia;
+    FSexta: THorariosDia;
+    FSabado: THorariosDia;
+    constructor Create;
     procedure SetID(const pValor: string);
     procedure SetDataAdmissao(const pValor: string);
-    constructor Create;
     procedure CalcularTempoAdmissao;
     procedure SetJornadaSemanal(const pValor: string);
     procedure SetIntervaloAlmoco(const pValor: string);
   public
+    class function ObterInstancia: TFolhaPontoSemanalSingleton;
     property ID: string read FID write SetID;
     property Nome: string read FNome write FNome;
     property DataAdmissao: string read FDataAdmissao write SetDataAdmissao;
     property TempoAdmissao: string read FTempoAdmissao;
     property JornadaSemanal: string read FJornadaSemanal write SetJornadaSemanal;
     property IntervaloAlmoco: string read FIntervaloAlmoco write SetIntervaloAlmoco;
-    class function ObterInstancia: TFolhaPontoSemanalSingleton;
+    property Segunda: THorariosDia read FSegunda write FSegunda;
+    property Terca: THorariosDia read FTerca write FTerca;
+    property Quarta: THorariosDia read FQuarta write FQuarta;
+    property Quinta: THorariosDia read FQuinta write FQuinta;
+    property Sexta: THorariosDia read FSexta write FSexta;
+    property Sabado: THorariosDia read FSabado write FSabado;
   end;
 
 var
@@ -44,6 +59,13 @@ begin
   FNome := EmptyStr;
   FDataAdmissao := EmptyStr;
   FTempoAdmissao := '-> anos; meses; semanas; dias;';
+
+  FSegunda := THorariosDia.Create(dsSegunda);
+  FTerca := THorariosDia.Create(dsTerca);
+  FQuarta := THorariosDia.Create(dsQuarta);
+  FQuinta := THorariosDia.Create(dsQuinta);
+  FSexta := THorariosDia.Create(dsSexta);
+  FSabado := THorariosDia.Create(dsSabado);
 end;
 
 class function TFolhaPontoSemanalSingleton.ObterInstancia: TFolhaPontoSemanalSingleton;

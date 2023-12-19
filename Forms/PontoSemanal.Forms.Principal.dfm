@@ -86,15 +86,17 @@ object frmPrincipal: TfrmPrincipal
     HeaderFont.Style = [fsBold]
     ParentFont = False
     TabOrder = 2
-    inline frmHorariosDiaUtil1: TfrmHorariosDiaUtil
+    inline frmSegunda: TfrmHorariosDiaUtil
       Left = 2
       Top = 17
       Width = 541
       Height = 55
       Align = alClient
       TabOrder = 0
-      ExplicitLeft = -12
-      ExplicitTop = 25
+      ExplicitLeft = 2
+      ExplicitTop = 17
+      ExplicitWidth = 541
+      ExplicitHeight = 55
     end
   end
   object tmrHorario: TTimer

@@ -124,6 +124,10 @@
             <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
+        <DCCReference Include="Interfaces\Observer\PontoSemanal.Interfaces.Observer.Observador.pas"/>
+        <DCCReference Include="Interfaces\Observer\PontoSemanal.Interfaces.Observer.Sujeito.pas"/>
+        <DCCReference Include="Classes\Base\PontoSemanal.Classes.Base.Horarios.pas"/>
+        <DCCReference Include="Helpers\PontoSemanal.Helpers.Enumerados.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

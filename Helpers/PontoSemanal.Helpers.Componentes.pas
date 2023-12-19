@@ -59,7 +59,8 @@ begin
     Exit;
   end;
 
-  pEdit.Text := string(pEdit.Text).PadLeft(4, '0');
+  Completar(pEdit, 4, '0');
+//  pEdit.Text := string(pEdit.Text).PadLeft(4, '0');
 end;
 
 class procedure TComponenteHelpers.MoverFinal(const pEdit: TCustomEdit);
