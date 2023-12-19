@@ -14,12 +14,14 @@ type
     class function VerificarCampoVazio(const pEdit: TCustomEdit): Boolean;
     class procedure FormatarData(const pEdit: TCustomEdit);
     class procedure MoverFinal(const pEdit: TCustomEdit);
+    class procedure FormatarIntervalo(const pEdit: TCustomEdit);
+    class procedure FormatarHorario(const pEdit: TCustomEdit);
   end;
 
 implementation
 
 uses
-  PontoSemanal.Helpers.Strings;
+  PontoSemanal.Helpers.Strings, System.SysUtils;
 
 { TComponenteHelpers }
 
@@ -42,6 +44,22 @@ class procedure TComponenteHelpers.FormatarData(const pEdit: TCustomEdit);
 begin
   pEdit.Text := TStringHelpers.FormatarData(pEdit.Text);
   MoverFinal(pEdit);
+end;
+
+class procedure TComponenteHelpers.FormatarHorario(const pEdit: TCustomEdit);
+begin
+  pEdit.Text := TStringHelpers.FormatarHorario(pEdit.Text);
+  MoverFinal(pEdit);
+end;
+
+class procedure TComponenteHelpers.FormatarIntervalo(const pEdit: TCustomEdit);
+begin
+  if VerificarCampoVazio(pEdit) then
+  begin
+    Exit;
+  end;
+
+  pEdit.Text := string(pEdit.Text).PadLeft(4, '0');
 end;
 
 class procedure TComponenteHelpers.MoverFinal(const pEdit: TCustomEdit);

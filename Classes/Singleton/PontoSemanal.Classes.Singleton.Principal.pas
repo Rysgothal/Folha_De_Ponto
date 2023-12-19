@@ -9,15 +9,21 @@ type
     FNome: string;
     FDataAdmissao: string;
     FTempoAdmissao: string;
+    FJornadaSemanal: string;
+    FIntervaloAlmoco: string;
     procedure SetID(const pValor: string);
     procedure SetDataAdmissao(const pValor: string);
     constructor Create;
     procedure CalcularTempoAdmissao;
+    procedure SetJornadaSemanal(const pValor: string);
+    procedure SetIntervaloAlmoco(const pValor: string);
   public
     property ID: string read FID write SetID;
     property Nome: string read FNome write FNome;
     property DataAdmissao: string read FDataAdmissao write SetDataAdmissao;
     property TempoAdmissao: string read FTempoAdmissao;
+    property JornadaSemanal: string read FJornadaSemanal write SetJornadaSemanal;
+    property IntervaloAlmoco: string read FIntervaloAlmoco write SetIntervaloAlmoco;
     class function ObterInstancia: TFolhaPontoSemanalSingleton;
   end;
 
@@ -50,19 +56,17 @@ end;
 
 procedure TFolhaPontoSemanalSingleton.SetDataAdmissao(const pValor: string);
 var
-  lValor: string;
   lData: TDateTime;
 begin
+  FDataAdmissao := EmptyStr;
+
   if TStringHelpers.VerificarCampoVazio(pValor) then
   begin
-    FDataAdmissao := EmptyStr;
     CalcularTempoAdmissao;
     Exit;
   end;
 
-  lValor := pValor;
-
-  if not TryStrToDate(lValor, lData) then
+  if not TryStrToDate(pValor, lData) then
   begin
     raise EDataInvalida.Create('A data informada está incorreta, verifique.');
   end;
@@ -95,11 +99,55 @@ begin
   FID := TStringHelpers.Completar(lValor, 7, '0');
 end;
 
+procedure TFolhaPontoSemanalSingleton.SetIntervaloAlmoco(const pValor: string);
+var
+  lValor: TDateTime;
+begin
+  if TStringHelpers.VerificarCampoVazio(pValor) then
+  begin
+    FIntervaloAlmoco := EmptyStr;
+    Exit;
+  end;
+
+  if not TryStrToTime(pValor, lValor) then
+  begin
+    raise EIntervaloAlmocoInvalido.Create('O intervalo de almoço inserido está incorreto, verifique.');
+  end;
+
+  FIntervaloAlmoco := pValor;
+end;
+
+procedure TFolhaPontoSemanalSingleton.SetJornadaSemanal(const pValor: string);
+var
+  lValor: Integer;
+begin
+  FJornadaSemanal := EmptyStr;
+
+  if TStringHelpers.VerificarCampoVazio(pValor) then
+  begin
+    Exit;
+  end;
+
+  if not TryStrToInt(pValor, lValor) then
+  begin
+    raise EJornadaSemanalInvalida.Create('A jornada semanal inserida está incorreta, verifique.');
+  end;
+
+  if lValor > 44 then //
+  begin
+    raise EJornadaSemanalNaoPermitidaLei.Create('A jornada semanal informada não é aceita pela Lei, verifique...');
+  end;
+
+  FJornadaSemanal := pValor;
+end;
+
 procedure TFolhaPontoSemanalSingleton.CalcularTempoAdmissao;
 var
   lDataNascimento: TDateTime;
   lAnos, lMeses, lSemanas, lDias: Integer;
 begin
+  FTempoAdmissao := EmptyStr;
+
   if TStringHelpers.VerificarCampoVazio(DataAdmissao) then
   begin
     FTempoAdmissao := '-> anos; meses; semanas; dias;';
@@ -108,12 +156,17 @@ begin
 
   lDataNascimento := StrToDate(DataAdmissao);
 
-  lAnos    := YearsBetween(lDataNascimento, Date);
-  lMeses   := MonthsBetween(IncYear(lDataNascimento, lAnos), Date);
-  lSemanas := WeeksBetween(IncMonth(IncYear(lDataNascimento, lAnos), lMeses), Date);
-  lDias    := DaysBetween(IncWeek(IncMonth(IncYear(lDataNascimento, lAnos), lMeses), lSemanas), Date);
+  lAnos    := YearsBetween(lDataNascimento, Now);
+  lMeses   := MonthsBetween(IncYear(lDataNascimento, lAnos), Now);
 
-  FTempoAdmissao := 'Seu primeiro dia..';
+  if lMeses = 12 then
+  begin
+    lMeses := 0;
+    Inc(lAnos);
+  end;
+
+  lSemanas := WeeksBetween(IncMonth(IncYear(lDataNascimento, lAnos), lMeses), Now);
+  lDias    := DaysBetween(IncWeek(IncMonth(IncYear(lDataNascimento, lAnos), lMeses), lSemanas), Now);
 
   case lAnos of
     0: ;
@@ -139,7 +192,10 @@ begin
     else FTempoAdmissao := FTempoAdmissao + lDias.ToString + ' Dias. ';
   end;
 
-  FTempoAdmissao := Copy(FTempoAdmissao, 1, Length(FTempoAdmissao) - 2) + '.';
+  case TStringHelpers.VerificarCampoVazio(FTempoAdmissao) of
+    True: FTempoAdmissao := 'Primeiro dia.';
+    else FTempoAdmissao := Copy(FTempoAdmissao, 1, Length(FTempoAdmissao) - 2) + '.';
+  end;
 end;
 
 initialization

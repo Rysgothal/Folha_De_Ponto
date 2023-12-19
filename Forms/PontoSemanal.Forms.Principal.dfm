@@ -20,8 +20,8 @@ object frmPrincipal: TfrmPrincipal
   object gbxDadosFuncionario: TGroupBox
     Left = 8
     Top = 8
-    Width = 555
-    Height = 161
+    Width = 545
+    Height = 145
     Caption = 'Dados do Funcion'#225'rio'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -30,205 +30,17 @@ object frmPrincipal: TfrmPrincipal
     Font.Style = [fsBold]
     ParentFont = False
     TabOrder = 0
-    object lblCodigo: TLabel
-      Left = 60
-      Top = 25
-      Width = 42
-      Height = 15
-      Alignment = taRightJustify
-      Caption = 'C'#243'digo:'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -12
-      Font.Name = 'Segoe UI'
-      Font.Style = []
-      ParentFont = False
-    end
-    object lblNome: TLabel
-      Left = 61
-      Top = 49
-      Width = 36
-      Height = 15
-      Alignment = taRightJustify
-      Caption = 'Nome:'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -12
-      Font.Name = 'Segoe UI'
-      Font.Style = []
-      ParentFont = False
-    end
-    object lblAdmissao: TLabel
-      Left = 47
-      Top = 73
-      Width = 55
-      Height = 15
-      Alignment = taRightJustify
-      Caption = 'Admiss'#227'o:'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -12
-      Font.Name = 'Segoe UI'
-      Font.Style = []
-      ParentFont = False
-    end
-    object lblJornadaSemanal: TLabel
-      Left = 10
-      Top = 97
-      Width = 92
-      Height = 15
-      Alignment = taRightJustify
-      Caption = 'Jornada Semanal:'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -12
-      Font.Name = 'Segoe UI'
-      Font.Style = []
-      ParentFont = False
-    end
-    object lblIntervaloAlmoco: TLabel
-      Left = 10
-      Top = 121
-      Width = 92
-      Height = 15
-      Alignment = taRightJustify
-      Caption = 'Intervalo almo'#231'o:'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -12
-      Font.Name = 'Segoe UI'
-      Font.Style = []
-      ParentFont = False
-    end
-    object lblAnosMesesSemanasDias: TLabel
-      Left = 213
-      Top = 74
-      Width = 165
-      Height = 15
-      Caption = '-> anos; meses; semanas; dias.'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -12
-      Font.Name = 'Segoe UI'
-      Font.Style = [fsBold]
-      ParentFont = False
-    end
-    object lblHoras: TLabel
-      Left = 152
-      Top = 97
-      Width = 29
-      Height = 15
-      Caption = 'horas'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -12
-      Font.Name = 'Segoe UI'
-      Font.Style = []
-      ParentFont = False
-    end
-    object lblTempoExtenso: TLabel
-      Left = 190
-      Top = 121
-      Width = 123
-      Height = 15
-      Caption = '"x" horas e "y" minutos'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -12
-      Font.Name = 'Segoe UI'
-      Font.Style = []
-      ParentFont = False
-    end
-    object edtCodigo: TEdit
-      Left = 106
-      Top = 22
-      Width = 98
-      Height = 23
-      Alignment = taCenter
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -12
-      Font.Name = 'Segoe UI'
-      Font.Style = []
-      MaxLength = 7
-      ParentFont = False
-      ParentShowHint = False
-      ShowHint = False
+    inline frmDadosFuncionario: TfrmDadosFuncionario
+      Left = 2
+      Top = 17
+      Width = 541
+      Height = 126
+      Align = alClient
       TabOrder = 0
-      OnChange = edtCodigoChange
-      OnExit = edtCodigoExit
-    end
-    object edtNome: TEdit
-      Left = 106
-      Top = 46
-      Width = 434
-      Height = 23
-      CharCase = ecUpperCase
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -12
-      Font.Name = 'Segoe UI'
-      Font.Style = []
-      ParentFont = False
-      ParentShowHint = False
-      ShowHint = False
-      TabOrder = 1
-      OnChange = edtNomeChange
-      OnExit = edtNomeExit
-    end
-    object edtAdmissao: TEdit
-      Left = 106
-      Top = 70
-      Width = 98
-      Height = 23
-      Alignment = taCenter
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -12
-      Font.Name = 'Segoe UI'
-      Font.Style = []
-      MaxLength = 10
-      ParentFont = False
-      ParentShowHint = False
-      ShowHint = False
-      TabOrder = 2
-      TextHint = 'dd/mm/yyyy'
-      OnChange = edtAdmissaoChange
-      OnExit = edtAdmissaoExit
-    end
-    object edtJornadaSemanal: TEdit
-      Left = 106
-      Top = 94
-      Width = 42
-      Height = 23
-      Alignment = taCenter
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -12
-      Font.Name = 'Segoe UI'
-      Font.Style = []
-      MaxLength = 2
-      ParentFont = False
-      TabOrder = 3
-      TextHint = 'hh'
-    end
-    object edtIntervaloAlmoco: TEdit
-      Left = 106
-      Top = 118
-      Width = 83
-      Height = 23
-      Alignment = taCenter
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -12
-      Font.Name = 'Segoe UI'
-      Font.Style = []
-      MaxLength = 4
-      ParentFont = False
-      ParentShowHint = False
-      ShowHint = False
-      TabOrder = 4
-      TextHint = 'hh:mm'
+      ExplicitLeft = 2
+      ExplicitTop = 17
+      ExplicitWidth = 541
+      ExplicitHeight = 126
     end
   end
   object sttsbarSistemaInfo: TStatusBar
@@ -255,10 +67,40 @@ object frmPrincipal: TfrmPrincipal
       end>
     UseSystemFont = False
   end
+  object gbxSeg: TGroupBox
+    Left = 8
+    Top = 159
+    Width = 545
+    Height = 74
+    Caption = 'Segunda-Feira'
+    DefaultHeaderFont = False
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -12
+    Font.Name = 'Segoe UI'
+    Font.Style = []
+    HeaderFont.Charset = DEFAULT_CHARSET
+    HeaderFont.Color = clWindowText
+    HeaderFont.Height = -12
+    HeaderFont.Name = 'Segoe UI'
+    HeaderFont.Style = [fsBold]
+    ParentFont = False
+    TabOrder = 2
+    inline frmHorariosDiaUtil1: TfrmHorariosDiaUtil
+      Left = 2
+      Top = 17
+      Width = 541
+      Height = 55
+      Align = alClient
+      TabOrder = 0
+      ExplicitLeft = -12
+      ExplicitTop = 25
+    end
+  end
   object tmrHorario: TTimer
     Enabled = False
     OnTimer = tmrHorarioTimer
-    Left = 504
-    Top = 112
+    Left = 488
+    Top = 96
   end
 end

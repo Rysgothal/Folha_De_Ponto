@@ -3,7 +3,7 @@ unit PontoSemanal.Helpers.Strings;
 interface
 
 uses
-  System.SysUtils;
+  System.SysUtils, System.Classes;
 
 type
   TPositions = array of Integer;
@@ -21,12 +21,14 @@ type
     class function Completar(const pValor: string; pQuantidade: Integer; pValorAPreencher: Char = ' '): string;
     class function VerificarCampoVazio(const pValor: string): Boolean;
     class function FormatarData(const pValor: string): string;
+    class function IntervaloPorExtenso(const pValor: string): string;
+    class function FormatarHorario(const pValor: string): string;
   end;
 
 implementation
 
 uses
-  System.Math;
+  System.Math, System.StrUtils;
 
 { TStringHelpers }
 
@@ -62,6 +64,12 @@ begin
   InsertChars(Result, [4, 2], '/')
 end;
 
+class function TStringHelpers.FormatarHorario(const pValor: string): string;
+begin
+  Result := DigitarSomenteNumeros(pValor).Substring(0,8);
+  InsertChars(Result, [2], ':')
+end;
+
 class procedure TStringHelpers.InsertChars(var pValor: string; const pPos: TPositions; const pChar: Char);
 begin
   InsertChars(pValor, pPos, [pChar]);
@@ -78,6 +86,32 @@ begin
     vCharsCount := Pred(Length(pChars));
     pChar := pChars[Min(vCharsCount, I)];
     InsertChar(pValor, pPos[i], pChar);
+  end;
+end;
+
+class function TStringHelpers.IntervaloPorExtenso(const pValor: string): string;
+var
+  lHoras, lMinutos: Integer;
+  lIntervalo: TDateTime;
+begin
+  if not TryStrToTime(pValor, lIntervalo) then
+  begin
+    Exit(EmptyStr);
+  end;
+
+  lHoras := SplitString(pValor, ':')[0].ToInteger;
+  lMinutos := SplitString(pValor, ':')[1].ToInteger;
+
+  case lHoras of
+    0: ;
+    1: Result := lHoras.ToString + ' hora' + IfThen(lMinutos.ToString > '0', ' e ');
+    else Result := lHoras.ToString + ' horas' + IfThen(lMinutos.ToString > '0', ' e ');
+  end;
+
+  case lMinutos of
+    0: ;
+    1: Result := Result + lMinutos.ToString + ' minuto';
+    else Result := Result + lMinutos.ToString + ' minutos';
   end;
 end;
 
