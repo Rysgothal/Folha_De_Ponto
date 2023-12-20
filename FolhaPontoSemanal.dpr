@@ -14,7 +14,11 @@ uses
   PontoSemanal.Interfaces.Observer.Observador in 'Interfaces\Observer\PontoSemanal.Interfaces.Observer.Observador.pas',
   PontoSemanal.Interfaces.Observer.Sujeito in 'Interfaces\Observer\PontoSemanal.Interfaces.Observer.Sujeito.pas',
   PontoSemanal.Classes.Base.Horarios in 'Classes\Base\PontoSemanal.Classes.Base.Horarios.pas',
-  PontoSemanal.Helpers.Enumerados in 'Helpers\PontoSemanal.Helpers.Enumerados.pas';
+  PontoSemanal.Helpers.TiposAuxiliares in 'Helpers\PontoSemanal.Helpers.TiposAuxiliares.pas',
+  PontoSemanal.Frames.SaldoHorasDia in 'Frames\PontoSemanal.Frames.SaldoHorasDia.pas' {frmSaldoHorasDia: TFrame},
+  PontoSemanal.Classes.Base.Desempenho in 'Classes\Base\PontoSemanal.Classes.Base.Desempenho.pas',
+  PontoSemanal.Interfaces.Bridge.Converter in 'Interfaces\Bridge\PontoSemanal.Interfaces.Bridge.Converter.pas',
+  PontoSemanal.Classes.Bridge.Converter in 'Classes\Bridge\PontoSemanal.Classes.Bridge.Converter.pas';
 
 {$R *.res}
 

@@ -6,30 +6,27 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,
   Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Mask, Vcl.ExtCtrls,
   PontoSemanal.Interfaces.Observer.Observador,
-  PontoSemanal.Classes.Base.Horarios, PontoSemanal.Helpers.Enumerados,
-  PontoSemanal.Interfaces.Observer.Sujeito;
+  PontoSemanal.Classes.Base.Horarios, PontoSemanal.Helpers.TiposAuxiliares,
+  PontoSemanal.Interfaces.Observer.Sujeito, PontoSemanal.Frames.SaldoHorasDia;
 
 type
   TProcInserirHorario = procedure(const pValor: string) of object;
 
   TfrmHorariosDiaUtil = class(TFrame, ISujeito)
-    lbeEntrada: TLabeledEdit;
-    edtSaldoHora: TEdit;
-    lblDesempenho: TLabel;
-    edtTotalHora: TEdit;
-    lblTotalHora: TLabel;
-    lbeSaidaAlmoco: TLabeledEdit;
-    lbeRetornoAlmoco: TLabeledEdit;
-    lbeSaidaFinal: TLabeledEdit;
     bvlDivisorTotalHoras: TBevel;
-    procedure lbeEntradaChange(Sender: TObject);
-    procedure lbeSaidaAlmocoChange(Sender: TObject);
-    procedure lbeSaidaFinalChange(Sender: TObject);
-    procedure lbeRetornoAlmocoChange(Sender: TObject);
-    procedure lbeEntradaExit(Sender: TObject);
-    procedure lbeRetornoAlmocoExit(Sender: TObject);
-    procedure lbeSaidaAlmocoExit(Sender: TObject);
-    procedure lbeSaidaFinalExit(Sender: TObject);
+    medEntrada: TMaskEdit;
+    medSaidaAlmoco: TMaskEdit;
+    medRetornoAlmoco: TMaskEdit;
+    medSaidaFinal: TMaskEdit;
+    lblSaidaFinal: TLabel;
+    lblRetornoAlmoco: TLabel;
+    lblSaidaAlmoco: TLabel;
+    lblEntrada: TLabel;
+    frmSaldoHorasDia: TfrmSaldoHorasDia;
+    procedure medEntradaExit(Sender: TObject);
+    procedure medRetornoAlmocoExit(Sender: TObject);
+    procedure medSaidaAlmocoExit(Sender: TObject);
+    procedure medSaidaFinalExit(Sender: TObject);
   private
     { Private declarations }
     procedure TratarExcecoes(pE: Exception);
@@ -37,7 +34,6 @@ type
     function RetornarDiaSemana: THorariosDia;
     procedure Notificar;
   public
-    FTag: TDiaSemana;
     { Public declarations }
   end;
 
@@ -48,64 +44,56 @@ uses
 
 {$R *.dfm}
 
-procedure TfrmHorariosDiaUtil.lbeEntradaChange(Sender: TObject);
-begin
-  lbeEntrada.FormatarHorario(lbeEntrada);
-end;
-
-procedure TfrmHorariosDiaUtil.lbeEntradaExit(Sender: TObject);
+procedure TfrmHorariosDiaUtil.medEntradaExit(Sender: TObject);
 var
   lDiaSemana: THorariosDia;
 begin
-  lbeEntrada.Completar(lbeEntrada, 5, '0');
+  medEntrada.Completar(medEntrada, 5, '0');
   lDiaSemana := RetornarDiaSemana;
-  SairCampo(lDiaSemana.InserirEntrada, lDiaSemana, lbeEntrada);
+  SairCampo(lDiaSemana.InserirEntrada, lDiaSemana, medEntrada);
 end;
 
-procedure TfrmHorariosDiaUtil.lbeRetornoAlmocoChange(Sender: TObject);
-begin
-  lbeRetornoAlmoco.FormatarHorario(lbeRetornoAlmoco);
-end;
-
-procedure TfrmHorariosDiaUtil.lbeRetornoAlmocoExit(Sender: TObject);
+procedure TfrmHorariosDiaUtil.medRetornoAlmocoExit(Sender: TObject);
 var
   lDiaSemana: THorariosDia;
 begin
   lDiaSemana := RetornarDiaSemana;
-  SairCampo(lDiaSemana.InserirRetornoAlmoco, lDiaSemana, lbeRetornoAlmoco);
+  SairCampo(lDiaSemana.InserirRetornoAlmoco, lDiaSemana, medRetornoAlmoco);
 end;
 
-procedure TfrmHorariosDiaUtil.lbeSaidaAlmocoChange(Sender: TObject);
-begin
-  lbeSaidaAlmoco.FormatarHorario(lbeSaidaAlmoco);
-end;
-
-procedure TfrmHorariosDiaUtil.lbeSaidaAlmocoExit(Sender: TObject);
+procedure TfrmHorariosDiaUtil.medSaidaAlmocoExit(Sender: TObject);
 var
   lDiaSemana: THorariosDia;
 begin
   lDiaSemana := RetornarDiaSemana;
-  SairCampo(lDiaSemana.InserirSaidaAlmoco, lDiaSemana, lbeSaidaAlmoco);
+  SairCampo(lDiaSemana.InserirSaidaAlmoco, lDiaSemana, medSaidaAlmoco);
 end;
 
-procedure TfrmHorariosDiaUtil.lbeSaidaFinalChange(Sender: TObject);
-begin
-  lbeSaidaFinal.FormatarHorario(lbeSaidaFinal);
-end;
-
-procedure TfrmHorariosDiaUtil.lbeSaidaFinalExit(Sender: TObject);
+procedure TfrmHorariosDiaUtil.medSaidaFinalExit(Sender: TObject);
 var
   lDiaSemana: THorariosDia;
 begin
   lDiaSemana := RetornarDiaSemana;
-  SairCampo(lDiaSemana.InserirSaidaFinal, lDiaSemana, lbeSaidaFinal);
+  SairCampo(lDiaSemana.InserirSaidaFinal, lDiaSemana, medSaidaFinal);
 end;
 
 procedure TfrmHorariosDiaUtil.Notificar;
 var
-  lDiaSemana: THorariosDia;
+  lPontoSemanal: TFolhaPontoSemanalSingleton;
+  lDia: THorariosDia;
 begin
+  lPontoSemanal := TFolhaPontoSemanalSingleton.ObterInstancia;
+  lDia := RetornarDiaSemana;
 
+  for var lObservador in lPontoSemanal.Observers do
+  begin
+    if (TDiaSemana(Self.Tag) <> lDia.Tag) or (Self.Tag <> 0) then
+    begin
+      Continue;
+    end;
+
+    lObservador.Atualizar;
+  end;
 end;
 
 function TfrmHorariosDiaUtil.RetornarDiaSemana: THorariosDia;
@@ -114,7 +102,7 @@ var
 begin
   lPontoSemanal := TFolhaPontoSemanalSingleton.ObterInstancia;
 
-  case Self.FTag of
+  case TDiaSemana(Self.Tag) of
     dsSegunda: Result := lPontoSemanal.Segunda;
     dsTerca: Result := lPontoSemanal.Terca;
     dsQuarta: Result := lPontoSemanal.Quarta;
@@ -125,9 +113,16 @@ begin
 end;
 
 procedure TfrmHorariosDiaUtil.SairCampo(pProcedure: TProcInserirHorario; pDiaSemana: THorariosDia; pEdit: TCustomEdit);
+var
+  lPontoSemanal: TFolhaPontoSemanalSingleton;
 begin
+  lPontoSemanal := TFolhaPontoSemanalSingleton.ObterInstancia;
+
   try
     pProcedure(pEdit.Text);
+    pDiaSemana.CalcularHorasTrabalhadas;
+    lPontoSemanal.CalcularDesempenho;
+    Notificar;
   except
     on E: Exception do
     begin

@@ -3,7 +3,10 @@ unit PontoSemanal.Classes.Singleton.Principal;
 interface
 
 uses
-  PontoSemanal.Classes.Base.Horarios, PontoSemanal.Helpers.Enumerados;
+  PontoSemanal.Classes.Base.Horarios, PontoSemanal.Helpers.TiposAuxiliares,
+  System.Generics.Collections, PontoSemanal.Interfaces.Observer.Observador,
+  PontoSemanal.Classes.Base.Desempenho,
+  PontoSemanal.Interfaces.Bridge.Converter;
 
 type
   TFolhaPontoSemanalSingleton = class
@@ -14,18 +17,22 @@ type
     FTempoAdmissao: string;
     FJornadaSemanal: string;
     FIntervaloAlmoco: string;
+    FDesempenho: TDesempenho;
     FSegunda: THorariosDia;
     FTerca: THorariosDia;
     FQuarta: THorariosDia;
     FQuinta: THorariosDia;
     FSexta: THorariosDia;
     FSabado: THorariosDia;
+    FObservers: TList<IObservador>;
+    FConverterHora: IConverter;
     constructor Create;
     procedure SetID(const pValor: string);
     procedure SetDataAdmissao(const pValor: string);
     procedure CalcularTempoAdmissao;
     procedure SetJornadaSemanal(const pValor: string);
     procedure SetIntervaloAlmoco(const pValor: string);
+    procedure DistribuirHorarios(pValor: Integer);
   public
     class function ObterInstancia: TFolhaPontoSemanalSingleton;
     property ID: string read FID write SetID;
@@ -34,12 +41,17 @@ type
     property TempoAdmissao: string read FTempoAdmissao;
     property JornadaSemanal: string read FJornadaSemanal write SetJornadaSemanal;
     property IntervaloAlmoco: string read FIntervaloAlmoco write SetIntervaloAlmoco;
+    property Desempenho: TDesempenho read FDesempenho write FDesempenho;
     property Segunda: THorariosDia read FSegunda write FSegunda;
     property Terca: THorariosDia read FTerca write FTerca;
     property Quarta: THorariosDia read FQuarta write FQuarta;
     property Quinta: THorariosDia read FQuinta write FQuinta;
     property Sexta: THorariosDia read FSexta write FSexta;
     property Sabado: THorariosDia read FSabado write FSabado;
+    property Observers: TList<IObservador> read FObservers; // write FObservers;
+    property ConverterHora: IConverter read FConverterHora write FConverterHora;
+    procedure AdicionarObservador(pObservador: IObservador);
+    procedure CalcularDesempenho;
   end;
 
 var
@@ -49,7 +61,7 @@ implementation
 
 uses
   System.SysUtils, PontoSemanal.Helpers.Strings, System.DateUtils,
-  PontoSemanal.Helpers.Exceptions;
+  PontoSemanal.Helpers.Exceptions, PontoSemanal.Classes.Bridge.Converter;
 
 { TFolhaPontoSemanalSingleton }
 
@@ -59,6 +71,7 @@ begin
   FNome := EmptyStr;
   FDataAdmissao := EmptyStr;
   FTempoAdmissao := '-> anos; meses; semanas; dias;';
+  FDesempenho := TDesempenho.Create;
 
   FSegunda := THorariosDia.Create(dsSegunda);
   FTerca := THorariosDia.Create(dsTerca);
@@ -66,14 +79,33 @@ begin
   FQuinta := THorariosDia.Create(dsQuinta);
   FSexta := THorariosDia.Create(dsSexta);
   FSabado := THorariosDia.Create(dsSabado);
+
+  FObservers := TList<IObservador>.Create;
+  FConverterHora := TConverter.Create;
 end;
 
 class function TFolhaPontoSemanalSingleton.ObterInstancia: TFolhaPontoSemanalSingleton;
 begin
-  case Assigned(FFolhaPontoSemanal) of
-    True: Result := FFolhaPontoSemanal;
-    else  Result := TFolhaPontoSemanalSingleton.Create;
+  if not Assigned(FFolhaPontoSemanal) then
+  begin
+    FFolhaPontoSemanal := TFolhaPontoSemanalSingleton.Create;
   end;
+
+  Result := FFolhaPontoSemanal;
+end;
+
+procedure TFolhaPontoSemanalSingleton.DistribuirHorarios(pValor: Integer);
+var
+  lJornadaDiaria: Integer;
+begin
+  lJornadaDiaria := pValor div 5;
+
+  Segunda.Jornada := lJornadaDiaria;
+  Terca.Jornada := lJornadaDiaria;
+  Quarta.Jornada := lJornadaDiaria;
+  Quinta.Jornada := lJornadaDiaria;
+  Sexta.Jornada := lJornadaDiaria;
+  Sabado.Jornada := pValor mod 5;
 end;
 
 procedure TFolhaPontoSemanalSingleton.SetDataAdmissao(const pValor: string);
@@ -161,6 +193,50 @@ begin
   end;
 
   FJornadaSemanal := pValor;
+  DistribuirHorarios(lValor);
+end;
+
+procedure TFolhaPontoSemanalSingleton.AdicionarObservador(pObservador: IObservador);
+begin
+  FObservers.Add(pObservador);
+end;
+
+procedure TFolhaPontoSemanalSingleton.CalcularDesempenho;
+var
+  lSegunda, lTerca, lQuarta, lQuinta, lSexta, lSabado, lTotalMinutos, lTotalHoras: Integer;
+  lSaldoHoras: THorarioSeparado;
+  lTotalTrabalhadas, lTotalSaldoHoras: string;
+begin
+  lSegunda := ConverterHora.ParaMinutos(Segunda.Desempenho.TotalTrabalhado);
+  lTerca := ConverterHora.ParaMinutos(Terca.Desempenho.TotalTrabalhado);
+  lQuarta := ConverterHora.ParaMinutos(Quarta.Desempenho.TotalTrabalhado);
+  lQuinta := ConverterHora.ParaMinutos(Quinta.Desempenho.TotalTrabalhado);
+  lSexta := ConverterHora.ParaMinutos(Sexta.Desempenho.TotalTrabalhado);
+  lSabado := ConverterHora.ParaMinutos(Sabado.Desempenho.TotalTrabalhado);
+
+  lTotalMinutos := lSegunda + lTerca + lQuarta + lQuinta + lSexta + lSabado;
+  lTotalHoras := lTotalMinutos div 60;
+
+  lSaldoHoras.Minutos := Abs(FJornadaSemanal.ToInteger * 60 - lTotalMinutos) mod 60;
+
+  lTotalMinutos := lTotalMinutos mod 60;
+  lSaldoHoras.Horas := Abs(JornadaSemanal.ToInteger - lTotalHoras);
+
+  if (lTotalHoras < JornadaSemanal.ToInteger) and (lSaldoHoras.Minutos <> 0) then
+  begin
+    lSaldoHoras.Horas := Abs(Pred(lSaldoHoras.Horas));
+  end else
+  if lTotalHoras >= JornadaSemanal.ToInteger then
+  begin
+    lSaldoHoras.Minutos := lTotalMinutos;
+  end;
+
+  lTotalTrabalhadas := lTotalHoras.ToString.PadLeft(2, '0') + ':' + lTotalMinutos.ToString.PadLeft(2, '0');
+  lTotalSaldoHoras := IntToStr(lSaldoHoras.Horas).PadLeft(2, '0') + ':' + lSaldoHoras.Minutos.ToString.PadLeft(2, '0');
+
+  Desempenho.TotalTrabalhado := lTotalTrabalhadas;
+  Desempenho.SaldoHoras := lTotalSaldoHoras;
+  Desempenho.AtualizarCumprimento(JornadaSemanal.ToInteger);
 end;
 
 procedure TFolhaPontoSemanalSingleton.CalcularTempoAdmissao;
@@ -178,8 +254,8 @@ begin
 
   lDataNascimento := StrToDate(DataAdmissao);
 
-  lAnos    := YearsBetween(lDataNascimento, Now);
-  lMeses   := MonthsBetween(IncYear(lDataNascimento, lAnos), Now);
+  lAnos := YearsBetween(lDataNascimento, Now);
+  lMeses := MonthsBetween(IncYear(lDataNascimento, lAnos), Now);
 
   if lMeses = 12 then
   begin
@@ -188,7 +264,7 @@ begin
   end;
 
   lSemanas := WeeksBetween(IncMonth(IncYear(lDataNascimento, lAnos), lMeses), Now);
-  lDias    := DaysBetween(IncWeek(IncMonth(IncYear(lDataNascimento, lAnos), lMeses), lSemanas), Now);
+  lDias := DaysBetween(IncWeek(IncMonth(IncYear(lDataNascimento, lAnos), lMeses), lSemanas), Now);
 
   case lAnos of
     0: ;

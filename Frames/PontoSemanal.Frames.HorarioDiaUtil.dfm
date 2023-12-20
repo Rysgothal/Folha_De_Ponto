@@ -1,151 +1,123 @@
 object frmHorariosDiaUtil: TfrmHorariosDiaUtil
   Left = 0
   Top = 0
-  Width = 538
-  Height = 48
+  Width = 547
+  Height = 54
   TabOrder = 0
   PixelsPerInch = 96
-  object lblDesempenho: TLabel
-    Left = 498
-    Top = -1
-    Width = 20
-    Height = 22
-    Alignment = taCenter
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -20
-    Font.Name = 'Wingdings'
-    Font.Style = []
-    ParentFont = False
-  end
-  object lblTotalHora: TLabel
-    Left = 390
-    Top = 0
-    Width = 79
-    Height = 15
-    Caption = 'Total de Horas'
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -12
-    Font.Name = 'Segoe UI'
-    Font.Style = [fsBold]
-    ParentFont = False
-  end
   object bvlDivisorTotalHoras: TBevel
-    Left = 372
+    Left = 368
     Top = 0
     Width = 4
     Height = 48
     Shape = bsLeftLine
   end
-  object lbeEntrada: TLabeledEdit
-    Left = 3
+  object lblSaidaFinal: TLabel
+    Left = 286
+    Top = 0
+    Width = 64
+    Height = 15
+    Caption = 'Sa'#237'da - Final'
+  end
+  object lblRetornoAlmoco: TLabel
+    Left = 184
+    Top = 0
+    Width = 85
+    Height = 15
+    Caption = 'Retorno almo'#231'o'
+  end
+  object lblSaidaAlmoco: TLabel
+    Left = 99
+    Top = 0
+    Width = 71
+    Height = 15
+    Caption = 'Sa'#237'da almo'#231'o'
+  end
+  object lblEntrada: TLabel
+    Left = 23
+    Top = 0
+    Width = 40
+    Height = 15
+    Caption = 'Entrada'
+  end
+  object medEntrada: TMaskEdit
+    Left = 7
     Top = 21
-    Width = 81
+    Width = 72
     Height = 23
     Alignment = taCenter
-    EditLabel.Width = 40
-    EditLabel.Height = 15
-    EditLabel.BiDiMode = bdLeftToRight
-    EditLabel.Caption = 'Entrada'
-    EditLabel.ParentBiDiMode = False
+    EditMask = '!99:99;1;_'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -12
+    Font.Name = 'Segoe UI'
+    Font.Style = []
     MaxLength = 5
+    ParentFont = False
     TabOrder = 0
-    Text = ''
-    OnChange = lbeEntradaChange
-    OnExit = lbeEntradaExit
-  end
-  object edtSaldoHora: TEdit
-    Left = 484
-    Top = 21
-    Width = 48
-    Height = 23
-    TabStop = False
-    Alignment = taCenter
-    BevelInner = bvSpace
-    BevelKind = bkSoft
-    Color = clInfoBk
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -12
-    Font.Name = 'Segoe UI'
-    Font.Style = [fsBold]
-    ParentFont = False
-    ReadOnly = True
-    TabOrder = 5
-  end
-  object edtTotalHora: TEdit
-    Left = 385
-    Top = 21
-    Width = 88
-    Height = 23
-    TabStop = False
-    Alignment = taCenter
-    BevelInner = bvSpace
-    BevelKind = bkSoft
-    Color = clInfoBk
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -12
-    Font.Name = 'Segoe UI'
-    Font.Style = [fsBold]
-    ParentFont = False
-    ReadOnly = True
-    TabOrder = 4
     Text = '  :  '
+    OnExit = medEntradaExit
   end
-  object lbeSaidaAlmoco: TLabeledEdit
-    Left = 94
+  object medSaidaAlmoco: TMaskEdit
+    Left = 98
     Top = 21
-    Width = 81
+    Width = 72
     Height = 23
     Alignment = taCenter
-    EditLabel.Width = 73
-    EditLabel.Height = 15
-    EditLabel.BiDiMode = bdLeftToRight
-    EditLabel.Caption = 'Sa'#237'da Almo'#231'o'
-    EditLabel.ParentBiDiMode = False
-    EditLabel.Layout = tlCenter
+    EditMask = '!99:99;1;_'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -12
+    Font.Name = 'Segoe UI'
+    Font.Style = []
     MaxLength = 5
+    ParentFont = False
     TabOrder = 1
-    Text = ''
-    OnChange = lbeSaidaAlmocoChange
-    OnExit = lbeSaidaAlmocoExit
+    Text = '  :  '
+    OnExit = medSaidaAlmocoExit
   end
-  object lbeRetornoAlmoco: TLabeledEdit
-    Left = 186
+  object medRetornoAlmoco: TMaskEdit
+    Left = 190
     Top = 21
-    Width = 81
+    Width = 72
     Height = 23
     Alignment = taCenter
-    EditLabel.Width = 87
-    EditLabel.Height = 15
-    EditLabel.BiDiMode = bdLeftToRight
-    EditLabel.Caption = 'Retorno Almo'#231'o'
-    EditLabel.ParentBiDiMode = False
-    EditLabel.Layout = tlCenter
+    EditMask = '!99:99;1;_'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -12
+    Font.Name = 'Segoe UI'
+    Font.Style = []
     MaxLength = 5
+    ParentFont = False
     TabOrder = 2
-    Text = ''
-    OnChange = lbeRetornoAlmocoChange
-    OnExit = lbeRetornoAlmocoExit
+    Text = '  :  '
+    OnExit = medRetornoAlmocoExit
   end
-  object lbeSaidaFinal: TLabeledEdit
-    Left = 278
+  object medSaidaFinal: TMaskEdit
+    Left = 282
     Top = 21
-    Width = 81
+    Width = 72
     Height = 23
     Alignment = taCenter
-    EditLabel.Width = 64
-    EditLabel.Height = 15
-    EditLabel.BiDiMode = bdLeftToRight
-    EditLabel.Caption = 'Sa'#237'da - Final'
-    EditLabel.ParentBiDiMode = False
-    EditLabel.Layout = tlCenter
+    EditMask = '!99:99;1;_'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -12
+    Font.Name = 'Segoe UI'
+    Font.Style = []
     MaxLength = 5
+    ParentFont = False
     TabOrder = 3
-    Text = ''
-    OnChange = lbeSaidaFinalChange
-    OnExit = lbeSaidaFinalExit
+    Text = '  :  '
+    OnExit = medSaidaFinalExit
+  end
+  inline frmSaldoHorasDia: TfrmSaldoHorasDia
+    Left = 382
+    Top = 0
+    Width = 149
+    Height = 48
+    TabOrder = 4
+    ExplicitLeft = 382
   end
 end
