@@ -47,7 +47,7 @@ uses
 
 procedure TfrmDadosFuncionario.edtAdmissaoChange(Sender: TObject);
 begin
-  edtAdmissao.FormatarData(edtAdmissao);
+  TComponenteHelpers.FormatarData(edtAdmissao);
 end;
 
 procedure TfrmDadosFuncionario.edtAdmissaoExit(Sender: TObject);
@@ -62,7 +62,7 @@ end;
 
 procedure TfrmDadosFuncionario.edtCodigoChange(Sender: TObject);
 begin
-  edtCodigo.DigitarSomenteNumeros(edtCodigo);
+  TComponenteHelpers.DigitarSomenteNumeros(edtCodigo);
 end;
 
 procedure TfrmDadosFuncionario.edtCodigoExit(Sender: TObject);
@@ -76,14 +76,14 @@ end;
 
 procedure TfrmDadosFuncionario.edtIntervaloAlmocoChange(Sender: TObject);
 begin
-  edtIntervaloAlmoco.FormatarHorario(edtIntervaloAlmoco);
+  TComponenteHelpers.FormatarHorario(edtIntervaloAlmoco);
 end;
 
 procedure TfrmDadosFuncionario.edtIntervaloAlmocoExit(Sender: TObject);
 var
   lFolhaPonto: TFolhaPontoSemanalSingleton;
 begin
-  edtIntervaloAlmoco.FormatarIntervalo(edtIntervaloAlmoco);
+  TComponenteHelpers.FormatarIntervalo(edtIntervaloAlmoco);
 
   lFolhaPonto := TFolhaPontoSemanalSingleton.ObterInstancia;
   lFolhaPonto.IntervaloAlmoco := edtIntervaloAlmoco.Text;
@@ -92,7 +92,7 @@ end;
 
 procedure TfrmDadosFuncionario.edtJornadaSemanalChange(Sender: TObject);
 begin
-  edtJornadaSemanal.DigitarSomenteNumeros(edtJornadaSemanal);
+  TComponenteHelpers.DigitarSomenteNumeros(edtJornadaSemanal);
 end;
 
 procedure TfrmDadosFuncionario.edtJornadaSemanalExit(Sender: TObject);
@@ -105,7 +105,7 @@ end;
 
 procedure TfrmDadosFuncionario.edtNomeChange(Sender: TObject);
 begin
-  edtNome.DigitarSomenteLetras(edtNome);
+  TComponenteHelpers.DigitarSomenteLetras(edtNome);
 end;
 
 procedure TfrmDadosFuncionario.edtNomeExit(Sender: TObject);

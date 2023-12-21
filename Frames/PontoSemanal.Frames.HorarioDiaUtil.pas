@@ -7,7 +7,8 @@ uses
   Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Mask, Vcl.ExtCtrls,
   PontoSemanal.Interfaces.Observer.Observador,
   PontoSemanal.Classes.Base.Horarios, PontoSemanal.Helpers.TiposAuxiliares,
-  PontoSemanal.Interfaces.Observer.Sujeito, PontoSemanal.Frames.SaldoHorasDia;
+  PontoSemanal.Interfaces.Observer.Sujeito, PontoSemanal.Frames.SaldoHorasDia, 
+  PontoSemanal.Helpers.Componentes;
 
 type
   TProcInserirHorario = procedure(const pValor: string) of object;
@@ -30,25 +31,33 @@ type
   private
     { Private declarations }
     procedure TratarExcecoes(pE: Exception);
-    procedure SairCampo(pProcedure: TProcInserirHorario; pDiaSemana: THorariosDia; pEdit: TCustomEdit);
+    procedure SairCampo(pProcInserirHorario: TProcInserirHorario; pDiaSemana: THorariosDia; pEdit: TCustomEdit);
     function RetornarDiaSemana: THorariosDia;
     procedure Notificar;
   public
+    procedure AtivarEventosOnExit;
     { Public declarations }
   end;
 
 implementation
 
 uses
-  PontoSemanal.Helpers.Componentes, PontoSemanal.Classes.Singleton.Principal;
+  PontoSemanal.Classes.Singleton.Principal;
 
 {$R *.dfm}
+
+procedure TfrmHorariosDiaUtil.AtivarEventosOnExit;
+begin
+  medEntrada.OnExit(medEntrada);
+  medSaidaAlmoco.OnExit(medSaidaAlmoco);
+  medRetornoAlmoco.OnExit(medRetornoAlmoco);
+  medSaidaFinal.OnExit(medSaidaFinal);
+end;
 
 procedure TfrmHorariosDiaUtil.medEntradaExit(Sender: TObject);
 var
   lDiaSemana: THorariosDia;
 begin
-  medEntrada.Completar(medEntrada, 5, '0');
   lDiaSemana := RetornarDiaSemana;
   SairCampo(lDiaSemana.InserirEntrada, lDiaSemana, medEntrada);
 end;
@@ -80,19 +89,21 @@ end;
 procedure TfrmHorariosDiaUtil.Notificar;
 var
   lPontoSemanal: TFolhaPontoSemanalSingleton;
-  lDia: THorariosDia;
+  lValoresVazios: Boolean;
 begin
   lPontoSemanal := TFolhaPontoSemanalSingleton.ObterInstancia;
-  lDia := RetornarDiaSemana;
-
+  lValoresVazios := TComponenteHelpers.VerificarCampoVazio(
+    [medEntrada, medSaidaAlmoco, medRetornoAlmoco, medSaidaFinal]
+  );
+  
   for var lObservador in lPontoSemanal.Observers do
   begin
-    if (TDiaSemana(Self.Tag) <> lDia.Tag) or (Self.Tag <> 0) then
+    if (lObservador.Key <> TDiaSemana(Self.Tag)) and (lObservador.Key <> dsNenhum) then
     begin
       Continue;
     end;
-
-    lObservador.Atualizar;
+    
+    lObservador.Value.Atualizar(lValoresVazios);
   end;
 end;
 
@@ -112,14 +123,15 @@ begin
   end;
 end;
 
-procedure TfrmHorariosDiaUtil.SairCampo(pProcedure: TProcInserirHorario; pDiaSemana: THorariosDia; pEdit: TCustomEdit);
+procedure TfrmHorariosDiaUtil.SairCampo(pProcInserirHorario: TProcInserirHorario; pDiaSemana: THorariosDia;
+  pEdit: TCustomEdit);
 var
   lPontoSemanal: TFolhaPontoSemanalSingleton;
 begin
   lPontoSemanal := TFolhaPontoSemanalSingleton.ObterInstancia;
 
   try
-    pProcedure(pEdit.Text);
+    pProcInserirHorario(pEdit.Text);
     pDiaSemana.CalcularHorasTrabalhadas;
     lPontoSemanal.CalcularDesempenho;
     Notificar;
@@ -127,6 +139,7 @@ begin
     on E: Exception do
     begin
       TratarExcecoes(E);
+      TComponenteHelpers.Focar(pEdit);
     end;
   end;
 end;

@@ -6,7 +6,8 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,
   Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls,
   PontoSemanal.Interfaces.Observer.Observador,
-  PontoSemanal.Classes.Base.Horarios;
+  PontoSemanal.Classes.Base.Horarios, PontoSemanal.Helpers.TiposAuxiliares,
+  PontoSemanal.Classes.Base.Desempenho;
 
 type
   TfrmSaldoHorasDia = class(TFrame, IObservador)
@@ -20,65 +21,114 @@ type
     procedure ConfigurarSaldoHorasPositivas;
     procedure ConfigurarSaldoHorasNeutra;
     procedure ConfigurarSaldoHorasNegativa;
+    procedure ConfigurarComponentes(pCor: TColor; pLetraDesempenho, pLetraRosto: Char);
+    procedure ConfigurarSaldoDeHoras(lDesempenho: TDesempenho);
   public
     { Public declarations }
-    procedure Atualizar;
+    procedure Atualizar(const pValoresVazios: Boolean);
+    procedure Limpar;
   end;
 
 implementation
 
 uses
-  PontoSemanal.Classes.Singleton.Principal,
-  PontoSemanal.Helpers.TiposAuxiliares, PontoSemanal.Classes.Base.Desempenho;
+  PontoSemanal.Classes.Singleton.Principal;
 
 {$R *.dfm}
 
 { TfrmSaldoHorasDia }
 
-procedure TfrmSaldoHorasDia.Atualizar;
+procedure TfrmSaldoHorasDia.Atualizar(const pValoresVazios: Boolean);
 var
   lDesempenho: TDesempenho;
   lPontoSemanal: TFolhaPontoSemanalSingleton;
 begin
-  lPontoSemanal := TFolhaPontoSemanalSingleton.ObterInstancia;
+//  lPontoSemanal := TFolhaPontoSemanalSingleton.ObterInstancia;
+//
+//  if TDiaSemana(Self.Tag) = dsNenhum then // Da Semana
+//  begin
+//    lDesempenho := lPontoSemanal.Desempenho;
+//
+//    if (lDesempenho.TotalTrabalhado = '00:00') and (lDesempenho.SaldoHoras = '00:00') then
+//    begin
+//      Limpar;
+//      Exit;
+//    end;
+//  end else
+//  if pValoresVazios then
+//  begin
+//    Limpar;
+//    Exit;
+//  end;
 
-  case TDiaSemana(Self.Tag) = dsNenhum of
-    True: lDesempenho := lPontoSemanal.Desempenho;
-    else lDesempenho := RetornarDiaSemana.Desempenho;
-  end;
 
+
+//  if pValoresVazios and (TDiaSemana(Self.Tag) <> dsNenhum) then
+//  begin
+//    Limpar;
+//    Exit;
+//  end;
+//
+//
+//  if TDiaSemana(Self.Tag) = dsNenhum then
+//  begin
+//
+//
+//  end;
+
+  lDesempenho := RetornarDiaSemana.Desempenho;
   edtTotalHora.Text := lDesempenho.TotalTrabalhado;
   edtSaldoHora.Text := lDesempenho.SaldoHoras;
 
-  case lDesempenho.CumprimentoHorario of
-    chAcima: ConfigurarSaldoHorasPositivas;
-    chRegular: ConfigurarSaldoHorasNeutra;
-    chAbaixo: ConfigurarSaldoHorasNegativa;
-  end;
+  ConfigurarSaldoDeHoras(lDesempenho);
 end;
 
 procedure TfrmSaldoHorasDia.ConfigurarSaldoHorasNegativa;
 begin
-  lblDesempenho.Caption := 'ê';
-  lblDesempenho.Font.Color := $303497;
-  edtSaldoHora.Font.Color := $303497;
-  edtTotalHora.Font.Color := $303497;
+  ConfigurarComponentes($303497, 'ê','L');
 end;
 
 procedure TfrmSaldoHorasDia.ConfigurarSaldoHorasNeutra;
 begin
-  lblDesempenho.Caption := 'ü';
-  lblDesempenho.Font.Color := clGreen;
-  edtSaldoHora.Font.Color := clGreen;
-  edtTotalHora.Font.Color := clGreen;
+  ConfigurarComponentes(clGreen, 'ü','K');
 end;
 
 procedure TfrmSaldoHorasDia.ConfigurarSaldoHorasPositivas;
 begin
-  lblDesempenho.Caption := 'é';
-  lblDesempenho.Font.Color := $ff0000;
-  edtSaldoHora.Font.Color := $ff0000;
-  edtTotalHora.Font.Color := $ff0000;
+  ConfigurarComponentes($ff0000, 'é','J');
+end;
+
+procedure TfrmSaldoHorasDia.Limpar;
+begin
+  ConfigurarComponentes(clWindowText, #0, ':');
+  edtTotalHora.Text := ':';
+  edtSaldoHora.Clear;
+end;
+
+procedure TfrmSaldoHorasDia.ConfigurarSaldoDeHoras(lDesempenho: TDesempenho);
+begin
+  case lDesempenho.CumprimentoHorario of
+    chAcima:
+      ConfigurarSaldoHorasPositivas;
+    chRegular:
+      ConfigurarSaldoHorasNeutra;
+    chAbaixo:
+      ConfigurarSaldoHorasNegativa;
+  end;
+end;
+
+procedure TfrmSaldoHorasDia.ConfigurarComponentes(pCor: TColor; pLetraDesempenho: Char; pLetraRosto: Char);
+begin
+  lblDesempenho.Caption := pLetraDesempenho;
+  lblDesempenho.Font.Color := pCor;
+  edtSaldoHora.Font.Color := pCor;
+  edtTotalHora.Font.Color := pCor;
+
+  if lblTotalHora.Font.Name = 'Wingdings' then
+  begin
+    lblTotalHora.Caption := pLetraRosto;
+    lblTotalHora.Font.Color := pCor;
+  end;
 end;
 
 function TfrmSaldoHorasDia.RetornarDiaSemana: THorariosDia;

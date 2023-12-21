@@ -4,7 +4,7 @@ interface
 
 type
   IConverter = interface
-    function ParaMinutos(const pHorario: string): Integer;
+    function ParaMinutos(pHorario: string): Integer;
   end;
 
 implementation

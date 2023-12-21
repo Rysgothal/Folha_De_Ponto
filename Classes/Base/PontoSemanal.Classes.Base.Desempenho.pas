@@ -42,15 +42,6 @@ begin
   begin
     FCumprimentoHorario := chAbaixo;
   end;
-
-//  if (lHorario.Horas > pJornadaDiaria) or ((lHorario.Horas = pJornadaDiaria) and (lHorario.Minutos > 0)) then
-//  begin
-//    FCumprimentoHorario := chAcima;
-//  end else
-//  if lHorario.Horas < pJornadaDiaria then
-//  begin
-//    FCumprimentoHorario := chAbaixo;
-//  end;
 end;
 
 end.

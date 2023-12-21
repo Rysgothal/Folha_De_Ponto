@@ -4,7 +4,7 @@ interface
 
 type
   IObservador = interface
-    procedure Atualizar;
+    procedure Atualizar(const pValoresVazios: Boolean);
   end;
 
 implementation

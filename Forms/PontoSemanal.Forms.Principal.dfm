@@ -4,7 +4,7 @@ object frmPrincipal: TfrmPrincipal
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = 'Registro de Ponto Semanal'
-  ClientHeight = 496
+  ClientHeight = 699
   ClientWidth = 1262
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -41,11 +41,14 @@ object frmPrincipal: TfrmPrincipal
       ExplicitTop = 17
       ExplicitWidth = 541
       ExplicitHeight = 126
+      inherited edtJornadaSemanal: TEdit
+        OnExit = frmDadosFuncionarioedtJornadaSemanalExit
+      end
     end
   end
   object sttsbarSistemaInfo: TStatusBar
     Left = 0
-    Top = 477
+    Top = 680
     Width = 1262
     Height = 19
     Font.Charset = DEFAULT_CHARSET
@@ -56,7 +59,7 @@ object frmPrincipal: TfrmPrincipal
     Panels = <
       item
         Text = 'Data do Sistema: 00/00/0000'
-        Width = 900
+        Width = 1150
       end
       item
         Alignment = taCenter
@@ -66,11 +69,11 @@ object frmPrincipal: TfrmPrincipal
         Width = 50
       end>
     UseSystemFont = False
-    ExplicitWidth = 1017
+    ExplicitTop = 477
   end
   object gbxSeg: TGroupBox
     Left = 8
-    Top = 159
+    Top = 160
     Width = 545
     Height = 74
     Caption = 'Segunda-Feira'
@@ -127,7 +130,8 @@ object frmPrincipal: TfrmPrincipal
       Height = 71
       Align = alClient
       TabOrder = 0
-      ExplicitTop = 16
+      ExplicitLeft = 2
+      ExplicitTop = 17
       ExplicitWidth = 350
       ExplicitHeight = 71
       inherited lblDesempenho: TLabel
@@ -172,10 +176,171 @@ object frmPrincipal: TfrmPrincipal
       end
     end
   end
+  object gbxTer: TGroupBox
+    Left = 8
+    Top = 241
+    Width = 545
+    Height = 80
+    Caption = 'Ter'#231'a-Feira'
+    DefaultHeaderFont = False
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -12
+    Font.Name = 'Segoe UI'
+    Font.Style = []
+    HeaderFont.Charset = DEFAULT_CHARSET
+    HeaderFont.Color = clWindowText
+    HeaderFont.Height = -12
+    HeaderFont.Name = 'Segoe UI'
+    HeaderFont.Style = [fsBold]
+    ParentFont = False
+    TabOrder = 4
+    inline frmTerca: TfrmHorariosDiaUtil
+      Left = 2
+      Top = 17
+      Width = 541
+      Height = 61
+      Align = alClient
+      TabOrder = 0
+      ExplicitLeft = -2
+      ExplicitTop = 26
+    end
+  end
+  object gbxQua: TGroupBox
+    Left = 8
+    Top = 328
+    Width = 545
+    Height = 80
+    Caption = 'Quarta-Feira'
+    DefaultHeaderFont = False
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -12
+    Font.Name = 'Segoe UI'
+    Font.Style = []
+    HeaderFont.Charset = DEFAULT_CHARSET
+    HeaderFont.Color = clWindowText
+    HeaderFont.Height = -12
+    HeaderFont.Name = 'Segoe UI'
+    HeaderFont.Style = [fsBold]
+    ParentFont = False
+    TabOrder = 5
+    inline frmQuarta: TfrmHorariosDiaUtil
+      Left = 2
+      Top = 17
+      Width = 541
+      Height = 61
+      Align = alClient
+      TabOrder = 0
+      ExplicitLeft = -2
+      ExplicitTop = 24
+    end
+  end
+  object gbxQui: TGroupBox
+    Left = 8
+    Top = 415
+    Width = 545
+    Height = 80
+    Caption = 'Quinta-Feira'
+    DefaultHeaderFont = False
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -12
+    Font.Name = 'Segoe UI'
+    Font.Style = []
+    HeaderFont.Charset = DEFAULT_CHARSET
+    HeaderFont.Color = clWindowText
+    HeaderFont.Height = -12
+    HeaderFont.Name = 'Segoe UI'
+    HeaderFont.Style = [fsBold]
+    ParentFont = False
+    TabOrder = 6
+    inline frmQuinta: TfrmHorariosDiaUtil
+      Left = 2
+      Top = 17
+      Width = 541
+      Height = 61
+      Align = alClient
+      TabOrder = 0
+      ExplicitLeft = -2
+    end
+  end
+  object gbxSex: TGroupBox
+    Left = 8
+    Top = 502
+    Width = 545
+    Height = 80
+    Caption = 'Sexta-Feira'
+    DefaultHeaderFont = False
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -12
+    Font.Name = 'Segoe UI'
+    Font.Style = []
+    HeaderFont.Charset = DEFAULT_CHARSET
+    HeaderFont.Color = clWindowText
+    HeaderFont.Height = -12
+    HeaderFont.Name = 'Segoe UI'
+    HeaderFont.Style = [fsBold]
+    ParentFont = False
+    TabOrder = 7
+    inline frmSexta: TfrmHorariosDiaUtil
+      Left = 2
+      Top = 17
+      Width = 541
+      Height = 61
+      Align = alClient
+      TabOrder = 0
+      ExplicitLeft = -2
+      ExplicitTop = 26
+    end
+  end
+  object gbxSab: TGroupBox
+    Left = 8
+    Top = 589
+    Width = 545
+    Height = 80
+    Caption = 'S'#225'bado'
+    DefaultHeaderFont = False
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -12
+    Font.Name = 'Segoe UI'
+    Font.Style = []
+    HeaderFont.Charset = DEFAULT_CHARSET
+    HeaderFont.Color = clWindowText
+    HeaderFont.Height = -12
+    HeaderFont.Name = 'Segoe UI'
+    HeaderFont.Style = [fsBold]
+    ParentFont = False
+    TabOrder = 8
+    inline frmSabado: TfrmHorariosDiaUtil
+      Left = 2
+      Top = 17
+      Width = 541
+      Height = 61
+      Align = alClient
+      TabOrder = 0
+      ExplicitLeft = -2
+      ExplicitTop = 26
+      inherited lblRetornoAlmoco: TLabel
+        Enabled = False
+      end
+      inherited lblSaidaAlmoco: TLabel
+        Enabled = False
+      end
+      inherited medSaidaAlmoco: TMaskEdit
+        Enabled = False
+      end
+      inherited medRetornoAlmoco: TMaskEdit
+        Enabled = False
+      end
+    end
+  end
   object tmrHorario: TTimer
     Enabled = False
     OnTimer = tmrHorarioTimer
-    Left = 488
+    Left = 496
     Top = 96
   end
 end

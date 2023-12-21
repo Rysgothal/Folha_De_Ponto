@@ -94,9 +94,11 @@ var
   lHoras, lMinutos: Integer;
   lIntervalo: TDateTime;
 begin
+  Result := '"x" horas e "y" minutos';
+
   if not TryStrToTime(pValor, lIntervalo) then
   begin
-    Exit(EmptyStr);
+    Exit;
   end;
 
   lHoras := SplitString(pValor, ':')[0].ToInteger;
@@ -124,8 +126,12 @@ begin
 end;
 
 class function TStringHelpers.VerificarCampoVazio(const pValor: string): Boolean;
+var
+  lValor: string;
 begin
-  Result := pValor.Trim = EmptyStr;
+  lValor := StringReplace(pValor.Trim, '_', EmptyStr, [rfReplaceAll]);
+  lValor := StringReplace(lValor.Trim, ':', EmptyStr, [rfReplaceAll]);
+  Result := lValor.Trim = EmptyStr;
 end;
 
 end.

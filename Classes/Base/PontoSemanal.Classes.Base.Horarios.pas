@@ -55,33 +55,27 @@ uses
 procedure THorariosDia.CalcularHorasTrabalhadas;
 var
   lHorasTrabalhadas, lSaldoHoras: TTime;
-  lVerificarPeriodoDaManha, lVerificarPeriodoTarde, lVerificarPeriodoIntegral: Boolean;
+  lVerificarPeriodoManha, lVerificarPeriodoTarde, lEntrouSaiu: Boolean;
 begin
   lHorasTrabalhadas := 0;
 
-  lVerificarPeriodoDaManha := (FEntrada <> EmptyStr) and (FSaidaAlmoco <> EmptyStr) and (FSaidaAlmoco <> '00:00');
-  lVerificarPeriodoTarde := (FRetornoAlmoco <> EmptyStr) and (FRetornoAlmoco <> '00:00') and (FSaidaFinal <> EmptyStr);
-  lVerificarPeriodoIntegral := lVerificarPeriodoDaManha and lVerificarPeriodoTarde;
+  lVerificarPeriodoManha := (Entrada <> EmptyStr) and (SaidaAlmoco <> EmptyStr) and (SaidaAlmoco <> '00:00');
+  lVerificarPeriodoTarde := (RetornoAlmoco <> EmptyStr) and (RetornoAlmoco <> '00:00') and (FSaidaFinal <> EmptyStr);
+  lEntrouSaiu := (FEntrada <> EmptyStr) and (FSaidaFinal <> EmptyStr);
 
-  if lVerificarPeriodoDaManha then
+  if lVerificarPeriodoManha then
   begin
-    lHorasTrabalhadas := StrToTime(FSaidaAlmoco) - StrToTime(FEntrada);
+    lHorasTrabalhadas := StrToTime(SaidaAlmoco) - StrToTime(Entrada);
   end;
 
   if lVerificarPeriodoTarde then
   begin
-    lHorasTrabalhadas := lHorasTrabalhadas + StrToTime(FRetornoAlmoco) - StrToTime(FSaidaFinal);
+    lHorasTrabalhadas := lHorasTrabalhadas + (StrToTime(RetornoAlmoco) - StrToTime(SaidaFinal));
   end;
 
-  if (FEntrada <> EmptyStr) and (FSaidaFinal <> EmptyStr) and (lHorasTrabalhadas = 0) then
+  if lEntrouSaiu and (lHorasTrabalhadas = 0) then
   begin
     lHorasTrabalhadas :=  StrToTime(FSaidaFinal) - StrToTime(FEntrada);
-  end;
-
-  if lVerificarPeriodoIntegral then
-  begin
-    lHorasTrabalhadas := StrToTime(FSaidaAlmoco) - StrToTime(FEntrada) + StrToTime(FSaidaFinal) -
-      StrToTime(FRetornoAlmoco);
   end;
 
   if (FEntrada = EmptyStr) and (FSaidaFinal = EmptyStr) then
@@ -94,6 +88,42 @@ begin
   Desempenho.TotalTrabalhado := FormatDateTime('hh:mm', lHorasTrabalhadas);
   Desempenho.SaldoHoras := FormatDateTime('hh:mm', lSaldoHoras);
   FDesempenho.AtualizarCumprimento(Jornada);
+
+//  lVerificarPeriodoManha := (FEntrada <> EmptyStr) and (FSaidaAlmoco <> EmptyStr) and (FSaidaAlmoco <> '00:00');
+//  lVerificarPeriodoTarde := (FRetornoAlmoco <> EmptyStr) and (FRetornoAlmoco <> '00:00') and (FSaidaFinal <> EmptyStr);
+//  lVerificarPeriodoIntegral := lVerificarPeriodoManha and lVerificarPeriodoTarde;
+//
+//  if lVerificarPeriodoManha then
+//  begin
+//    lHorasTrabalhadas := StrToTime(FSaidaAlmoco) - StrToTime(FEntrada);
+//  end;
+//
+//  if lVerificarPeriodoTarde then
+//  begin
+//    lHorasTrabalhadas := lHorasTrabalhadas + StrToTime(FRetornoAlmoco) - StrToTime(FSaidaFinal);
+//  end;
+//
+//  if (FEntrada <> EmptyStr) and (FSaidaFinal <> EmptyStr) and (lHorasTrabalhadas = 0) then
+//  begin
+//    lHorasTrabalhadas :=  StrToTime(FSaidaFinal) - StrToTime(FEntrada);
+//  end;
+//
+//  if lVerificarPeriodoIntegral then
+//  begin
+//    lHorasTrabalhadas := StrToTime(FSaidaAlmoco) - StrToTime(FEntrada) + StrToTime(FSaidaFinal) -
+//      StrToTime(FRetornoAlmoco);
+//  end;
+//
+//  if (FEntrada = EmptyStr) and (FSaidaFinal = EmptyStr) then
+//  begin
+//    lHorasTrabalhadas := 0;
+//  end;
+//
+//  lSaldoHoras := lHorasTrabalhadas - StrToTime(IntToStr(Jornada));
+//
+//  Desempenho.TotalTrabalhado := FormatDateTime('hh:mm', lHorasTrabalhadas);
+//  Desempenho.SaldoHoras := FormatDateTime('hh:mm', lSaldoHoras);
+//  FDesempenho.AtualizarCumprimento(Jornada);
 end;
 
 constructor THorariosDia.Create(pTag: TDiaSemana);
@@ -284,7 +314,7 @@ end;
 
 function THorariosDia.VerificarHorarioVazio(const pValor: string): Boolean;
 begin
-  Result := TStringHelpers.VerificarCampoVazio(pValor) or (pValor = '__:__');
+  Result := TStringHelpers.VerificarCampoVazio(pValor);
 end;
 
 end.

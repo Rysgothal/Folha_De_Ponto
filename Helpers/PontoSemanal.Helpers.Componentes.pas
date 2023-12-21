@@ -3,19 +3,21 @@ unit PontoSemanal.Helpers.Componentes;
 interface
 
 uses
-  Vcl.StdCtrls;
+  Vcl.StdCtrls, Vcl.Controls;
 
 type
-  TComponenteHelpers = class Helper for TCustomEdit
+  TComponenteHelpers = class abstract
   public
     class procedure DigitarSomenteNumeros(const pEdit: TCustomEdit);
     class procedure DigitarSomenteLetras(const pEdit: TCustomEdit);
     class procedure Completar(const pEdit: TCustomEdit; pQuantidade: Integer; pValorAPreencher: Char = ' ');
-    class function VerificarCampoVazio(const pEdit: TCustomEdit): Boolean;
+    class function VerificarCampoVazio(const pEdit: TCustomEdit): Boolean; overload;
+    class function VerificarCampoVazio(const pEdits: TArray<TCustomEdit>): Boolean; overload;
     class procedure FormatarData(const pEdit: TCustomEdit);
     class procedure MoverFinal(const pEdit: TCustomEdit);
     class procedure FormatarIntervalo(const pEdit: TCustomEdit);
     class procedure FormatarHorario(const pEdit: TCustomEdit);
+    class procedure Focar(const pEdit: TWinControl);
   end;
 
 implementation
@@ -40,6 +42,14 @@ begin
   pEdit.Text := TStringHelpers.DigitarSomenteNumeros(pEdit.Text);
 end;
 
+class procedure TComponenteHelpers.Focar(const pEdit: TWinControl);
+begin
+  if pEdit.CanFocus then
+  begin
+    pEdit.SetFocus;
+  end;
+end;
+
 class procedure TComponenteHelpers.FormatarData(const pEdit: TCustomEdit);
 begin
   pEdit.Text := TStringHelpers.FormatarData(pEdit.Text);
@@ -60,12 +70,26 @@ begin
   end;
 
   Completar(pEdit, 4, '0');
-//  pEdit.Text := string(pEdit.Text).PadLeft(4, '0');
 end;
 
 class procedure TComponenteHelpers.MoverFinal(const pEdit: TCustomEdit);
 begin
   pEdit.SelStart := Length(pEdit.Text);
+end;
+
+class function TComponenteHelpers.VerificarCampoVazio(const pEdits: TArray<TCustomEdit>): Boolean;
+begin
+  Result := True;
+
+  for var lComponente in pEdits do
+  begin
+    Result := VerificarCampoVazio(lComponente);
+
+    if not Result then
+    begin
+      Break;
+    end;
+  end;
 end;
 
 class function TComponenteHelpers.VerificarCampoVazio(const pEdit: TCustomEdit): Boolean;

@@ -24,7 +24,7 @@ type
     FQuinta: THorariosDia;
     FSexta: THorariosDia;
     FSabado: THorariosDia;
-    FObservers: TList<IObservador>;
+    FObservers: TDictionary<TDiaSemana, IObservador>;
     FConverterHora: IConverter;
     constructor Create;
     procedure SetID(const pValor: string);
@@ -48,9 +48,9 @@ type
     property Quinta: THorariosDia read FQuinta write FQuinta;
     property Sexta: THorariosDia read FSexta write FSexta;
     property Sabado: THorariosDia read FSabado write FSabado;
-    property Observers: TList<IObservador> read FObservers; // write FObservers;
+    property Observers: TDictionary<TDiaSemana, IObservador> read FObservers; // write FObservers;
     property ConverterHora: IConverter read FConverterHora write FConverterHora;
-    procedure AdicionarObservador(pObservador: IObservador);
+    procedure AdicionarObservador(pDiaSemana: TDiaSemana; pObservador: IObservador);
     procedure CalcularDesempenho;
   end;
 
@@ -70,7 +70,9 @@ begin
   FID := EmptyStr;
   FNome := EmptyStr;
   FDataAdmissao := EmptyStr;
+  FJornadaSemanal := '0';
   FTempoAdmissao := '-> anos; meses; semanas; dias;';
+  FIntervaloAlmoco := EmptyStr;
   FDesempenho := TDesempenho.Create;
 
   FSegunda := THorariosDia.Create(dsSegunda);
@@ -80,7 +82,7 @@ begin
   FSexta := THorariosDia.Create(dsSexta);
   FSabado := THorariosDia.Create(dsSabado);
 
-  FObservers := TList<IObservador>.Create;
+  FObservers := TDictionary<TDiaSemana, IObservador>.Create;
   FConverterHora := TConverter.Create;
 end;
 
@@ -175,7 +177,7 @@ procedure TFolhaPontoSemanalSingleton.SetJornadaSemanal(const pValor: string);
 var
   lValor: Integer;
 begin
-  FJornadaSemanal := EmptyStr;
+  FJornadaSemanal := '0';
 
   if TStringHelpers.VerificarCampoVazio(pValor) then
   begin
@@ -187,7 +189,7 @@ begin
     raise EJornadaSemanalInvalida.Create('A jornada semanal inserida está incorreta, verifique.');
   end;
 
-  if lValor > 44 then //
+  if lValor > 44 then // Fazer Confg
   begin
     raise EJornadaSemanalNaoPermitidaLei.Create('A jornada semanal informada não é aceita pela Lei, verifique...');
   end;
@@ -196,9 +198,9 @@ begin
   DistribuirHorarios(lValor);
 end;
 
-procedure TFolhaPontoSemanalSingleton.AdicionarObservador(pObservador: IObservador);
+procedure TFolhaPontoSemanalSingleton.AdicionarObservador(pDiaSemana: TDiaSemana; pObservador: IObservador);
 begin
-  FObservers.Add(pObservador);
+  FObservers.Add(pDiaSemana, pObservador);
 end;
 
 procedure TFolhaPontoSemanalSingleton.CalcularDesempenho;
