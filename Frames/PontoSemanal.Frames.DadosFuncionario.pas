@@ -35,15 +35,23 @@ type
     { Private declarations }
   public
     { Public declarations }
+    function VerificarTodosValoresPreenchidos: Boolean;
+    function BuscarEditVazio: TCustomEdit;
+    procedure Limpar;
   end;
 
 implementation
 
 uses
   PontoSemanal.Classes.Singleton.Principal, PontoSemanal.Helpers.Componentes,
-  PontoSemanal.Helpers.Strings;
+  PontoSemanal.Helpers.Strings, System.Generics.Collections;
 
 {$R *.dfm}
+
+function TfrmDadosFuncionario.BuscarEditVazio: TCustomEdit;
+begin
+  Result := nil;
+end;
 
 procedure TfrmDadosFuncionario.edtAdmissaoChange(Sender: TObject);
 begin
@@ -114,6 +122,30 @@ var
 begin
   lFolhaPonto := TFolhaPontoSemanalSingleton.ObterInstancia;
   lFolhaPonto.Nome := edtNome.Text;
+end;
+
+procedure TfrmDadosFuncionario.Limpar;
+begin
+  edtIntervaloAlmoco.Clear;
+  edtAdmissao.Clear;
+  edtNome.Clear;
+  edtCodigo.Clear;
+  edtJornadaSemanal.Clear;
+  lblAnosMesesSemanasDias.Caption := '-> anos; meses; semanas; dias.';
+  lblTempoExtenso.Caption := '"x" horas e "y" minutos';
+end;
+
+function TfrmDadosFuncionario.VerificarTodosValoresPreenchidos: Boolean;
+var
+  lEdits: TArray<TCustomEdit>;
+begin
+  lEdits := [edtIntervaloAlmoco, edtAdmissao, edtNome, edtCodigo, edtJornadaSemanal];
+  Result := True;
+
+  if TComponenteHelpers.VerificarEditVazio(lEdits) <> nil then
+  begin
+    Result := False;
+  end;
 end;
 
 end.

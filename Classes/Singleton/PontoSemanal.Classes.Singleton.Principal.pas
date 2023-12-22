@@ -35,6 +35,7 @@ type
     procedure DistribuirHorarios(pValor: Integer);
   public
     class function ObterInstancia: TFolhaPontoSemanalSingleton;
+    destructor Destroy; override;
     property ID: string read FID write SetID;
     property Nome: string read FNome write FNome;
     property DataAdmissao: string read FDataAdmissao write SetDataAdmissao;
@@ -48,10 +49,11 @@ type
     property Quinta: THorariosDia read FQuinta write FQuinta;
     property Sexta: THorariosDia read FSexta write FSexta;
     property Sabado: THorariosDia read FSabado write FSabado;
-    property Observers: TDictionary<TDiaSemana, IObservador> read FObservers; // write FObservers;
+    property Observers: TDictionary<TDiaSemana, IObservador> read FObservers;
     property ConverterHora: IConverter read FConverterHora write FConverterHora;
     procedure AdicionarObservador(pDiaSemana: TDiaSemana; pObservador: IObservador);
     procedure CalcularDesempenho;
+    procedure Limpar;
   end;
 
 var
@@ -96,6 +98,20 @@ begin
   Result := FFolhaPontoSemanal;
 end;
 
+destructor TFolhaPontoSemanalSingleton.Destroy;
+begin
+  FreeAndNil(FSegunda);
+  FreeAndNil(FTerca);
+  FreeAndNil(FQuarta);
+  FreeAndNil(FQuinta);
+  FreeAndNil(FSexta);
+  FreeAndNil(FSabado);
+  FreeAndNil(FDesempenho);
+  FreeAndNil(FObservers);
+
+  inherited;
+end;
+
 procedure TFolhaPontoSemanalSingleton.DistribuirHorarios(pValor: Integer);
 var
   lJornadaDiaria: Integer;
@@ -108,6 +124,26 @@ begin
   Quinta.Jornada := lJornadaDiaria;
   Sexta.Jornada := lJornadaDiaria;
   Sabado.Jornada := pValor mod 5;
+end;
+
+procedure TFolhaPontoSemanalSingleton.Limpar;
+begin
+  FID := EmptyStr;
+  FNome := EmptyStr;
+  FDataAdmissao := EmptyStr;
+  FJornadaSemanal := '0';
+  FTempoAdmissao := '-> anos; meses; semanas; dias;';
+  FIntervaloAlmoco := EmptyStr;
+
+  FDesempenho.Limpar;
+  FSegunda.Limpar;
+  FTerca.Limpar;
+  FQuarta.Limpar;
+  FQuinta.Limpar;
+  FSexta.Limpar;
+  FSabado.Limpar;
+
+  FObservers.Clear;
 end;
 
 procedure TFolhaPontoSemanalSingleton.SetDataAdmissao(const pValor: string);
@@ -147,7 +183,13 @@ var
 begin
   lValor := pValor;
 
-  if TStringHelpers.VerificarCampoVazio(lValor) or (lValor.ToInteger = 0) then
+  if TStringHelpers.VerificarCampoVazio(lValor) then
+  begin
+    FID := EmptyStr;
+    Exit;
+  end;
+
+  if lValor.ToInteger = 0 then
   begin
     lValor := '1';
   end;

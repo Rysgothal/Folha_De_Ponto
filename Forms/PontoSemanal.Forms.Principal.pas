@@ -3,10 +3,11 @@ unit PontoSemanal.Forms.Principal;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.Variants, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ComCtrls, Vcl.ExtCtrls, PontoSemanal.Frames.DadosFuncionario,
-  Vcl.Mask, PontoSemanal.Frames.HorarioDiaUtil, PontoSemanal.Frames.SaldoHorasDia,
-  PontoSemanal.Helpers.TiposAuxiliares, System.Classes;
+  Winapi.Windows, Winapi.Messages, System.Variants, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls,
+  Vcl.ComCtrls, Vcl.ExtCtrls, PontoSemanal.Frames.DadosFuncionario, Vcl.Mask, PontoSemanal.Frames.HorarioDiaUtil,
+  PontoSemanal.Frames.SaldoHorasDia, PontoSemanal.Helpers.TiposAuxiliares, System.Classes, System.ImageList,
+  Vcl.ImgList, PontoSemanal.DataModules.Principal,
+  PontoSemanal.Helpers.Componentes;
 
 type
   TfrmPrincipal = class(TForm)
@@ -14,7 +15,7 @@ type
     sttsbarSistemaInfo: TStatusBar;
     tmrHorario: TTimer;
     gbxSeg: TGroupBox;
-    frmSegunda: TfrmHorariosDiaUtil;
+    frmSegunda: TfrmHorariosDia;
     frmDadosFuncionario: TfrmDadosFuncionario;
     gbxHorasTrabalhadas: TGroupBox;
     frmHorasTrabalhadasSemana: TfrmSaldoHorasDia;
@@ -23,19 +24,29 @@ type
     gbxQui: TGroupBox;
     gbxSex: TGroupBox;
     gbxSab: TGroupBox;
-    frmTerca: TfrmHorariosDiaUtil;
-    frmQuarta: TfrmHorariosDiaUtil;
-    frmQuinta: TfrmHorariosDiaUtil;
-    frmSexta: TfrmHorariosDiaUtil;
-    frmSabado: TfrmHorariosDiaUtil;
+    frmTerca: TfrmHorariosDia;
+    frmQuarta: TfrmHorariosDia;
+    frmQuinta: TfrmHorariosDia;
+    frmSexta: TfrmHorariosDia;
+    frmSabado: TfrmHorariosDia;
+    memHistHorario: TMemo;
+    btnNovoRegistro: TButton;
+    btnCarregarHist: TButton;
+    btnGerSalHist: TButton;
     procedure tmrHorarioTimer(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure frmDadosFuncionarioedtJornadaSemanalExit(Sender: TObject);
+    procedure btnNovoRegistroClick(Sender: TObject);
+    procedure btnGerSalHistClick(Sender: TObject);
   private
     { Private declarations }
     procedure AtualizarHorarioSistema;
     procedure ConfigurarObservadores;
-    procedure AplicarTagFrame(pFrame: TfrmHorariosDiaUtil; pTag: TDiaSemana);
+    procedure AplicarTagFrame(pFrame: TfrmHorariosDia; pTag: TDiaSemana);
+    procedure NovoRegistro;
+    function VerificarTodosCamposVazios: Boolean;
+    procedure LimparFormulario;
+    procedure SalvarHistorico;
   public
     { Public declarations }
   end;
@@ -69,12 +80,40 @@ begin
   frmSabado.AtivarEventosOnExit;
 end;
 
+procedure TfrmPrincipal.LimparFormulario;
+var
+  lPontoSemanal: TFolhaPontoSemanalSingleton;
+begin
+  lPontoSemanal := TFolhaPontoSemanalSingleton.ObterInstancia;
+  lPontoSemanal.Limpar;
+
+  frmDadosFuncionario.Limpar;
+  frmHorasTrabalhadasSemana.Limpar;
+  frmSegunda.Limpar;
+  frmTerca.Limpar;
+  frmQuarta.Limpar;
+  frmQuinta.Limpar;
+  frmSexta.Limpar;
+  frmSabado.Limpar;
+  memHistHorario.Clear;
+end;
+
 procedure TfrmPrincipal.AtualizarHorarioSistema;
 var
   lHorarioAtual: string;
 begin
   lHorarioAtual := FormatDateTime('hh:mm:ss', Now);
   sttsbarSistemaInfo.Panels[1].Text := lHorarioAtual;
+end;
+
+procedure TfrmPrincipal.btnGerSalHistClick(Sender: TObject);
+begin
+  SalvarHistorico;
+end;
+
+procedure TfrmPrincipal.btnNovoRegistroClick(Sender: TObject);
+begin
+  NovoRegistro;
 end;
 
 procedure TfrmPrincipal.ConfigurarObservadores;
@@ -93,7 +132,7 @@ begin
   lPontoSemanal.AdicionarObservador(dsNenhum, frmHorasTrabalhadasSemana);
 end;
 
-procedure TfrmPrincipal.AplicarTagFrame(pFrame: TfrmHorariosDiaUtil; pTag: TDiaSemana);
+procedure TfrmPrincipal.AplicarTagFrame(pFrame: TfrmHorariosDia; pTag: TDiaSemana);
 var
   lPontoSemanal: TFolhaPontoSemanalSingleton;
 begin
@@ -104,9 +143,49 @@ begin
   lPontoSemanal.AdicionarObservador(pTag, pFrame.frmSaldoHorasDia);
 end;
 
+procedure TfrmPrincipal.NovoRegistro;
+begin
+  if not VerificarTodosCamposVazios and (Application.MessageBox('Ainda existem valores anotados na Folha de Ponto, ' +
+    'ao criar um novo registro os dados serão sobrescritos.' + sLineBreak + sLineBreak + '> Deseja realmente ' +
+    'criar um novo registro?', 'ATENÇÃO', MB_YESNO + MB_ICONWARNING) = ID_NO) then
+  begin
+    Exit;
+  end;
+
+  LimparFormulario;
+  TComponenteHelpers.Focar(frmDadosFuncionario.edtCodigo);
+end;
+
+procedure TfrmPrincipal.SalvarHistorico;
+begin
+  if VerificarTodosCamposVazios then
+  
+end;
+
 procedure TfrmPrincipal.tmrHorarioTimer(Sender: TObject);
 begin
   AtualizarHorarioSistema;
+end;
+
+function TfrmPrincipal.VerificarTodosCamposVazios: Boolean;
+begin
+  Result := not frmDadosFuncionario.VerificarTodosValoresPreenchidos;
+
+
+  for var I := 0 to Pred(Self.ComponentCount) do
+  begin
+    if not Result then
+    begin
+      Break;
+    end;
+
+    if not (Self.Components[I] is TfrmHorariosDia) then
+    begin
+      Continue;
+    end;
+
+    Result := not TfrmHorariosDia(Self.Components[I]).VerificarTodosHorariosPreenchidos;
+  end;
 end;
 
 end.

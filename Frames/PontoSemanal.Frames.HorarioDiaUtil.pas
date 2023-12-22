@@ -13,7 +13,7 @@ uses
 type
   TProcInserirHorario = procedure(const pValor: string) of object;
 
-  TfrmHorariosDiaUtil = class(TFrame, ISujeito)
+  TfrmHorariosDia = class(TFrame, ISujeito)
     bvlDivisorTotalHoras: TBevel;
     medEntrada: TMaskEdit;
     medSaidaAlmoco: TMaskEdit;
@@ -36,6 +36,8 @@ type
     procedure Notificar;
   public
     procedure AtivarEventosOnExit;
+    function VerificarTodosHorariosPreenchidos: Boolean;
+    procedure Limpar;
     { Public declarations }
   end;
 
@@ -46,7 +48,7 @@ uses
 
 {$R *.dfm}
 
-procedure TfrmHorariosDiaUtil.AtivarEventosOnExit;
+procedure TfrmHorariosDia.AtivarEventosOnExit;
 begin
   medEntrada.OnExit(medEntrada);
   medSaidaAlmoco.OnExit(medSaidaAlmoco);
@@ -54,7 +56,16 @@ begin
   medSaidaFinal.OnExit(medSaidaFinal);
 end;
 
-procedure TfrmHorariosDiaUtil.medEntradaExit(Sender: TObject);
+procedure TfrmHorariosDia.Limpar;
+begin
+  medEntrada.Clear;
+  medSaidaAlmoco.Clear;
+  medRetornoAlmoco.Clear;
+  medSaidaFinal.Clear;
+  frmSaldoHorasDia.Limpar;
+end;
+
+procedure TfrmHorariosDia.medEntradaExit(Sender: TObject);
 var
   lDiaSemana: THorariosDia;
 begin
@@ -62,7 +73,7 @@ begin
   SairCampo(lDiaSemana.InserirEntrada, lDiaSemana, medEntrada);
 end;
 
-procedure TfrmHorariosDiaUtil.medRetornoAlmocoExit(Sender: TObject);
+procedure TfrmHorariosDia.medRetornoAlmocoExit(Sender: TObject);
 var
   lDiaSemana: THorariosDia;
 begin
@@ -70,7 +81,7 @@ begin
   SairCampo(lDiaSemana.InserirRetornoAlmoco, lDiaSemana, medRetornoAlmoco);
 end;
 
-procedure TfrmHorariosDiaUtil.medSaidaAlmocoExit(Sender: TObject);
+procedure TfrmHorariosDia.medSaidaAlmocoExit(Sender: TObject);
 var
   lDiaSemana: THorariosDia;
 begin
@@ -78,7 +89,7 @@ begin
   SairCampo(lDiaSemana.InserirSaidaAlmoco, lDiaSemana, medSaidaAlmoco);
 end;
 
-procedure TfrmHorariosDiaUtil.medSaidaFinalExit(Sender: TObject);
+procedure TfrmHorariosDia.medSaidaFinalExit(Sender: TObject);
 var
   lDiaSemana: THorariosDia;
 begin
@@ -86,16 +97,16 @@ begin
   SairCampo(lDiaSemana.InserirSaidaFinal, lDiaSemana, medSaidaFinal);
 end;
 
-procedure TfrmHorariosDiaUtil.Notificar;
+procedure TfrmHorariosDia.Notificar;
 var
   lPontoSemanal: TFolhaPontoSemanalSingleton;
   lValoresVazios: Boolean;
+  lEdits: TArray<TCustomEdit>;
 begin
+  lEdits := [medEntrada, medSaidaAlmoco, medRetornoAlmoco, medSaidaFinal];
+  lValoresVazios := TComponenteHelpers.VerificarTodosCamposVazio(lEdits);
+
   lPontoSemanal := TFolhaPontoSemanalSingleton.ObterInstancia;
-  lValoresVazios := TComponenteHelpers.VerificarCampoVazio(
-    [medEntrada, medSaidaAlmoco, medRetornoAlmoco, medSaidaFinal]
-  );
-  
   for var lObservador in lPontoSemanal.Observers do
   begin
     if (lObservador.Key <> TDiaSemana(Self.Tag)) and (lObservador.Key <> dsNenhum) then
@@ -107,7 +118,7 @@ begin
   end;
 end;
 
-function TfrmHorariosDiaUtil.RetornarDiaSemana: THorariosDia;
+function TfrmHorariosDia.RetornarDiaSemana: THorariosDia;
 var
   lPontoSemanal: TFolhaPontoSemanalSingleton;
 begin
@@ -123,7 +134,7 @@ begin
   end;
 end;
 
-procedure TfrmHorariosDiaUtil.SairCampo(pProcInserirHorario: TProcInserirHorario; pDiaSemana: THorariosDia;
+procedure TfrmHorariosDia.SairCampo(pProcInserirHorario: TProcInserirHorario; pDiaSemana: THorariosDia;
   pEdit: TCustomEdit);
 var
   lPontoSemanal: TFolhaPontoSemanalSingleton;
@@ -144,9 +155,22 @@ begin
   end;
 end;
 
-procedure TfrmHorariosDiaUtil.TratarExcecoes(pE: Exception);
+procedure TfrmHorariosDia.TratarExcecoes(pE: Exception);
 begin
   Application.MessageBox(pChar(pE.Message), 'ATENÇÃO', MB_ICONINFORMATION + MB_OK);
+end;
+
+function TfrmHorariosDia.VerificarTodosHorariosPreenchidos: Boolean;
+var
+  lEdits: TArray<TCustomEdit>;
+begin
+  lEdits := [medEntrada, medSaidaAlmoco, medRetornoAlmoco, medSaidaFinal];
+  Result := True;
+
+  if TComponenteHelpers.VerificarEditVazio(lEdits) <> nil then
+  begin
+    Result := False;
+  end;
 end;
 
 end.

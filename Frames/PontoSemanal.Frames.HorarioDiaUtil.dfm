@@ -1,4 +1,4 @@
-object frmHorariosDiaUtil: TfrmHorariosDiaUtil
+object frmHorariosDia: TfrmHorariosDia
   Left = 0
   Top = 0
   Width = 547

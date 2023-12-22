@@ -11,8 +11,9 @@ type
     class procedure DigitarSomenteNumeros(const pEdit: TCustomEdit);
     class procedure DigitarSomenteLetras(const pEdit: TCustomEdit);
     class procedure Completar(const pEdit: TCustomEdit; pQuantidade: Integer; pValorAPreencher: Char = ' ');
-    class function VerificarCampoVazio(const pEdit: TCustomEdit): Boolean; overload;
-    class function VerificarCampoVazio(const pEdits: TArray<TCustomEdit>): Boolean; overload;
+    class function VerificarCampoVazio(const pEdit: TCustomEdit): Boolean;
+    class function VerificarTodosCamposVazio(const pEdits: TArray<TCustomEdit>): Boolean;
+    class function VerificarEditVazio(const pEdits: TArray<TCustomEdit>): TCustomEdit;
     class procedure FormatarData(const pEdit: TCustomEdit);
     class procedure MoverFinal(const pEdit: TCustomEdit);
     class procedure FormatarIntervalo(const pEdit: TCustomEdit);
@@ -23,7 +24,7 @@ type
 implementation
 
 uses
-  PontoSemanal.Helpers.Strings, System.SysUtils;
+  PontoSemanal.Helpers.Strings;
 
 { TComponenteHelpers }
 
@@ -77,18 +78,35 @@ begin
   pEdit.SelStart := Length(pEdit.Text);
 end;
 
-class function TComponenteHelpers.VerificarCampoVazio(const pEdits: TArray<TCustomEdit>): Boolean;
+class function TComponenteHelpers.VerificarEditVazio(const pEdits: TArray<TCustomEdit>): TCustomEdit;
+begin
+  Result := nil;
+
+  for var lComponente in pEdits do
+  begin
+    if not VerificarCampoVazio(lComponente) then
+    begin
+      Continue;
+    end;
+
+    Result := lComponente;
+    Break;
+  end;
+end;
+
+class function TComponenteHelpers.VerificarTodosCamposVazio(const pEdits: TArray<TCustomEdit>): Boolean;
 begin
   Result := True;
 
   for var lComponente in pEdits do
   begin
-    Result := VerificarCampoVazio(lComponente);
-
-    if not Result then
+    if VerificarCampoVazio(lComponente) then
     begin
-      Break;
+      Continue;
     end;
+
+    Result := False;
+    Break;
   end;
 end;
 

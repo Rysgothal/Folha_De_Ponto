@@ -5,18 +5,18 @@ object frmPrincipal: TfrmPrincipal
   BorderStyle = bsSingle
   Caption = 'Registro de Ponto Semanal'
   ClientHeight = 699
-  ClientWidth = 1262
+  ClientWidth = 1209
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -12
-  Font.Name = 'Segoe UI'
+  Font.Name = 'Tahoma'
   Font.Style = []
   Position = poScreenCenter
   Visible = True
   OnCreate = FormCreate
   PixelsPerInch = 96
-  TextHeight = 15
+  TextHeight = 14
   object gbxDadosFuncionario: TGroupBox
     Left = 8
     Top = 8
@@ -49,7 +49,7 @@ object frmPrincipal: TfrmPrincipal
   object sttsbarSistemaInfo: TStatusBar
     Left = 0
     Top = 680
-    Width = 1262
+    Width = 1209
     Height = 19
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clBtnText
@@ -59,7 +59,7 @@ object frmPrincipal: TfrmPrincipal
     Panels = <
       item
         Text = 'Data do Sistema: 00/00/0000'
-        Width = 1150
+        Width = 1100
       end
       item
         Alignment = taCenter
@@ -69,7 +69,7 @@ object frmPrincipal: TfrmPrincipal
         Width = 50
       end>
     UseSystemFont = False
-    ExplicitTop = 477
+    ExplicitWidth = 1262
   end
   object gbxSeg: TGroupBox
     Left = 8
@@ -90,7 +90,7 @@ object frmPrincipal: TfrmPrincipal
     HeaderFont.Style = [fsBold]
     ParentFont = False
     TabOrder = 2
-    inline frmSegunda: TfrmHorariosDiaUtil
+    inline frmSegunda: TfrmHorariosDia
       Left = 2
       Top = 17
       Width = 541
@@ -107,7 +107,7 @@ object frmPrincipal: TfrmPrincipal
     Left = 559
     Top = 8
     Width = 354
-    Height = 90
+    Height = 114
     Caption = 'Horas Trabalhadas (Semana)'
     DefaultHeaderFont = False
     Font.Charset = DEFAULT_CHARSET
@@ -127,7 +127,7 @@ object frmPrincipal: TfrmPrincipal
       Left = 2
       Top = 17
       Width = 350
-      Height = 71
+      Height = 95
       Align = alClient
       TabOrder = 0
       ExplicitLeft = 2
@@ -135,42 +135,44 @@ object frmPrincipal: TfrmPrincipal
       ExplicitWidth = 350
       ExplicitHeight = 71
       inherited lblDesempenho: TLabel
-        Left = 195
-        ExplicitLeft = 195
+        Left = 196
+        Top = 5
+        ExplicitLeft = 196
+        ExplicitTop = 5
       end
       inherited lblTotalHora: TLabel
-        Left = 287
-        Top = 16
+        Left = 288
+        Top = 30
         Width = 33
         Height = 36
         Caption = ''
         Font.Height = -33
         Font.Name = 'Wingdings'
         Font.Style = []
-        ExplicitLeft = 287
-        ExplicitTop = 16
+        ExplicitLeft = 288
+        ExplicitTop = 30
         ExplicitWidth = 33
         ExplicitHeight = 36
       end
       inherited edtTotalHora: TEdit
-        Left = 23
-        Top = 20
+        Left = 27
+        Top = 32
         Width = 103
         Height = 31
         Font.Height = -17
-        ExplicitLeft = 23
-        ExplicitTop = 20
+        ExplicitLeft = 27
+        ExplicitTop = 32
         ExplicitWidth = 103
         ExplicitHeight = 31
       end
       inherited edtSaldoHora: TEdit
         Left = 155
-        Top = 20
+        Top = 32
         Width = 103
         Height = 31
         Font.Height = -17
         ExplicitLeft = 155
-        ExplicitTop = 20
+        ExplicitTop = 32
         ExplicitWidth = 103
         ExplicitHeight = 31
       end
@@ -195,15 +197,17 @@ object frmPrincipal: TfrmPrincipal
     HeaderFont.Style = [fsBold]
     ParentFont = False
     TabOrder = 4
-    inline frmTerca: TfrmHorariosDiaUtil
+    inline frmTerca: TfrmHorariosDia
       Left = 2
       Top = 17
       Width = 541
       Height = 61
       Align = alClient
       TabOrder = 0
-      ExplicitLeft = -2
-      ExplicitTop = 26
+      ExplicitLeft = 2
+      ExplicitTop = 17
+      ExplicitWidth = 541
+      ExplicitHeight = 61
     end
   end
   object gbxQua: TGroupBox
@@ -225,15 +229,17 @@ object frmPrincipal: TfrmPrincipal
     HeaderFont.Style = [fsBold]
     ParentFont = False
     TabOrder = 5
-    inline frmQuarta: TfrmHorariosDiaUtil
+    inline frmQuarta: TfrmHorariosDia
       Left = 2
       Top = 17
       Width = 541
       Height = 61
       Align = alClient
       TabOrder = 0
-      ExplicitLeft = -2
-      ExplicitTop = 24
+      ExplicitLeft = 2
+      ExplicitTop = 17
+      ExplicitWidth = 541
+      ExplicitHeight = 61
     end
   end
   object gbxQui: TGroupBox
@@ -255,14 +261,17 @@ object frmPrincipal: TfrmPrincipal
     HeaderFont.Style = [fsBold]
     ParentFont = False
     TabOrder = 6
-    inline frmQuinta: TfrmHorariosDiaUtil
+    inline frmQuinta: TfrmHorariosDia
       Left = 2
       Top = 17
       Width = 541
       Height = 61
       Align = alClient
       TabOrder = 0
-      ExplicitLeft = -2
+      ExplicitLeft = 2
+      ExplicitTop = 17
+      ExplicitWidth = 541
+      ExplicitHeight = 61
     end
   end
   object gbxSex: TGroupBox
@@ -284,15 +293,17 @@ object frmPrincipal: TfrmPrincipal
     HeaderFont.Style = [fsBold]
     ParentFont = False
     TabOrder = 7
-    inline frmSexta: TfrmHorariosDiaUtil
+    inline frmSexta: TfrmHorariosDia
       Left = 2
       Top = 17
       Width = 541
       Height = 61
       Align = alClient
       TabOrder = 0
-      ExplicitLeft = -2
-      ExplicitTop = 26
+      ExplicitLeft = 2
+      ExplicitTop = 17
+      ExplicitWidth = 541
+      ExplicitHeight = 61
     end
   end
   object gbxSab: TGroupBox
@@ -314,15 +325,17 @@ object frmPrincipal: TfrmPrincipal
     HeaderFont.Style = [fsBold]
     ParentFont = False
     TabOrder = 8
-    inline frmSabado: TfrmHorariosDiaUtil
+    inline frmSabado: TfrmHorariosDia
       Left = 2
       Top = 17
       Width = 541
       Height = 61
       Align = alClient
       TabOrder = 0
-      ExplicitLeft = -2
-      ExplicitTop = 26
+      ExplicitLeft = 2
+      ExplicitTop = 17
+      ExplicitWidth = 541
+      ExplicitHeight = 61
       inherited lblRetornoAlmoco: TLabel
         Enabled = False
       end
@@ -336,6 +349,83 @@ object frmPrincipal: TfrmPrincipal
         Enabled = False
       end
     end
+  end
+  object memHistHorario: TMemo
+    Left = 559
+    Top = 124
+    Width = 643
+    Height = 543
+    TabStop = False
+    BevelInner = bvLowered
+    BevelKind = bkSoft
+    Color = clInfoBk
+    DragMode = dmAutomatic
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -12
+    Font.Name = 'Courier New'
+    Font.Style = []
+    ParentFont = False
+    ParentShowHint = False
+    CanUndoSelText = True
+    ReadOnly = True
+    ShowHint = False
+    TabOrder = 9
+  end
+  object btnNovoRegistro: TButton
+    Tag = 1
+    Left = 952
+    Top = 87
+    Width = 226
+    Height = 32
+    Caption = '&Novo Registro'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -17
+    Font.Name = 'Segoe UI'
+    Font.Style = []
+    ImageIndex = 0
+    Images = dtmPrincipal.imglistIcones
+    ParentFont = False
+    TabOrder = 10
+    OnClick = btnNovoRegistroClick
+  end
+  object btnCarregarHist: TButton
+    Left = 952
+    Top = 51
+    Width = 226
+    Height = 32
+    BiDiMode = bdLeftToRight
+    Caption = '&Carregar Hist'#243'rico'
+    DoubleBuffered = False
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -17
+    Font.Name = 'Segoe UI'
+    Font.Style = []
+    ImageIndex = 2
+    Images = dtmPrincipal.imglistIcones
+    ParentBiDiMode = False
+    ParentDoubleBuffered = False
+    ParentFont = False
+    TabOrder = 11
+  end
+  object btnGerSalHist: TButton
+    Left = 952
+    Top = 16
+    Width = 226
+    Height = 32
+    Caption = '&Gerar e Salvar Hist'#243'rico'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -17
+    Font.Name = 'Segoe UI'
+    Font.Style = []
+    ImageIndex = 1
+    Images = dtmPrincipal.imglistIcones
+    ParentFont = False
+    TabOrder = 12
+    OnClick = btnGerSalHistClick
   end
   object tmrHorario: TTimer
     Enabled = False

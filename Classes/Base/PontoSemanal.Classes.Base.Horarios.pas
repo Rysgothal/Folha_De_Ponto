@@ -31,7 +31,8 @@ type
     function VerificarHorarioVazio(const pValor: string): Boolean;
   public
     constructor Create(pTag: TDiaSemana);
-    property Tag: TDiaSemana read FTag write FTag;
+    destructor Destroy; override;
+    property Tag: TDiaSemana read FTag;
     property Entrada: string read FEntrada write SetEntrada;
     property SaidaAlmoco: string read FSaidaAlmoco write SetSaidaAlmoco;
     property RetornoAlmoco: string read FRetornoAlmoco write SetRetornoAlmoco;
@@ -43,6 +44,7 @@ type
     procedure InserirRetornoAlmoco(const pValor: string);
     procedure InserirSaidaFinal(const pValor: string);
     procedure CalcularHorasTrabalhadas;
+    procedure Limpar;
   end;
 
 implementation
@@ -55,13 +57,16 @@ uses
 procedure THorariosDia.CalcularHorasTrabalhadas;
 var
   lHorasTrabalhadas, lSaldoHoras: TTime;
-  lVerificarPeriodoManha, lVerificarPeriodoTarde, lEntrouSaiu: Boolean;
+  lVerificarPeriodoManha, lVerificarPeriodoTarde, lSemAlmoco, lSaidaAlmocoNulo, lRetornoAlmocoNulo: Boolean;
 begin
   lHorasTrabalhadas := 0;
 
-  lVerificarPeriodoManha := (Entrada <> EmptyStr) and (SaidaAlmoco <> EmptyStr) and (SaidaAlmoco <> '00:00');
-  lVerificarPeriodoTarde := (RetornoAlmoco <> EmptyStr) and (RetornoAlmoco <> '00:00') and (FSaidaFinal <> EmptyStr);
-  lEntrouSaiu := (FEntrada <> EmptyStr) and (FSaidaFinal <> EmptyStr);
+  lSaidaAlmocoNulo := (SaidaAlmoco = EmptyStr) or (SaidaAlmoco = '00:00');
+  lRetornoAlmocoNulo := (RetornoAlmoco = EmptyStr) or (RetornoAlmoco = '00:00');
+
+  lVerificarPeriodoManha := (Entrada <> EmptyStr) and not lSaidaAlmocoNulo;
+  lVerificarPeriodoTarde := (SaidaFinal <> EmptyStr) and not lRetornoAlmocoNulo;
+  lSemAlmoco := (Entrada <> EmptyStr) and (SaidaFinal <> EmptyStr) and lSaidaAlmocoNulo and lRetornoAlmocoNulo;
 
   if lVerificarPeriodoManha then
   begin
@@ -70,10 +75,10 @@ begin
 
   if lVerificarPeriodoTarde then
   begin
-    lHorasTrabalhadas := lHorasTrabalhadas + (StrToTime(RetornoAlmoco) - StrToTime(SaidaFinal));
+    lHorasTrabalhadas := lHorasTrabalhadas + (StrToTime(SaidaFinal) - StrToTime(RetornoAlmoco));
   end;
 
-  if lEntrouSaiu and (lHorasTrabalhadas = 0) then
+  if lSemAlmoco then
   begin
     lHorasTrabalhadas :=  StrToTime(FSaidaFinal) - StrToTime(FEntrada);
   end;
@@ -88,42 +93,6 @@ begin
   Desempenho.TotalTrabalhado := FormatDateTime('hh:mm', lHorasTrabalhadas);
   Desempenho.SaldoHoras := FormatDateTime('hh:mm', lSaldoHoras);
   FDesempenho.AtualizarCumprimento(Jornada);
-
-//  lVerificarPeriodoManha := (FEntrada <> EmptyStr) and (FSaidaAlmoco <> EmptyStr) and (FSaidaAlmoco <> '00:00');
-//  lVerificarPeriodoTarde := (FRetornoAlmoco <> EmptyStr) and (FRetornoAlmoco <> '00:00') and (FSaidaFinal <> EmptyStr);
-//  lVerificarPeriodoIntegral := lVerificarPeriodoManha and lVerificarPeriodoTarde;
-//
-//  if lVerificarPeriodoManha then
-//  begin
-//    lHorasTrabalhadas := StrToTime(FSaidaAlmoco) - StrToTime(FEntrada);
-//  end;
-//
-//  if lVerificarPeriodoTarde then
-//  begin
-//    lHorasTrabalhadas := lHorasTrabalhadas + StrToTime(FRetornoAlmoco) - StrToTime(FSaidaFinal);
-//  end;
-//
-//  if (FEntrada <> EmptyStr) and (FSaidaFinal <> EmptyStr) and (lHorasTrabalhadas = 0) then
-//  begin
-//    lHorasTrabalhadas :=  StrToTime(FSaidaFinal) - StrToTime(FEntrada);
-//  end;
-//
-//  if lVerificarPeriodoIntegral then
-//  begin
-//    lHorasTrabalhadas := StrToTime(FSaidaAlmoco) - StrToTime(FEntrada) + StrToTime(FSaidaFinal) -
-//      StrToTime(FRetornoAlmoco);
-//  end;
-//
-//  if (FEntrada = EmptyStr) and (FSaidaFinal = EmptyStr) then
-//  begin
-//    lHorasTrabalhadas := 0;
-//  end;
-//
-//  lSaldoHoras := lHorasTrabalhadas - StrToTime(IntToStr(Jornada));
-//
-//  Desempenho.TotalTrabalhado := FormatDateTime('hh:mm', lHorasTrabalhadas);
-//  Desempenho.SaldoHoras := FormatDateTime('hh:mm', lSaldoHoras);
-//  FDesempenho.AtualizarCumprimento(Jornada);
 end;
 
 constructor THorariosDia.Create(pTag: TDiaSemana);
@@ -136,6 +105,12 @@ end;
 procedure THorariosDia.CriarException(pException: ExceptClass; pMensagem: string);
 begin
   raise pException.Create(pMensagem);
+end;
+
+destructor THorariosDia.Destroy;
+begin
+  FreeAndNil(FDesempenho);
+  inherited;
 end;
 
 procedure THorariosDia.InserirEntrada(const pValor: string);
@@ -156,6 +131,16 @@ end;
 procedure THorariosDia.InserirSaidaFinal(const pValor: string);
 begin
   SaidaFinal := pValor;
+end;
+
+procedure THorariosDia.Limpar;
+begin
+  FEntrada := EmptyStr;
+  FSaidaAlmoco := EmptyStr;
+  FRetornoAlmoco := EmptyStr;
+  FSaidaFinal := EmptyStr;
+  FDesempenho.Limpar;
+  FJornada := 0;
 end;
 
 procedure THorariosDia.AbortarCasoHorarioAtualMenorQueSaidaAlmoco(const pValor: string);

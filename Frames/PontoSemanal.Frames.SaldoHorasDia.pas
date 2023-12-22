@@ -17,7 +17,7 @@ type
     lblTotalHora: TLabel;
   private
     { Private declarations }
-    function RetornarDiaSemana: THorariosDia;
+    function RetornarDesempenhoDiaSemana: TDesempenho;
     procedure ConfigurarSaldoHorasPositivas;
     procedure ConfigurarSaldoHorasNeutra;
     procedure ConfigurarSaldoHorasNegativa;
@@ -42,41 +42,19 @@ procedure TfrmSaldoHorasDia.Atualizar(const pValoresVazios: Boolean);
 var
   lDesempenho: TDesempenho;
   lPontoSemanal: TFolhaPontoSemanalSingleton;
+  lDiaSemana: TDiaSemana;
 begin
-//  lPontoSemanal := TFolhaPontoSemanalSingleton.ObterInstancia;
-//
-//  if TDiaSemana(Self.Tag) = dsNenhum then // Da Semana
-//  begin
-//    lDesempenho := lPontoSemanal.Desempenho;
-//
-//    if (lDesempenho.TotalTrabalhado = '00:00') and (lDesempenho.SaldoHoras = '00:00') then
-//    begin
-//      Limpar;
-//      Exit;
-//    end;
-//  end else
-//  if pValoresVazios then
-//  begin
-//    Limpar;
-//    Exit;
-//  end;
+  lDiaSemana := TDiaSemana(Tag);
+  lPontoSemanal := TFolhaPontoSemanalSingleton.ObterInstancia;
 
+  if ((lPontoSemanal.JornadaSemanal.ToInteger = 0) and (TDiaSemana(Tag) = dsNenhum)) or
+    (pValoresVazios and (lDiaSemana <> dsNenhum)) then
+  begin
+    Limpar;
+    Exit;
+  end;
 
-
-//  if pValoresVazios and (TDiaSemana(Self.Tag) <> dsNenhum) then
-//  begin
-//    Limpar;
-//    Exit;
-//  end;
-//
-//
-//  if TDiaSemana(Self.Tag) = dsNenhum then
-//  begin
-//
-//
-//  end;
-
-  lDesempenho := RetornarDiaSemana.Desempenho;
+  lDesempenho := RetornarDesempenhoDiaSemana;
   edtTotalHora.Text := lDesempenho.TotalTrabalhado;
   edtSaldoHora.Text := lDesempenho.SaldoHoras;
 
@@ -100,7 +78,7 @@ end;
 
 procedure TfrmSaldoHorasDia.Limpar;
 begin
-  ConfigurarComponentes(clWindowText, #0, ':');
+  ConfigurarComponentes(clWindowText, #0, #0);
   edtTotalHora.Text := ':';
   edtSaldoHora.Clear;
 end;
@@ -108,12 +86,9 @@ end;
 procedure TfrmSaldoHorasDia.ConfigurarSaldoDeHoras(lDesempenho: TDesempenho);
 begin
   case lDesempenho.CumprimentoHorario of
-    chAcima:
-      ConfigurarSaldoHorasPositivas;
-    chRegular:
-      ConfigurarSaldoHorasNeutra;
-    chAbaixo:
-      ConfigurarSaldoHorasNegativa;
+    chAcima: ConfigurarSaldoHorasPositivas;
+    chRegular: ConfigurarSaldoHorasNeutra;
+    chAbaixo: ConfigurarSaldoHorasNegativa;
   end;
 end;
 
@@ -131,20 +106,20 @@ begin
   end;
 end;
 
-function TfrmSaldoHorasDia.RetornarDiaSemana: THorariosDia;
+function TfrmSaldoHorasDia.RetornarDesempenhoDiaSemana: TDesempenho;
 var
   lPontoSemanal: TFolhaPontoSemanalSingleton;
 begin
   lPontoSemanal := TFolhaPontoSemanalSingleton.ObterInstancia;
 
   case TDiaSemana(Self.Tag) of
-    dsSegunda: Result := lPontoSemanal.Segunda;
-    dsTerca: Result := lPontoSemanal.Terca;
-    dsQuarta: Result := lPontoSemanal.Quarta;
-    dsQuinta: Result := lPontoSemanal.Quinta;
-    dsSexta: Result := lPontoSemanal.Sexta;
-    dsSabado: Result := lPontoSemanal.Sabado;
-    else Result := nil;
+    dsSegunda: Result := lPontoSemanal.Segunda.Desempenho;
+    dsTerca: Result := lPontoSemanal.Terca.Desempenho;
+    dsQuarta: Result := lPontoSemanal.Quarta.Desempenho;
+    dsQuinta: Result := lPontoSemanal.Quinta.Desempenho;
+    dsSexta: Result := lPontoSemanal.Sexta.Desempenho;
+    dsSabado: Result := lPontoSemanal.Sabado.Desempenho;
+    else Result := lPontoSemanal.Desempenho;
   end;
 end;
 

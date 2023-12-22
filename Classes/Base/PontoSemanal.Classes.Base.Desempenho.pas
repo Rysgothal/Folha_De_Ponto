@@ -16,6 +16,7 @@ type
     property SaldoHoras: string read FSaldoHoras write FSaldoHoras;
     property CumprimentoHorario: TCumprimentoHorario read FCumprimentoHorario;
     procedure AtualizarCumprimento(pJornada: Integer);
+    procedure Limpar;
   end;
 
 implementation
@@ -42,6 +43,13 @@ begin
   begin
     FCumprimentoHorario := chAbaixo;
   end;
+end;
+
+procedure TDesempenho.Limpar;
+begin
+  FTotalTrabalhado := EmptyStr;
+  FSaldoHoras := EmptyStr;
+  FCumprimentoHorario := chNenhum;
 end;
 
 end.
