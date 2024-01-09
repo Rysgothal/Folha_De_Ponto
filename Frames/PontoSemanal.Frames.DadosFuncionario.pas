@@ -35,9 +35,8 @@ type
     { Private declarations }
   public
     { Public declarations }
-    function VerificarTodosValoresPreenchidos: Boolean;
-    function BuscarEditVazio: TCustomEdit;
     procedure Limpar;
+    function VerificarSePossuiValoresAnotados: Boolean;
   end;
 
 implementation
@@ -47,11 +46,6 @@ uses
   PontoSemanal.Helpers.Strings, System.Generics.Collections;
 
 {$R *.dfm}
-
-function TfrmDadosFuncionario.BuscarEditVazio: TCustomEdit;
-begin
-  Result := nil;
-end;
 
 procedure TfrmDadosFuncionario.edtAdmissaoChange(Sender: TObject);
 begin
@@ -135,17 +129,12 @@ begin
   lblTempoExtenso.Caption := '"x" horas e "y" minutos';
 end;
 
-function TfrmDadosFuncionario.VerificarTodosValoresPreenchidos: Boolean;
+function TfrmDadosFuncionario.VerificarSePossuiValoresAnotados: Boolean;
 var
   lEdits: TArray<TCustomEdit>;
 begin
-  lEdits := [edtIntervaloAlmoco, edtAdmissao, edtNome, edtCodigo, edtJornadaSemanal];
-  Result := True;
-
-  if TComponenteHelpers.VerificarEditVazio(lEdits) <> nil then
-  begin
-    Result := False;
-  end;
+  lEdits := [edtCodigo, edtNome, edtAdmissao, edtJornadaSemanal, edtIntervaloALmoco];
+  Result := not TComponenteHelpers.VerificarTodosCamposVazio(lEdits);
 end;
 
 end.

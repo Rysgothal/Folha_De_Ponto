@@ -44,9 +44,9 @@ type
     procedure ConfigurarObservadores;
     procedure AplicarTagFrame(pFrame: TfrmHorariosDia; pTag: TDiaSemana);
     procedure NovoRegistro;
-    function VerificarTodosCamposVazios: Boolean;
     procedure LimparFormulario;
     procedure SalvarHistorico;
+    function VerificarPossuiValoresPreenchidos: Boolean;
   public
     { Public declarations }
   end;
@@ -144,8 +144,12 @@ begin
 end;
 
 procedure TfrmPrincipal.NovoRegistro;
+var
+  lPossuiValoresPreenchidos: Boolean;
 begin
-  if not VerificarTodosCamposVazios and (Application.MessageBox('Ainda existem valores anotados na Folha de Ponto, ' +
+  lPossuiValoresPreenchidos := VerificarPossuiValoresPreenchidos;
+
+  if lPossuiValoresPreenchidos and (Application.MessageBox('Ainda existem valores anotados na Folha de Ponto, ' +
     'ao criar um novo registro os dados serão sobrescritos.' + sLineBreak + sLineBreak + '> Deseja realmente ' +
     'criar um novo registro?', 'ATENÇÃO', MB_YESNO + MB_ICONWARNING) = ID_NO) then
   begin
@@ -158,23 +162,38 @@ end;
 
 procedure TfrmPrincipal.SalvarHistorico;
 begin
-  if VerificarTodosCamposVazios then
-  
+//  if not VerificarTodosCamposVazios then
+//  begin
+//    // Salvar
+//     Exit;
+//  end;
+//
+//  Application.MessageBox('Existem valores que não foram anotados na Folha de Ponto, verifique.' + sLineBreak,
+//    'ATENÇÃO', MB_OK + MB_ICONINFORMATION);
+//
+//  if not frmDadosFuncionario.VerificarTodosValoresPreenchidos then
+//  begin
+//    TComponenteHelpers.Focar(frmDadosFuncionario.RetornarCampoVazio);
+//  end;
+
+
+
+
+//    TComponenteHelpers.VerificarEditVazio();
 end;
 
-procedure TfrmPrincipal.tmrHorarioTimer(Sender: TObject);
+function TfrmPrincipal.VerificarPossuiValoresPreenchidos: Boolean;
 begin
-  AtualizarHorarioSistema;
-end;
+  Result := False;
 
-function TfrmPrincipal.VerificarTodosCamposVazios: Boolean;
-begin
-  Result := not frmDadosFuncionario.VerificarTodosValoresPreenchidos;
-
+  if frmDadosFuncionario.VerificarSePossuiValoresAnotados then
+  begin
+    Exit(True);
+  end;
 
   for var I := 0 to Pred(Self.ComponentCount) do
   begin
-    if not Result then
+    if Result then
     begin
       Break;
     end;
@@ -184,8 +203,13 @@ begin
       Continue;
     end;
 
-    Result := not TfrmHorariosDia(Self.Components[I]).VerificarTodosHorariosPreenchidos;
+    Result := TfrmHorariosDia(Self.Components[I]).VerificarSePossuiValoresAnotados;
   end;
+end;
+
+procedure TfrmPrincipal.tmrHorarioTimer(Sender: TObject);
+begin
+  AtualizarHorarioSistema;
 end;
 
 end.

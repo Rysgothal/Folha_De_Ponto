@@ -36,7 +36,8 @@ type
     procedure Notificar;
   public
     procedure AtivarEventosOnExit;
-    function VerificarTodosHorariosPreenchidos: Boolean;
+    function VerificarSePossuiValoresAnotados: Boolean;
+//    function RetornarCampoVazio: TCustomEdit;
     procedure Limpar;
     { Public declarations }
   end;
@@ -160,17 +161,12 @@ begin
   Application.MessageBox(pChar(pE.Message), 'ATENÇÃO', MB_ICONINFORMATION + MB_OK);
 end;
 
-function TfrmHorariosDia.VerificarTodosHorariosPreenchidos: Boolean;
+function TfrmHorariosDia.VerificarSePossuiValoresAnotados: Boolean;
 var
   lEdits: TArray<TCustomEdit>;
 begin
   lEdits := [medEntrada, medSaidaAlmoco, medRetornoAlmoco, medSaidaFinal];
-  Result := True;
-
-  if TComponenteHelpers.VerificarEditVazio(lEdits) <> nil then
-  begin
-    Result := False;
-  end;
+  Result := not TComponenteHelpers.VerificarTodosCamposVazio(lEdits);
 end;
 
 end.
