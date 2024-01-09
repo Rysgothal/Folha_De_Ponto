@@ -37,6 +37,7 @@ type
   public
     procedure AtivarEventosOnExit;
     function VerificarSePossuiValoresAnotados: Boolean;
+    function VerificarTodosValoresAnotados: Boolean;
 //    function RetornarCampoVazio: TCustomEdit;
     procedure Limpar;
     { Public declarations }
@@ -167,6 +168,18 @@ var
 begin
   lEdits := [medEntrada, medSaidaAlmoco, medRetornoAlmoco, medSaidaFinal];
   Result := not TComponenteHelpers.VerificarTodosCamposVazio(lEdits);
+end;
+
+function TfrmHorariosDia.VerificarTodosValoresAnotados: Boolean;
+var
+  lEdits: TArray<TCustomEdit>;
+begin
+  case TDiaSemana(Self.Tag) of
+    dsSabado: lEdits := [medEntrada, medSaidaFinal];
+    else lEdits := [medEntrada, medSaidaAlmoco, medRetornoAlmoco, medSaidaFinal];
+  end;
+
+  Result := TComponenteHelpers.VerificarEditVazio(lEdits) = nil;
 end;
 
 end.

@@ -37,6 +37,7 @@ type
     { Public declarations }
     procedure Limpar;
     function VerificarSePossuiValoresAnotados: Boolean;
+    function VerificarTodosValoresAnotados: Boolean;
   end;
 
 implementation
@@ -135,6 +136,14 @@ var
 begin
   lEdits := [edtCodigo, edtNome, edtAdmissao, edtJornadaSemanal, edtIntervaloALmoco];
   Result := not TComponenteHelpers.VerificarTodosCamposVazio(lEdits);
+end;
+
+function TfrmDadosFuncionario.VerificarTodosValoresAnotados: Boolean;
+var
+  lEdits: TArray<TCustomEdit>;
+begin
+  lEdits := [edtCodigo, edtNome, edtAdmissao, edtJornadaSemanal, edtIntervaloALmoco];
+  Result := TComponenteHelpers.VerificarEditVazio(lEdits) = nil;
 end;
 
 end.
