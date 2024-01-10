@@ -8,7 +8,7 @@ uses
   PontoSemanal.Interfaces.Observer.Observador,
   PontoSemanal.Classes.Base.Horarios, PontoSemanal.Helpers.TiposAuxiliares,
   PontoSemanal.Interfaces.Observer.Sujeito, PontoSemanal.Frames.SaldoHorasDia, 
-  PontoSemanal.Helpers.Componentes;
+  PontoSemanal.Helpers.Componentes, System.RegularExpressions, System.StrUtils;
 
 type
   TProcInserirHorario = procedure(const pValor: string) of object;
@@ -38,8 +38,9 @@ type
     procedure AtivarEventosOnExit;
     function VerificarSePossuiValoresAnotados: Boolean;
     function VerificarTodosValoresAnotados: Boolean;
-//    function RetornarCampoVazio: TCustomEdit;
     procedure Limpar;
+    procedure DefinirCorPadraoComponentes;
+    procedure PreencherValoresHorarios(pGroup: TGroup; pGroupCollection: TGroupCollection);
     { Public declarations }
   end;
 
@@ -56,6 +57,24 @@ begin
   medSaidaAlmoco.OnExit(medSaidaAlmoco);
   medRetornoAlmoco.OnExit(medRetornoAlmoco);
   medSaidaFinal.OnExit(medSaidaFinal);
+end;
+
+procedure TfrmHorariosDia.DefinirCorPadraoComponentes;
+begin
+  for var I := 0 to Pred(ComponentCount) do
+  begin
+    if Components[I] is TMaskEdit then
+    begin
+      TMaskEdit(Components[I]).Color := clWhite;
+      TMaskEdit(Components[I]).Font.Color := clWindowText;
+      Continue;
+    end;
+
+    if Components[I] is TfrmSaldoHorasDia then
+    begin
+      TfrmSaldoHorasDia(Components[I]).DefinirCorPadraoComponentes;
+    end;
+  end;
 end;
 
 procedure TfrmHorariosDia.Limpar;
@@ -180,6 +199,21 @@ begin
   end;
 
   Result := TComponenteHelpers.VerificarEditVazio(lEdits) = nil;
+end;
+
+procedure TfrmHorariosDia.PreencherValoresHorarios(pGroup: TGroup; pGroupCollection: TGroupCollection);
+begin
+  if TDiaSemana(Self.Tag) = dsSabado then
+  begin
+    medSaidaAlmoco.Text := pGroupCollection[7].Value;
+    medRetornoAlmoco.Text := pGroupCollection[8].Value;
+    Exit;
+  end;
+
+  medEntrada.Text := pGroupCollection[2].Value;
+  medSaidaAlmoco.Text := pGroupCollection[3].Value;
+  medRetornoAlmoco.Text := pGroupCollection[4].Value;
+  medSaidaFinal.Text := pGroupCollection[5].Value;
 end;
 
 end.

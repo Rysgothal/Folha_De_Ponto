@@ -24,6 +24,7 @@ type
     class function IntervaloPorExtenso(const pValor: string): string;
     class function FormatarHorario(const pValor: string): string;
     class function HashMD5(pValor, pSalting: string): string;
+    class function VerificarDiferenca(pValor, pValorCompara: string): Boolean;
   end;
 
 implementation
@@ -141,6 +142,11 @@ begin
   lValor := StringReplace(pValor.Trim, '_', EmptyStr, [rfReplaceAll]);
   lValor := StringReplace(lValor.Trim, ':', EmptyStr, [rfReplaceAll]);
   Result := lValor.Trim = EmptyStr;
+end;
+
+class function TStringHelpers.VerificarDiferenca(pValor, pValorCompara: string): Boolean;
+begin
+  Result := pValor <> pValorCompara;
 end;
 
 end.

@@ -4,7 +4,8 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,
-  Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls;
+  Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls,
+  System.RegularExpressions;
 
 type
   TfrmDadosFuncionario = class(TFrame)
@@ -38,6 +39,7 @@ type
     procedure Limpar;
     function VerificarSePossuiValoresAnotados: Boolean;
     function VerificarTodosValoresAnotados: Boolean;
+    procedure DefinirCorPadraoComponentes;
   end;
 
 implementation
@@ -47,6 +49,18 @@ uses
   PontoSemanal.Helpers.Strings, System.Generics.Collections;
 
 {$R *.dfm}
+
+procedure TfrmDadosFuncionario.DefinirCorPadraoComponentes;
+begin
+  for var I := 0 to Pred(ComponentCount) do
+  begin
+    if Components[I] is TEdit then
+    begin
+      TEdit(Components[I]).Color := clWhite;
+      TEdit(Components[I]).Font.Color := clWindowText;
+    end;
+  end;
+end;
 
 procedure TfrmDadosFuncionario.edtAdmissaoChange(Sender: TObject);
 begin

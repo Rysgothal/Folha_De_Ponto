@@ -27,6 +27,7 @@ type
     { Public declarations }
     procedure Atualizar(const pValoresVazios: Boolean);
     procedure Limpar;
+    procedure DefinirCorPadraoComponentes;
   end;
 
 implementation
@@ -74,6 +75,12 @@ end;
 procedure TfrmSaldoHorasDia.ConfigurarSaldoHorasPositivas;
 begin
   ConfigurarComponentes($ff0000, 'é','J');
+end;
+
+procedure TfrmSaldoHorasDia.DefinirCorPadraoComponentes;
+begin
+  edtTotalHora.Color := clInfoBk;
+  edtSaldoHora.Color := clInfoBk;
 end;
 
 procedure TfrmSaldoHorasDia.Limpar;

@@ -408,6 +408,7 @@ object frmPrincipal: TfrmPrincipal
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 11
+    OnClick = btnCarregarHistClick
   end
   object btnGerSalHist: TButton
     Left = 952
