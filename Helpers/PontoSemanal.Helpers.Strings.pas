@@ -23,12 +23,13 @@ type
     class function FormatarData(const pValor: string): string;
     class function IntervaloPorExtenso(const pValor: string): string;
     class function FormatarHorario(const pValor: string): string;
+    class function HashMD5(pValor, pSalting: string): string;
   end;
 
 implementation
 
 uses
-  System.Math, System.StrUtils;
+  System.Math, System.StrUtils, System.Hash;
 
 { TStringHelpers }
 
@@ -68,6 +69,14 @@ class function TStringHelpers.FormatarHorario(const pValor: string): string;
 begin
   Result := DigitarSomenteNumeros(pValor).Substring(0,8);
   InsertChars(Result, [2], ':')
+end;
+
+class function TStringHelpers.HashMD5(pValor: string; pSalting: string): string;
+var
+  lHash: THashMD5;
+begin
+  lHash := THashMD5.Create;
+  Result := lHash.GetHashString(pValor + pSalting);
 end;
 
 class procedure TStringHelpers.InsertChars(var pValor: string; const pPos: TPositions; const pChar: Char);

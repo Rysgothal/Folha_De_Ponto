@@ -69,7 +69,6 @@ object frmPrincipal: TfrmPrincipal
         Width = 50
       end>
     UseSystemFont = False
-    ExplicitWidth = 1262
   end
   object gbxSeg: TGroupBox
     Left = 8
@@ -104,7 +103,7 @@ object frmPrincipal: TfrmPrincipal
     end
   end
   object gbxHorasTrabalhadas: TGroupBox
-    Left = 559
+    Left = 561
     Top = 8
     Width = 354
     Height = 114
@@ -121,7 +120,7 @@ object frmPrincipal: TfrmPrincipal
     HeaderFont.Name = 'Segoe UI'
     HeaderFont.Style = [fsBold]
     ParentFont = False
-    TabOrder = 3
+    TabOrder = 8
     TabStop = True
     inline frmHorasTrabalhadasSemana: TfrmSaldoHorasDia
       Left = 2
@@ -133,7 +132,7 @@ object frmPrincipal: TfrmPrincipal
       ExplicitLeft = 2
       ExplicitTop = 17
       ExplicitWidth = 350
-      ExplicitHeight = 71
+      ExplicitHeight = 95
       inherited lblDesempenho: TLabel
         Left = 196
         Top = 5
@@ -196,7 +195,7 @@ object frmPrincipal: TfrmPrincipal
     HeaderFont.Name = 'Segoe UI'
     HeaderFont.Style = [fsBold]
     ParentFont = False
-    TabOrder = 4
+    TabOrder = 3
     inline frmTerca: TfrmHorariosDia
       Left = 2
       Top = 17
@@ -228,7 +227,7 @@ object frmPrincipal: TfrmPrincipal
     HeaderFont.Name = 'Segoe UI'
     HeaderFont.Style = [fsBold]
     ParentFont = False
-    TabOrder = 5
+    TabOrder = 4
     inline frmQuarta: TfrmHorariosDia
       Left = 2
       Top = 17
@@ -260,7 +259,7 @@ object frmPrincipal: TfrmPrincipal
     HeaderFont.Name = 'Segoe UI'
     HeaderFont.Style = [fsBold]
     ParentFont = False
-    TabOrder = 6
+    TabOrder = 5
     inline frmQuinta: TfrmHorariosDia
       Left = 2
       Top = 17
@@ -292,7 +291,7 @@ object frmPrincipal: TfrmPrincipal
     HeaderFont.Name = 'Segoe UI'
     HeaderFont.Style = [fsBold]
     ParentFont = False
-    TabOrder = 7
+    TabOrder = 6
     inline frmSexta: TfrmHorariosDia
       Left = 2
       Top = 17
@@ -324,7 +323,7 @@ object frmPrincipal: TfrmPrincipal
     HeaderFont.Name = 'Segoe UI'
     HeaderFont.Style = [fsBold]
     ParentFont = False
-    TabOrder = 8
+    TabOrder = 7
     inline frmSabado: TfrmHorariosDia
       Left = 2
       Top = 17
@@ -376,8 +375,8 @@ object frmPrincipal: TfrmPrincipal
     Tag = 1
     Left = 952
     Top = 87
-    Width = 226
-    Height = 32
+    Width = 228
+    Height = 34
     Caption = '&Novo Registro'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -393,8 +392,8 @@ object frmPrincipal: TfrmPrincipal
   object btnCarregarHist: TButton
     Left = 952
     Top = 51
-    Width = 226
-    Height = 32
+    Width = 228
+    Height = 34
     BiDiMode = bdLeftToRight
     Caption = '&Carregar Hist'#243'rico'
     DoubleBuffered = False
@@ -413,8 +412,8 @@ object frmPrincipal: TfrmPrincipal
   object btnGerSalHist: TButton
     Left = 952
     Top = 16
-    Width = 226
-    Height = 32
+    Width = 228
+    Height = 34
     Caption = '&Gerar e Salvar Hist'#243'rico'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
