@@ -136,6 +136,9 @@
         <DCCReference Include="Classes\Base\PontoSemanal.Classes.Base.Desempenho.pas"/>
         <DCCReference Include="Interfaces\Bridge\PontoSemanal.Interfaces.Bridge.Converter.pas"/>
         <DCCReference Include="Classes\Bridge\PontoSemanal.Classes.Bridge.Converter.pas"/>
+        <DCCReference Include="Interfaces\Builder\PontoSemanal.Interfaces.Builder.FolhaDePonto.pas"/>
+        <DCCReference Include="Classes\Builder\PontoSemanal.Classes.Builder.Diretor.pas"/>
+        <DCCReference Include="Classes\Builder\PontoSemanal.Classes.Builder.Construtor.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -972,9 +975,9 @@
                 <ProjectRoot Platform="OSX32" Name="$(PROJECTNAME).app"/>
                 <ProjectRoot Platform="OSX64" Name="$(PROJECTNAME).app"/>
                 <ProjectRoot Platform="Android64" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="OSXARM64" Name="$(PROJECTNAME).app"/>
                 <ProjectRoot Platform="Win32" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="Android" Name="$(PROJECTNAME)"/>
-                <ProjectRoot Platform="OSXARM64" Name="$(PROJECTNAME).app"/>
                 <ProjectRoot Platform="Win64" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="Linux64" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="iOSDevice32" Name="$(PROJECTNAME).app"/>

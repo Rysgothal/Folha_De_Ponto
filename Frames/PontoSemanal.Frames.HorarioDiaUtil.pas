@@ -40,7 +40,8 @@ type
     function VerificarTodosValoresAnotados: Boolean;
     procedure Limpar;
     procedure DefinirCorPadraoComponentes;
-    procedure PreencherValoresHorarios(pGroup: TGroup; pGroupCollection: TGroupCollection);
+    procedure PreencherValoresHorarios(pGroupCollection: TGroupCollection);
+    procedure AlterarEditHorarioViolado(pHorario: TRegistroHorario);
     { Public declarations }
   end;
 
@@ -50,6 +51,21 @@ uses
   PontoSemanal.Classes.Singleton.Principal;
 
 {$R *.dfm}
+
+procedure TfrmHorariosDia.AlterarEditHorarioViolado(pHorario: TRegistroHorario);
+var
+  lEdit: TMaskEdit;
+begin
+  case pHorario of
+    rhEntrada: lEdit := medEntrada;
+    rhSaidaAlmoco: lEdit := medSaidaAlmoco;
+    rhRetornoAlmoco: lEdit := medRetornoAlmoco;
+    rhSaidaFinal: lEdit := medSaidaFinal;
+    else Exit;
+  end;
+
+  lEdit.Color := clSkyBlue;
+end;
 
 procedure TfrmHorariosDia.AtivarEventosOnExit;
 begin
@@ -201,12 +217,12 @@ begin
   Result := TComponenteHelpers.VerificarEditVazio(lEdits) = nil;
 end;
 
-procedure TfrmHorariosDia.PreencherValoresHorarios(pGroup: TGroup; pGroupCollection: TGroupCollection);
+procedure TfrmHorariosDia.PreencherValoresHorarios(pGroupCollection: TGroupCollection);
 begin
   if TDiaSemana(Self.Tag) = dsSabado then
   begin
-    medSaidaAlmoco.Text := pGroupCollection[7].Value;
-    medRetornoAlmoco.Text := pGroupCollection[8].Value;
+    medEntrada.Text := pGroupCollection[7].Value;
+    medSaidaFinal.Text := pGroupCollection[8].Value;
     Exit;
   end;
 

@@ -17,6 +17,7 @@ type
     FSaidaFinal: string;
     FDesempenho: TDesempenho;
     FJornada: Integer;
+    FNome: string;
     procedure SetEntrada(const pValor: string);
     procedure SetRetornoAlmoco(const pValor: string);
     procedure SetSaidaAlmoco(const pValor: string);
@@ -45,6 +46,7 @@ type
     procedure InserirSaidaFinal(const pValor: string);
     procedure CalcularHorasTrabalhadas;
     procedure Limpar;
+    function PegarNomeDaSemana(pNomeCompleto: Boolean = False; pCaracterEspecial: Boolean = False): string;
   end;
 
 implementation
@@ -141,6 +143,34 @@ begin
   FSaidaFinal := EmptyStr;
   FDesempenho.Limpar;
   FJornada := 0;
+end;
+
+function THorariosDia.PegarNomeDaSemana(pNomeCompleto: Boolean = False; pCaracterEspecial: Boolean = False): string;
+var
+  lNome: string;
+begin
+  case FTag of
+    dsNenhum: lNome := EmptyStr;
+    dsSegunda: lNome := 'Segunda-Feira';
+    dsTerca: lNome := 'Terça-Feira';
+    dsQuarta: lNome := 'Quarta-Feira';
+    dsQuinta: lNome := 'Quinta-Feira';
+    dsSexta: lNome := 'Sexta-Feira'; 
+    dsSabado: lNome := 'Sábado'; 
+  end;
+
+  if not pNomeCompleto then
+  begin  
+    lNome := lNome.Replace('-Feira', EmptyStr, [rfReplaceAll]);
+  end;
+
+  if not pCaracterEspecial then
+  begin
+    lNome := lNome.Replace('ç', 'c', [rfReplaceAll]);
+    lNome := lNome.Replace('á', 'a', [rfReplaceAll]);
+  end;
+
+  Result := lNome;
 end;
 
 procedure THorariosDia.AbortarCasoHorarioAtualMenorQueSaidaAlmoco(const pValor: string);

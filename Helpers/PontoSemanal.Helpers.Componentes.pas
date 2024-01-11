@@ -21,6 +21,11 @@ type
     class procedure Focar(const pEdit: TWinControl);
   end;
 
+  TMemoHelper = class Helper for TMemo
+  public
+    procedure FocarCabecalho;
+  end;
+
 implementation
 
 uses
@@ -113,6 +118,14 @@ end;
 class function TComponenteHelpers.VerificarCampoVazio(const pEdit: TCustomEdit): Boolean;
 begin
   Result := TStringHelpers.VerificarCampoVazio(pEdit.Text);
+end;
+
+{ TMemoHelper }
+
+procedure TMemoHelper.FocarCabecalho;
+begin
+  SelStart := 1;
+  SelLength := 1;
 end;
 
 end.

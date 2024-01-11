@@ -26,6 +26,8 @@ type
     FSabado: THorariosDia;
     FObservers: TDictionary<TDiaSemana, IObservador>;
     FConverterHora: IConverter;
+    FJornadaSemanalExtenso: string;
+    FIntervaloAlmocoExtenso: string;
     constructor Create;
     procedure SetID(const pValor: string);
     procedure SetDataAdmissao(const pValor: string);
@@ -42,6 +44,7 @@ type
     property TempoAdmissao: string read FTempoAdmissao;
     property JornadaSemanal: string read FJornadaSemanal write SetJornadaSemanal;
     property IntervaloAlmoco: string read FIntervaloAlmoco write SetIntervaloAlmoco;
+    property IntervaloAlmocoExtenso: string read FIntervaloAlmocoExtenso;
     property Desempenho: TDesempenho read FDesempenho write FDesempenho;
     property Segunda: THorariosDia read FSegunda write FSegunda;
     property Terca: THorariosDia read FTerca write FTerca;
@@ -75,6 +78,7 @@ begin
   FJornadaSemanal := '0';
   FTempoAdmissao := '-> anos; meses; semanas; dias;';
   FIntervaloAlmoco := EmptyStr;
+  FIntervaloAlmocoExtenso := EmptyStr;
   FDesempenho := TDesempenho.Create;
 
   FSegunda := THorariosDia.Create(dsSegunda);
@@ -134,6 +138,7 @@ begin
   FJornadaSemanal := '0';
   FTempoAdmissao := '-> anos; meses; semanas; dias;';
   FIntervaloAlmoco := EmptyStr;
+  FIntervaloAlmocoExtenso := EmptyStr;
 
   FDesempenho.Limpar;
   FSegunda.Limpar;
@@ -213,6 +218,7 @@ begin
   end;
 
   FIntervaloAlmoco := pValor;
+  FIntervaloAlmocoExtenso := TStringHelpers.IntervaloPorExtenso(pValor);
 end;
 
 procedure TFolhaPontoSemanalSingleton.SetJornadaSemanal(const pValor: string);

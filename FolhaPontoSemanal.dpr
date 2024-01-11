@@ -18,7 +18,10 @@ uses
   PontoSemanal.Frames.SaldoHorasDia in 'Frames\PontoSemanal.Frames.SaldoHorasDia.pas' {frmSaldoHorasDia: TFrame},
   PontoSemanal.Classes.Base.Desempenho in 'Classes\Base\PontoSemanal.Classes.Base.Desempenho.pas',
   PontoSemanal.Interfaces.Bridge.Converter in 'Interfaces\Bridge\PontoSemanal.Interfaces.Bridge.Converter.pas',
-  PontoSemanal.Classes.Bridge.Converter in 'Classes\Bridge\PontoSemanal.Classes.Bridge.Converter.pas';
+  PontoSemanal.Classes.Bridge.Converter in 'Classes\Bridge\PontoSemanal.Classes.Bridge.Converter.pas',
+  PontoSemanal.Interfaces.Builder.FolhaDePonto in 'Interfaces\Builder\PontoSemanal.Interfaces.Builder.FolhaDePonto.pas',
+  PontoSemanal.Classes.Builder.Diretor in 'Classes\Builder\PontoSemanal.Classes.Builder.Diretor.pas',
+  PontoSemanal.Classes.Builder.Construtor in 'Classes\Builder\PontoSemanal.Classes.Builder.Construtor.pas';
 
 {$R *.res}
 
