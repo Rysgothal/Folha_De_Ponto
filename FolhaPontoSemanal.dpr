@@ -21,7 +21,8 @@ uses
   PontoSemanal.Classes.Bridge.Converter in 'Classes\Bridge\PontoSemanal.Classes.Bridge.Converter.pas',
   PontoSemanal.Interfaces.Builder.FolhaDePonto in 'Interfaces\Builder\PontoSemanal.Interfaces.Builder.FolhaDePonto.pas',
   PontoSemanal.Classes.Builder.Diretor in 'Classes\Builder\PontoSemanal.Classes.Builder.Diretor.pas',
-  PontoSemanal.Classes.Builder.Construtor in 'Classes\Builder\PontoSemanal.Classes.Builder.Construtor.pas';
+  PontoSemanal.Classes.Builder.Construtor in 'Classes\Builder\PontoSemanal.Classes.Builder.Construtor.pas',
+  PontoSemanal.Helpers.Constantes in 'Helpers\PontoSemanal.Helpers.Constantes.pas';
 
 {$R *.res}
 

@@ -3,7 +3,7 @@ unit PontoSemanal.Helpers.Strings;
 interface
 
 uses
-  System.SysUtils, System.Classes;
+  System.SysUtils, System.Classes, PontoSemanal.Helpers.Constantes;
 
 type
   TPositions = array of Integer;
@@ -23,7 +23,7 @@ type
     class function FormatarData(const pValor: string): string;
     class function IntervaloPorExtenso(const pValor: string): string;
     class function FormatarHorario(const pValor: string): string;
-    class function HashMD5(pValor, pSalting: string): string;
+    class function HashMD5(pValor: string): string;
     class function VerificarDiferenca(pValor, pValorCompara: string): Boolean;
   end;
 
@@ -72,12 +72,12 @@ begin
   InsertChars(Result, [2], ':')
 end;
 
-class function TStringHelpers.HashMD5(pValor: string; pSalting: string): string;
+class function TStringHelpers.HashMD5(pValor: string): string;
 var
   lHash: THashMD5;
 begin
   lHash := THashMD5.Create;
-  Result := lHash.GetHashString(pValor + pSalting);
+  Result := lHash.GetHashString(pValor + TConstantes.HASH_SALTING);
 end;
 
 class procedure TStringHelpers.InsertChars(var pValor: string; const pPos: TPositions; const pChar: Char);

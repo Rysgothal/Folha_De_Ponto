@@ -4,17 +4,23 @@ interface
 
 uses
   PontoSemanal.Interfaces.Builder.FolhaDePonto, System.Classes, 
-  PontoSemanal.Classes.Base.Horarios;
+  PontoSemanal.Classes.Base.Horarios, PontoSemanal.Helpers.TiposAuxiliares;
 
 type
   TConstrutor = class(TInterfacedObject, IConstrutor)
   private
-    FFolhaDePonto: TStringList;          
+    FFolhaDePonto: TStringList;
     function GetFolhaDePonto: TStringList;
-    function RetornarLinhaDeHorarios(pDiaHorarios: THorariosDia): string;
-  public                                        
+    function RetornarLinhaDiaDaSemana(pDia: THorariosDia): string;
+    function RetornarLinhaTotalHoras: string;
+    function RetornarLinhaHorasFaltantes: string;
+    function RetornarLinhaHorasExcedentes: string;
+    function ConcatenarHorarios(pDia: THorariosDia): string;
+    function RetornarHashHorario(pRegistroHorario: TRegistroHorario; pDia: THorariosDia): string;
+    procedure AdicionarLinhaHash(pDia: THorariosDia);
+  public
     constructor Create;
-    property FolhaDePonto: TStringList read GetFolhaDePonto write FFolhaDePonto;
+    property FolhaDePonto: TStringList read GetFolhaDePonto;
     procedure ConstruirCabecalho;
     procedure ConstruirDadosFuncionario;
     procedure ConstruirTituloHorarios;
@@ -24,7 +30,7 @@ type
     procedure ConstruirHorarioQuinta;
     procedure ConstruirHorarioSexta;
     procedure ConstruirHorarioSabado;
-    procedure ConstruirSaldoDeHoras;   
+    procedure ConstruirSaldoDeHoras;
     procedure ConstruirLinhaDivisaoHorarios;
     procedure ConstruirRodape;
   end;
@@ -33,9 +39,83 @@ implementation
 
 uses
   PontoSemanal.Classes.Singleton.Principal, 
-  System.StrUtils, System.SysUtils, PontoSemanal.Helpers.TiposAuxiliares;
+  System.StrUtils, System.SysUtils,
+  PontoSemanal.Helpers.Strings, PontoSemanal.Helpers.Constantes;
 
 { TConstrutor }
+
+function TConstrutor.RetornarLinhaDiaDaSemana(pDia: THorariosDia): string;
+var
+  lDiaNome, lSaidaAlmoco, lRetornoAlmoco, lLinhaMontada: string;
+begin
+  lSaidaAlmoco := '  -  ' ;
+  lRetornoAlmoco := '  -  ';
+
+  if pDia.Tag <> dsSabado then
+  begin
+    lSaidaAlmoco := IfThen(pDia.SaidaAlmoco.Trim = EmptyStr, '00:00', pDia.SaidaAlmoco);
+    lRetornoAlmoco := IfThen(pDia.RetornoAlmoco.Trim = EmptyStr, '00:00', pDia.RetornoAlmoco);
+  end;
+
+  lSaidaAlmoco := lSaidaAlmoco.PadRight(10, ' ').PadLeft(14, ' ');
+  lRetornoAlmoco := lRetornoAlmoco.PadRight(11, ' ').PadLeft(16, ' ');
+  lDiaNome := pDia.PegarNomeDaSemana(True, True).PadRight(15, ' ');
+
+  lLinhaMontada := lDiaNome + '|  ' + pDia.Entrada + '  |' + lSaidaAlmoco + '|' + lRetornoAlmoco + '|    ' +
+    pDia.SaidaFinal.PadRight(9, ' ') + '|' + pDia.Desempenho.TotalTrabalhado.PadLeft(9, ' ');
+
+  Result := lLinhaMontada;
+end;
+
+function TConstrutor.RetornarLinhaHorasExcedentes: string;
+var
+  lPontoSemanal: TFolhaPontoSemanalSingleton;
+  lSaldoHoras, lLinha: string;
+begin
+  lPontoSemanal := TFolhaPontoSemanalSingleton.ObterInstancia;
+  lSaldoHoras := lPontoSemanal.Desempenho.SaldoHoras.PadRight(9, ' ');
+  lLinha := EmptyStr;
+
+  case lPontoSemanal.Desempenho.CumprimentoHorario of
+    chAcima: lLinha := 'Horas/minutos excedentes:    '.PadLeft(77, ' ') + lSaldoHoras;
+    else lLinha := 'Horas/minutos excedentes:      -      '.PadLeft(86, ' ');
+  end;
+
+  Result := ' |' + lLinha + '|';
+end;
+
+function TConstrutor.RetornarLinhaHorasFaltantes: string;
+var
+  lPontoSemanal: TFolhaPontoSemanalSingleton;
+  lSaldoHoras, lLinha: string;
+begin
+  lPontoSemanal := TFolhaPontoSemanalSingleton.ObterInstancia;
+  lSaldoHoras := lPontoSemanal.Desempenho.SaldoHoras.PadRight(9, ' ');
+  lLinha := EmptyStr;
+
+  case lPontoSemanal.Desempenho.CumprimentoHorario of
+    chAbaixo: lLinha := 'Horas/minutos faltantes:    '.PadLeft(77, ' ') + lSaldoHoras;
+    else lLinha := 'Horas/minutos faltantes:      -      '.PadLeft(86, ' ');
+  end;
+
+  Result := ' |' + lLinha + '|';
+end;
+
+function TConstrutor.RetornarLinhaTotalHoras: string;
+var
+  lPontoSemanal: TFolhaPontoSemanalSingleton;
+  lLinha: string;
+begin
+  lPontoSemanal := TFolhaPontoSemanalSingleton.ObterInstancia;
+  lLinha := 'Total de horas trabalhadas na semana:    '.PadLeft(77, ' ') + lPontoSemanal.Desempenho.TotalTrabalhado;
+  lLinha := ' |' + lLinha.PadRight(86, ' ') + '|';
+  Result := lLinha;
+end;
+
+function TConstrutor.ConcatenarHorarios(pDia: THorariosDia): string;
+begin
+  Result := pDia.Entrada + pDia.SaidaAlmoco + pDia.RetornoAlmoco + pDia.SaidaFinal;
+end;
 
 procedure TConstrutor.ConstruirCabecalho;
 begin
@@ -61,77 +141,113 @@ end;
 
 procedure TConstrutor.ConstruirHorarioQuarta;
 var
-  lPontoSemanal: TFolhaPontoSemanalSingleton;
+  lHorariosDia: THorariosDia;
 begin
-  lPontoSemanal := TFolhaPontoSemanalSingleton.ObterInstancia;
-
+  lHorariosDia := TFolhaPontoSemanalSingleton.ObterInstancia.Quarta;
+  FFolhaDePonto.Add(' | ' + RetornarLinhaDiaDaSemana(lHorariosDia) + '    | ');
+  ConstruirLinhaDivisaoHorarios;
 end;
 
 procedure TConstrutor.ConstruirHorarioQuinta;
 var
-  lPontoSemanal: TFolhaPontoSemanalSingleton;
+  lHorariosDia: THorariosDia;
 begin
-  lPontoSemanal := TFolhaPontoSemanalSingleton.ObterInstancia;
+  lHorariosDia := TFolhaPontoSemanalSingleton.ObterInstancia.Quinta;
+  FFolhaDePonto.Add(' | ' + RetornarLinhaDiaDaSemana(lHorariosDia) + '    | ');
+  ConstruirLinhaDivisaoHorarios;
 end;
 
 procedure TConstrutor.ConstruirHorarioSabado;
 var
-  lPontoSemanal: TFolhaPontoSemanalSingleton;
+  lHorariosDia: THorariosDia;
 begin
-  lPontoSemanal := TFolhaPontoSemanalSingleton.ObterInstancia;
-
+  lHorariosDia := TFolhaPontoSemanalSingleton.ObterInstancia.Sabado;
+  FFolhaDePonto.Add(' | ' + RetornarLinhaDiaDaSemana(lHorariosDia) + '    | ');
+  ConstruirLinhaDivisaoHorarios;
 end;
 
 procedure TConstrutor.ConstruirHorarioSegunda;
 var
-//  lPontoSemanal: TFolhaPontoSemanalSingleton; 
   lHorariosDia: THorariosDia;
-  lDiaNome, lSaidaAlmoco, lRetornoAlmoco, lHorariosNoMemo: string;
-begin                                                      
+begin
   lHorariosDia := TFolhaPontoSemanalSingleton.ObterInstancia.Segunda;
-  lDiaNome := lHorariosDia.PegarNomeDaSemana(True, True);
-
-  lSaidaAlmoco := IfThen(lHorariosDia.SaidaAlmoco.Trim = EmptyStr, '00:00', lHorariosDia.SaidaAlmoco);
-  lRetornoAlmoco := IfThen(lHorariosDia.RetornoAlmoco.Trim = EmptyStr, '00:00', lHorariosDia.RetornoAlmoco);
-  
-  lSaidaAlmoco := lSaidaAlmoco.PadRight(10, ' ').PadLeft(14, ' ');
-  lRetornoAlmoco := lRetornoAlmoco.PadRight(11, ' ').PadLeft(16, ' ');
-
-  lHorariosNoMemo := RetornarLinhaDeHorarios(lHorariosDia).PadRight(41, ' ');
-  lHorariosNoMemo := lDiaNome.PadRight(15, ' ') + '|   ' + lHorariosNoMemo + '|    ' + lHorariosDia.Desempenho.TotalTrabalhado;
-
-  FolhaDePonto.Add(' | ' + lHorariosNoMemo + '    | ');
+  FFolhaDePonto.Add(' | ' + RetornarLinhaDiaDaSemana(lHorariosDia) + '    | ');
+  ConstruirLinhaDivisaoHorarios;
 end;
 
 procedure TConstrutor.ConstruirHorarioSexta;
 var
-  lPontoSemanal: TFolhaPontoSemanalSingleton;
+  lHorariosDia: THorariosDia;
 begin
-  lPontoSemanal := TFolhaPontoSemanalSingleton.ObterInstancia;
-
+  lHorariosDia := TFolhaPontoSemanalSingleton.ObterInstancia.Sexta;
+  FFolhaDePonto.Add(' | ' + RetornarLinhaDiaDaSemana(lHorariosDia) + '    | ');
+  ConstruirLinhaDivisaoHorarios;
 end;
 
 procedure TConstrutor.ConstruirHorarioTerca;
 var
-  lPontoSemanal: TFolhaPontoSemanalSingleton;
+  lHorariosDia: THorariosDia;
 begin
-  lPontoSemanal := TFolhaPontoSemanalSingleton.ObterInstancia;
-
+  lHorariosDia := TFolhaPontoSemanalSingleton.ObterInstancia.Terca;
+  FFolhaDePonto.Add(' | ' + RetornarLinhaDiaDaSemana(lHorariosDia) + '    | ');
+  ConstruirLinhaDivisaoHorarios;
 end;
 
 procedure TConstrutor.ConstruirLinhaDivisaoHorarios;
+var
+  lLinha: string;
 begin
-  FFolhaDePonto.Add(' |----------------|---------|--------------|----------------|-------------|-------------| ');
+  lLinha := ' |'.PadRight(17, '-');
+  lLinha := lLinha + '-|'.PadRight(10, '-');
+  lLinha := lLinha + '-|'.PadRight(15, '-');
+  lLinha := lLinha + '-|'.PadRight(17, '-');
+  lLinha := lLinha + '-|'.PadRight(14, '-');
+  lLinha := lLinha + '-|'.PadRight(15, '-') + '| ';
+
+  FFolhaDePonto.Add(lLinha);
 end;
 
 procedure TConstrutor.ConstruirRodape;
+var
+  lPontoSemanal: TFolhaPontoSemanalSingleton;
+  lSegunda, lTerca, lQuarta, lQuinta, lSexta, lSabado: string;
 begin
+  lPontoSemanal := TFolhaPontoSemanalSingleton.ObterInstancia;
 
+  lSegunda := ConcatenarHorarios(lPontoSemanal.Segunda);
+  lTerca := ConcatenarHorarios(lPontoSemanal.Terca);
+  lQuarta := ConcatenarHorarios(lPontoSemanal.Quarta);
+  lQuinta := ConcatenarHorarios(lPontoSemanal.Quinta);
+  lSexta := ConcatenarHorarios(lPontoSemanal.Sexta);
+  lSabado := ConcatenarHorarios(lPontoSemanal.Sabado);
+
+  FFolhaDePonto.Add('');
+  FFolhaDePonto.Add('');
+  FFolhaDePonto.Add('');
+  FFolhaDePonto.Add('[Folha]: ' + TStringHelpers.HashMD5(FFolhaDePonto.Text));
+  FFolhaDePonto.Add('[Segunda]: ' + TStringHelpers.HashMD5(lSegunda));
+  FFolhaDePonto.Add('[Terca]: ' + TStringHelpers.HashMD5(lTerca));
+  FFolhaDePonto.Add('[Quarta]: ' + TStringHelpers.HashMD5(lQuarta));
+  FFolhaDePonto.Add('[Quinta]: ' + TStringHelpers.HashMD5(lQuinta));
+  FFolhaDePonto.Add('[Sexta]: ' + TStringHelpers.HashMD5(lSexta));
+  FFolhaDePonto.Add('[Sabado]: ' + TStringHelpers.HashMD5(lSabado));
+
+  AdicionarLinhaHash(lPontoSemanal.Segunda);
+  AdicionarLinhaHash(lPontoSemanal.Terca);
+  AdicionarLinhaHash(lPontoSemanal.Quarta);
+  AdicionarLinhaHash(lPontoSemanal.Quinta);
+  AdicionarLinhaHash(lPontoSemanal.Sexta);
+  AdicionarLinhaHash(lPontoSemanal.Sabado);
 end;
 
 procedure TConstrutor.ConstruirSaldoDeHoras;
 begin
-
+  FolhaDePonto.Add(' |'.PadRight(88, ' ') + '| ');
+  FolhaDePonto.Add(RetornarLinhaTotalHoras);
+  FolhaDePonto.Add(RetornarLinhaHorasFaltantes);
+  FolhaDePonto.Add(RetornarLinhaHorasExcedentes);
+  FolhaDePonto.Add(' |'.PadRight(88, ' ') + '| ');
+  FolhaDePonto.Add(' \'.PadRight(88, '_') + '/ ');
 end;
 
 procedure TConstrutor.ConstruirTituloHorarios;
@@ -154,23 +270,35 @@ begin
   Result := FFolhaDePonto;
 end;
 
-function TConstrutor.RetornarLinhaDeHorarios(pDiaHorarios: THorariosDia): string;
+function TConstrutor.RetornarHashHorario(pRegistroHorario: TRegistroHorario; pDia: THorariosDia): string;
 var
-  lSaidaAlmoco, lRetornoAlmoco: string;
+  lHorario: string;
 begin
-  lSaidaAlmoco := IfThen(pDiaHorarios.SaidaAlmoco.Trim = EmptyStr, '00:00', pDiaHorarios.SaidaAlmoco);
-  lRetornoAlmoco := IfThen(pDiaHorarios.RetornoAlmoco.Trim = EmptyStr, '00:00', pDiaHorarios.RetornoAlmoco);
-
-  if pDiaHorarios.Tag = dsSabado then
-  begin
-    lSaidaAlmoco := '  -  ' ;
-    lRetornoAlmoco := '  -  ';
+  case pRegistroHorario of
+    rhEntrada: lHorario := pDia.Entrada;
+    rhSaidaAlmoco: lHorario := pDia.SaidaAlmoco;
+    rhRetornoAlmoco: lHorario := pDia.RetornoAlmoco;
+    rhSaidaFinal: lHorario := pDia.SaidaFinal;
   end;
-  
-  lSaidaAlmoco := lSaidaAlmoco.PadRight(10, ' ').PadLeft(14, ' ');
-  lRetornoAlmoco := lRetornoAlmoco.PadRight(11, ' ').PadLeft(16, ' ');
-  
-  Result := pDiaHorarios.Entrada + ' |' + lSaidaAlmoco + '|' + lRetornoAlmoco + '|    ' + pDiaHorarios.SaidaFinal;
+
+  Result := TStringHelpers.HashMD5(lHorario + TConstantes.HASH_SALTING);
+end;
+
+procedure TConstrutor.AdicionarLinhaHash(pDia: THorariosDia);
+var
+  lDia: string;
+begin
+  lDia := pDia.PegarNomeDaSemana;
+
+  FFolhaDePonto.Add('[' + lDia + '-Entrada]: ' + RetornarHashHorario(rhEntrada, pDia));
+
+  if not (pDia.SaidaAlmoco.Trim = EmptyStr) and not (pDia.RetornoAlmoco.Trim = EmptyStr) then
+  begin
+    FFolhaDePonto.Add('[' + lDia + '-SaidaAlmoco]: ' + RetornarHashHorario(rhSaidaAlmoco, pDia));
+    FFolhaDePonto.Add('[' + lDia + '-RetornoAlmoco]: ' + RetornarHashHorario(rhRetornoAlmoco, pDia));
+  end;
+
+  FFolhaDePonto.Add('[' + lDia + '-SaidaFinal]: ' + RetornarHashHorario(rhSaidaFinal, pDia));
 end;
 
 end.

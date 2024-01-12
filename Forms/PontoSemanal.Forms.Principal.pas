@@ -10,7 +10,7 @@ uses
   PontoSemanal.Helpers.Componentes, PontoSemanal.Classes.Base.Horarios,
   PontoSemanal.Classes.Builder.Diretor,
   PontoSemanal.Interfaces.Builder.FolhaDePonto,
-  PontoSemanal.Classes.Builder.Construtor;
+  PontoSemanal.Classes.Builder.Construtor, PontoSemanal.Helpers.Constantes;
 
 type
   TfrmPrincipal = class(TForm)
@@ -72,17 +72,6 @@ type
     procedure AnalizarDiaDaSemanaAlterado(pDiaSemana: THorariosDia);
     procedure DestacarHorariosAlterados(pHorarios: THorariosDia; pDia: string);
     function RetornarFrameDia(pDia: TDiaSemana): TfrmHorariosDia;
-
-    const REGEX_HORARIOS = '(Segunda|Terça|Quarta|Sexta|Quinta)\D{0,}?\W{0,}?([0,1][0-9]:[0-5][0-9]|[2][0-3]:[0-5][0' +
-      '-9])\W{0,}?([0,1][0-9]:[0-5][0-9]|[2][0-3]:[0-5][0-9])\W{0,}?([0,1][0-9]:[0-5][0-9]|[2][0-3]:[0-5][0-9])\W{0,' +
-      '}?([0,1][0-9]:[0-5][0-9]|[2][0-3]:[0-5][0{0,}([0,1][0-9]:[0-5][0-9]|[2][0-3]:[0-5][0-9])|(Sábado|Sabado)\D{0,' +
-      '}?\W{0,}([0,1][0-9]:[0-5][0-9]|[2][0-3]:[0-5][0-9])\W{0,}([0,1][0-9]:[0-5][0-9]|[2][0-3]:[0-5][0-9])';
-    const REGEX_CODIGO_FUNCIONARIO = '(Código|Codigo)\W{0,}(\d{0,7})';
-    const REGEX_NOME_FUNCIONARIO = '(Funcionário|Funcionario)\W{0,}(.*)\R';
-    const REGEX_ADMISSAO_FUNCIONARIO = '(Admissão|Admissao)\W{0,}(\d{2}[\/]\d{2}[\/]\d{4})';
-    const REGEX_JORNADA_FUNCIONARIO = '(Jornada\sSemanal)\W{0,}(\d{0,3})';
-    const REGEX_INTERVALO_FUNCIONARIO = '(Intervalo\sAlmoço)\W{0,}(\d{2}[\:]\d{2})';
-    const HASH_SALTING = '3175634@0733b$66ç723464335&d5d5*b5d5ód~2d5b2d3d5b';
   public
     { Public declarations }
   end;
@@ -208,11 +197,11 @@ end;
 
 procedure TfrmPrincipal.BuscarValoresDadosFuncionario;
 begin
-  PreencherValoresDadosFuncionario(REGEX_CODIGO_FUNCIONARIO, frmDadosFuncionario.edtCodigo);
-  PreencherValoresDadosFuncionario(REGEX_NOME_FUNCIONARIO, frmDadosFuncionario.edtNome);
-  PreencherValoresDadosFuncionario(REGEX_ADMISSAO_FUNCIONARIO, frmDadosFuncionario.edtAdmissao);
-  PreencherValoresDadosFuncionario(REGEX_JORNADA_FUNCIONARIO, frmDadosFuncionario.edtJornadaSemanal);
-  PreencherValoresDadosFuncionario(REGEX_INTERVALO_FUNCIONARIO, frmDadosFuncionario.edtIntervaloAlmoco);
+  PreencherValoresDadosFuncionario(TConstantes.REGEX_CODIGO_FUNCIONARIO, frmDadosFuncionario.edtCodigo);
+  PreencherValoresDadosFuncionario(TConstantes.REGEX_NOME_FUNCIONARIO, frmDadosFuncionario.edtNome);
+  PreencherValoresDadosFuncionario(TConstantes.REGEX_ADMISSAO_FUNCIONARIO, frmDadosFuncionario.edtAdmissao);
+  PreencherValoresDadosFuncionario(TConstantes.REGEX_JORNADA_FUNCIONARIO, frmDadosFuncionario.edtJornadaSemanal);
+  PreencherValoresDadosFuncionario(TConstantes.REGEX_INTERVALO_FUNCIONARIO, frmDadosFuncionario.edtIntervaloAlmoco);
 end;
 
 procedure TfrmPrincipal.BuscarValoresHorariosRegEx;
@@ -222,7 +211,7 @@ var
   lFrame: TfrmHorariosDia;
   lDiaSemana: TDiaSemana;
 begin
-  lMatches := TRegex.Matches(memHistHorario.Text, REGEX_HORARIOS, [roIgnoreCase]);
+  lMatches := TRegex.Matches(memHistHorario.Text, TConstantes.REGEX_HORARIOS, [roIgnoreCase]);
 
   for var lMatch in lMatches do
   begin
@@ -260,7 +249,7 @@ begin
 
     memHistHorario.Lines.LoadFromFile(dtmPrincipal.CarregarArquivo.FileName);
 
-    if not TRegex.IsMatch(memHistHorario.Text, REGEX_HORARIOS, [roIgnoreCase]) then
+    if not TRegex.IsMatch(memHistHorario.Text, TConstantes.REGEX_HORARIOS, [roIgnoreCase]) then
     begin
       memHistHorario.Clear;
       Application.MessageBox('> Folha de Ponto inválida <' + sLineBreak + 'O Arquivo escolhido não possui nenhum horário',
@@ -355,36 +344,36 @@ begin
 end;
 
 procedure TfrmPrincipal.AdicionarHashMemo;
-var
-  lPontoSemanal: TFolhaPontoSemanalSingleton;
-  lSegunda, lTerca, lQuarta, lQuinta, lSexta, lSabado: string;
+//var
+//  lPontoSemanal: TFolhaPontoSemanalSingleton;
+//  lSegunda, lTerca, lQuarta, lQuinta, lSexta, lSabado: string;
 begin
-  lPontoSemanal := TFolhaPontoSemanalSingleton.ObterInstancia;
+//  lPontoSemanal := TFolhaPontoSemanalSingleton.ObterInstancia;
+//
+//  lSegunda := ConcatenarHorarios(lPontoSemanal.Segunda);
+//  lTerca := ConcatenarHorarios(lPontoSemanal.Terca);
+//  lQuarta := ConcatenarHorarios(lPontoSemanal.Quarta);
+//  lQuinta := ConcatenarHorarios(lPontoSemanal.Quinta);
+//  lSexta := ConcatenarHorarios(lPontoSemanal.Sexta);
+//  lSabado := ConcatenarHorarios(lPontoSemanal.Sabado);
+//
+//  memHistHorario.Lines.Add('');
+//  memHistHorario.Lines.Add('');
+//  memHistHorario.Lines.Add('');
+//  memHistHorario.Lines.Add('[Folha]: ' + TStringHelpers.HashMD5(memHistHorario.Text, TConstantes.HASH_SALTING));
+//  memHistHorario.Lines.Add('[Segunda]: ' + TStringHelpers.HashMD5(lSegunda, TConstantes.HASH_SALTING));
+//  memHistHorario.Lines.Add('[Terca]: ' + TStringHelpers.HashMD5(lTerca, TConstantes.HASH_SALTING));
+//  memHistHorario.Lines.Add('[Quarta]: ' + TStringHelpers.HashMD5(lQuarta, TConstantes.HASH_SALTING));
+//  memHistHorario.Lines.Add('[Quinta]: ' + TStringHelpers.HashMD5(lQuinta, TConstantes.HASH_SALTING));
+//  memHistHorario.Lines.Add('[Sexta]: ' + TStringHelpers.HashMD5(lSexta, TConstantes.HASH_SALTING));
+//  memHistHorario.Lines.Add('[Sabado]: ' + TStringHelpers.HashMD5(lSabado, TConstantes.HASH_SALTING));
 
-  lSegunda := ConcatenarHorarios(lPontoSemanal.Segunda);
-  lTerca := ConcatenarHorarios(lPontoSemanal.Terca);
-  lQuarta := ConcatenarHorarios(lPontoSemanal.Quarta);
-  lQuinta := ConcatenarHorarios(lPontoSemanal.Quinta);
-  lSexta := ConcatenarHorarios(lPontoSemanal.Sexta);
-  lSabado := ConcatenarHorarios(lPontoSemanal.Sabado);
-
-  memHistHorario.Lines.Add('');
-  memHistHorario.Lines.Add('');
-  memHistHorario.Lines.Add('');
-  memHistHorario.Lines.Add('[Folha]: ' + TStringHelpers.HashMD5(memHistHorario.Text, HASH_SALTING));
-  memHistHorario.Lines.Add('[Segunda]: ' + TStringHelpers.HashMD5(lSegunda, HASH_SALTING));
-  memHistHorario.Lines.Add('[Terca]: ' + TStringHelpers.HashMD5(lTerca, HASH_SALTING));
-  memHistHorario.Lines.Add('[Quarta]: ' + TStringHelpers.HashMD5(lQuarta, HASH_SALTING));
-  memHistHorario.Lines.Add('[Quinta]: ' + TStringHelpers.HashMD5(lQuinta, HASH_SALTING));
-  memHistHorario.Lines.Add('[Sexta]: ' + TStringHelpers.HashMD5(lSexta, HASH_SALTING));
-  memHistHorario.Lines.Add('[Sabado]: ' + TStringHelpers.HashMD5(lSabado, HASH_SALTING));
-
-  PreencherDadosNoMemoHashHorarios(lPontoSemanal.Segunda);
-  PreencherDadosNoMemoHashHorarios(lPontoSemanal.Terca);
-  PreencherDadosNoMemoHashHorarios(lPontoSemanal.Quarta);
-  PreencherDadosNoMemoHashHorarios(lPontoSemanal.Quinta);
-  PreencherDadosNoMemoHashHorarios(lPontoSemanal.Sexta);
-  PreencherDadosNoMemoHashHorarios(lPontoSemanal.Sabado);
+//  PreencherDadosNoMemoHashHorarios(lPontoSemanal.Segunda);
+//  PreencherDadosNoMemoHashHorarios(lPontoSemanal.Terca);
+//  PreencherDadosNoMemoHashHorarios(lPontoSemanal.Quarta);
+//  PreencherDadosNoMemoHashHorarios(lPontoSemanal.Quinta);
+//  PreencherDadosNoMemoHashHorarios(lPontoSemanal.Sexta);
+//  PreencherDadosNoMemoHashHorarios(lPontoSemanal.Sabado);
 end;
 
 procedure TfrmPrincipal.AnalizarDiaDaSemanaAlterado(pDiaSemana: THorariosDia);
@@ -393,7 +382,7 @@ var
 begin
   lNomeDia := pDiaSemana.PegarNomeDaSemana;
   lHashDiaAtual := ConcatenarHorarios(pDiaSemana);
-  lHashDiaAtual := TStringHelpers.HashMD5(lHashDiaAtual, HASH_SALTING);
+  lHashDiaAtual := TStringHelpers.HashMD5(lHashDiaAtual);
 
   if RetornarHashDentroArquivo('[' + lNomeDia + ']') <> lHashDiaAtual then
   begin
@@ -411,10 +400,10 @@ begin
   lHashArquivo[2] := RetornarHashDentroArquivo('[' + pDia + '-RetornoAlmoco]');
   lHashArquivo[3] := RetornarHashDentroArquivo('[' + pDia + '-SaidaFinal]');
 
-  lHashAtual[0] := TStringHelpers.HashMD5(pHorarios.Entrada, HASH_SALTING);
-  lHashAtual[1] := TStringHelpers.HashMD5(pHorarios.SaidaAlmoco, HASH_SALTING);
-  lHashAtual[2] := TStringHelpers.HashMD5(pHorarios.RetornoAlmoco, HASH_SALTING);
-  lHashAtual[3] := TStringHelpers.HashMD5(pHorarios.SaidaFinal, HASH_SALTING);
+  lHashAtual[0] := TStringHelpers.HashMD5(pHorarios.Entrada);
+  lHashAtual[1] := TStringHelpers.HashMD5(pHorarios.SaidaAlmoco);
+  lHashAtual[2] := TStringHelpers.HashMD5(pHorarios.RetornoAlmoco);
+  lHashAtual[3] := TStringHelpers.HashMD5(pHorarios.SaidaFinal);
 
   lFrame := RetornarFrameDia(pHorarios.Tag);
 
@@ -536,22 +525,22 @@ begin
 //  memHistHorario.Lines.Add(' | DIA DA SEMANA  | ENTRADA | SAÍDA ALMOÇO | RETORNO ALMOÇO | SAÍDA FINAL | TOTAL HORAS | ');
 //  memHistHorario.Lines.Add(' |                |         |              |                |             |             | ');
 //  PreencherDadosNoMemoLinha;
-  PreencherDadosNoMemoDiaSemana(lPontoSemanal.Segunda);
-  PreencherDadosNoMemoLinha;
-  PreencherDadosNoMemoDiaSemana(lPontoSemanal.Terca);
-  PreencherDadosNoMemoLinha;
-  PreencherDadosNoMemoDiaSemana(lPontoSemanal.Quarta);
-  PreencherDadosNoMemoLinha;
-  PreencherDadosNoMemoDiaSemana(lPontoSemanal.Quinta);
-  PreencherDadosNoMemoLinha;
-  PreencherDadosNoMemoDiaSemana(lPontoSemanal.Sexta);
-  PreencherDadosNoMemoLinha;
-  PreencherDadosNoMemoDiaSemana(lPontoSemanal.Sabado);
-  PreencherDadosNoMemoLinha;
-  memHistHorario.Lines.Add(' |                                                                                      | ');
-  PreencherDadosNoMemoRodape;
-  memHistHorario.Lines.Add(' |                                                                                      | ');
-  memHistHorario.Lines.Add(' \______________________________________________________________________________________/');
+//  PreencherDadosNoMemoDiaSemana(lPontoSemanal.Segunda);
+//  PreencherDadosNoMemoLinha;
+//  PreencherDadosNoMemoDiaSemana(lPontoSemanal.Terca);
+//  PreencherDadosNoMemoLinha;
+//  PreencherDadosNoMemoDiaSemana(lPontoSemanal.Quarta);
+//  PreencherDadosNoMemoLinha;
+//  PreencherDadosNoMemoDiaSemana(lPontoSemanal.Quinta);
+//  PreencherDadosNoMemoLinha;
+//  PreencherDadosNoMemoDiaSemana(lPontoSemanal.Sexta);
+//  PreencherDadosNoMemoLinha;
+//  PreencherDadosNoMemoDiaSemana(lPontoSemanal.Sabado);
+//  PreencherDadosNoMemoLinha;
+//  memHistHorario.Lines.Add(' |                                                                                      | ');
+//  PreencherDadosNoMemoRodape;
+//  memHistHorario.Lines.Add(' |                                                                                      | ');
+//  memHistHorario.Lines.Add(' \______________________________________________________________________________________/');
 end;
 
 procedure TfrmPrincipal.PreencherDadosNoMemoDiaSemana(pDia: THorariosDia);
@@ -584,10 +573,10 @@ var
 begin
   lDia := pDia.PegarNomeDaSemana;
 
-  lHashEntrada := TStringHelpers.HashMD5(pDia.Entrada, HASH_SALTING);
-  lHashSaidaAlmoco := TStringHelpers.HashMD5(pDia.SaidaAlmoco, HASH_SALTING);
-  lHashRetornoAlmoco := TStringHelpers.HashMD5(pDia.RetornoAlmoco, HASH_SALTING);
-  lHashSaidaFinal := TStringHelpers.HashMD5(pDia.SaidaFinal, HASH_SALTING);
+  lHashEntrada := TStringHelpers.HashMD5(pDia.Entrada);
+  lHashSaidaAlmoco := TStringHelpers.HashMD5(pDia.SaidaAlmoco);
+  lHashRetornoAlmoco := TStringHelpers.HashMD5(pDia.RetornoAlmoco);
+  lHashSaidaFinal := TStringHelpers.HashMD5(pDia.SaidaFinal);
 
   memHistHorario.Lines.Add('[' + lDia + '-Entrada]: ' + lHashEntrada);
 
@@ -732,14 +721,14 @@ begin
   I := 0;
   lHashArquivo := RetornarHashDentroArquivo('[Folha]');
 
-  while I < 29 do
+  while I < 30 do
   begin
-    memHistHorario.Lines.Delete(memHistHorario.Lines.Count-1);
+    memHistHorario.Lines.Delete(memHistHorario.Lines.Count - 1);
     Inc(I);
   end;
   memHistHorario.FocarCabecalho;
 
-  lHashAtual := TStringHelpers.HashMD5(memHistHorario.Text, HASH_SALTING);
+  lHashAtual := TStringHelpers.HashMD5(memHistHorario.Text);
   Result := TStringHelpers.VerificarDiferenca(lHashArquivo, lHashAtual);
 end;
 
