@@ -35,6 +35,7 @@ type
       pCaptionBotoes: array of string): Integer;
     procedure SairCampo(pProcInserirHorario: TProcInserirHorario; pDiaSemana: THorariosDia; pEdit: TCustomEdit);
     function RetornarDiaSemana: THorariosDia;
+    function RetornarEditsNaoVerificados: TArray<TMaskEdit>;
     procedure Notificar;
   public
     procedure AtivarEventosOnExit;
@@ -209,40 +210,50 @@ begin
   end;
 end;
 
+function TfrmHorariosDia.RetornarEditsNaoVerificados: TArray<TMaskEdit>;
+begin
+  Result := [];
+
+  for var lComponente in Self do
+  begin
+    if not (lComponente is TMaskEdit) then
+    begin
+      Continue;
+    end;
+
+    if (TMaskEdit(lComponente).Color = clGray) then
+    begin
+      Result := Result + [TMaskEdit(lComponente)];
+    end;
+  end;
+end;
+
 procedure TfrmHorariosDia.SairCampo(pProcInserirHorario: TProcInserirHorario; pDiaSemana: THorariosDia;
   pEdit: TCustomEdit);
 var
   lPontoSemanal: TFolhaPontoSemanalSingleton;
   lMensagemDlg: Integer;
-  lPossuiHorarioInvalido: Boolean;
   lEdit: TMaskEdit absolute pEdit;
 begin
   lPontoSemanal := TFolhaPontoSemanalSingleton.ObterInstancia;
-  lPossuiHorarioInvalido := False;
 
   try
     pProcInserirHorario(lEdit.Text);
 
-//    for var lComponente in Self do
-//    begin
-//      if not (lComponente is TMaskEdit) then
-//      begin
-//        Continue;
-//      end;
-//
-//      if (TMaskEdit(lComponente).Color <> clWindow) and (TMaskEdit(lComponente).Color <> clSkyBlue) then
-//      begin
-//        lPossuiHorarioInvalido := True;
-//      end;
-//    end;
-//
-//    if not lPossuiHorarioInvalido then
-//    begin
+    for var lComponente in RetornarEditsNaoVerificados do
+    begin
+      if lComponente = lEdit then
+      begin
+        lComponente.Color := clWindow;
+      end;
+    end;
+
+    if RetornarEditsNaoVerificados = nil then
+    begin
       pDiaSemana.CalcularHorasTrabalhadas;
       lPontoSemanal.CalcularDesempenho;
-//    end;
-
-    Notificar;
+      Notificar;
+    end;
   except
     on E: Exception do
     begin
@@ -253,7 +264,7 @@ begin
       begin
         TComponenteHelpers.Focar(lEdit);
         lEdit.Color := clWindow;
-        Exit
+        Abort;
       end;
 
       lEdit.Color := clGray;

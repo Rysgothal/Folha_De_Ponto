@@ -242,6 +242,21 @@ end;
 procedure TfrmPrincipal.CarregarArquivoFolhaDePonto;
 begin
   try
+//    for var lComponente in Self do
+//    begin
+//      if not (lComponente is TMaskEdit) then
+//      begin
+//        Continue;
+//      end;
+//
+//      if (TMaskEdit(lComponente).Color = clGray) then
+//      begin
+//        Application.MessageBox('Ainda possui valores que não foram revisados, verifique', 'Atenção',
+//          MB_OK + MB_ICONINFORMATION);
+//        Exit;
+//      end;
+//    end;
+
     if not dtmPrincipal.CarregarArquivo.Execute then
     begin
       Exit;
@@ -305,6 +320,11 @@ begin
   except
     on E: Exception do
     begin
+      if E.ClassType = EAbort then
+      begin
+        Exit;
+      end;
+
       Application.MessageBox(PChar('Houve uma inconsistencia no sistema, verifique:' + sLineBreak + E.Message),
         'Atenção', MB_OKCANCEL + MB_ICONWARNING);
     end;
@@ -562,14 +582,15 @@ procedure TfrmPrincipal.Salvar;
 begin
   for var lComponente in Self do
   begin
-    if not (lComponente is TfrmHorariosDia) then
+    if not (lComponente is TMaskEdit) then
     begin
       Continue;
     end;
 
-    if TfrmHorariosDia(lComponente).ProcurarHorarioIncorreto then
+    if (TMaskEdit(lComponente).Color = clGray) then
     begin
-      Application.MessageBox('Possui Horários ainda não revisados, verifique.', 'Atenção', MB_OK + MB_ICONINFORMATION);
+      Application.MessageBox('Ainda possui valores que não foram revisados, verifique', 'Atenção',
+        MB_OK + MB_ICONINFORMATION);
       Exit;
     end;
   end;

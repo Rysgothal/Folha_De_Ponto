@@ -71,10 +71,18 @@ procedure TfrmDadosFuncionario.edtAdmissaoExit(Sender: TObject);
 var
   lFolhaPonto: TFolhaPontoSemanalSingleton;
 begin
-  lFolhaPonto := TFolhaPontoSemanalSingleton.ObterInstancia;
-  lFolhaPonto.DataAdmissao := edtAdmissao.Text;
-  edtAdmissao.Text := lFolhaPonto.DataAdmissao;
-  lblAnosMesesSemanasDias.Caption := lFolhaPonto.TempoAdmissao;
+  try
+    lFolhaPonto := TFolhaPontoSemanalSingleton.ObterInstancia;
+    lFolhaPonto.DataAdmissao := edtAdmissao.Text;
+    edtAdmissao.Text := lFolhaPonto.DataAdmissao;
+    lblAnosMesesSemanasDias.Caption := lFolhaPonto.TempoAdmissao;
+  except
+    on E: Exception do
+    begin
+      Application.MessageBox(PChar(E.Message), 'Atenção', MB_OKCANCEL + MB_ICONWARNING);
+      TComponenteHelpers.Focar(edtAdmissao);
+    end;
+  end;
 end;
 
 procedure TfrmDadosFuncionario.edtCodigoChange(Sender: TObject);
@@ -86,9 +94,17 @@ procedure TfrmDadosFuncionario.edtCodigoExit(Sender: TObject);
 var
   lFolhaPonto: TFolhaPontoSemanalSingleton;
 begin
-  lFolhaPonto := TFolhaPontoSemanalSingleton.ObterInstancia;
-  lFolhaPonto.ID := edtCodigo.Text;
-  edtCodigo.Text := lFolhaPonto.ID;
+  try
+    lFolhaPonto := TFolhaPontoSemanalSingleton.ObterInstancia;
+    lFolhaPonto.ID := edtCodigo.Text;
+    edtCodigo.Text := lFolhaPonto.ID;
+  except
+    on E: Exception do
+    begin
+      Application.MessageBox(PChar(E.Message), 'Atenção', MB_OKCANCEL + MB_ICONWARNING);
+      TComponenteHelpers.Focar(edtCodigo);
+    end;
+  end;
 end;
 
 procedure TfrmDadosFuncionario.edtIntervaloAlmocoChange(Sender: TObject);
@@ -100,11 +116,19 @@ procedure TfrmDadosFuncionario.edtIntervaloAlmocoExit(Sender: TObject);
 var
   lFolhaPonto: TFolhaPontoSemanalSingleton;
 begin
-  TComponenteHelpers.FormatarIntervalo(edtIntervaloAlmoco);
+  try
+    TComponenteHelpers.FormatarIntervalo(edtIntervaloAlmoco);
 
-  lFolhaPonto := TFolhaPontoSemanalSingleton.ObterInstancia;
-  lFolhaPonto.IntervaloAlmoco := edtIntervaloAlmoco.Text;
-  lblTempoExtenso.Caption := lFolhaPonto.IntervaloAlmocoExtenso;
+    lFolhaPonto := TFolhaPontoSemanalSingleton.ObterInstancia;
+    lFolhaPonto.IntervaloAlmoco := edtIntervaloAlmoco.Text;
+    lblTempoExtenso.Caption := lFolhaPonto.IntervaloAlmocoExtenso;
+  except
+    on E: Exception do
+    begin
+      Application.MessageBox(PChar(E.Message), 'Atenção', MB_OKCANCEL + MB_ICONWARNING);
+      TComponenteHelpers.Focar(edtIntervaloAlmoco);
+    end;
+  end;
 end;
 
 procedure TfrmDadosFuncionario.edtJornadaSemanalChange(Sender: TObject);
@@ -116,8 +140,16 @@ procedure TfrmDadosFuncionario.edtJornadaSemanalExit(Sender: TObject);
 var
   lFolhaPonto: TFolhaPontoSemanalSingleton;
 begin
-  lFolhaPonto := TFolhaPontoSemanalSingleton.ObterInstancia;
-  lFolhaPonto.JornadaSemanal := edtJornadaSemanal.Text;
+  try
+    lFolhaPonto := TFolhaPontoSemanalSingleton.ObterInstancia;
+    lFolhaPonto.JornadaSemanal := edtJornadaSemanal.Text;
+  except
+    on E: Exception do
+    begin
+      Application.MessageBox(PChar(E.Message), 'Atenção', MB_OKCANCEL + MB_ICONWARNING);
+      TComponenteHelpers.Focar(edtJornadaSemanal);
+    end;
+  end;
 end;
 
 procedure TfrmDadosFuncionario.edtNomeChange(Sender: TObject);
@@ -129,8 +161,16 @@ procedure TfrmDadosFuncionario.edtNomeExit(Sender: TObject);
 var
   lFolhaPonto: TFolhaPontoSemanalSingleton;
 begin
-  lFolhaPonto := TFolhaPontoSemanalSingleton.ObterInstancia;
-  lFolhaPonto.Nome := edtNome.Text;
+  try
+    lFolhaPonto := TFolhaPontoSemanalSingleton.ObterInstancia;
+    lFolhaPonto.Nome := edtNome.Text;
+  except
+    on E: Exception do
+    begin
+      Application.MessageBox(PChar(E.Message), 'Atenção', MB_OKCANCEL + MB_ICONWARNING);
+      TComponenteHelpers.Focar(edtNome);
+    end;
+  end;
 end;
 
 procedure TfrmDadosFuncionario.Limpar;
