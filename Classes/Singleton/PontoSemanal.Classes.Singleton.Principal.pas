@@ -26,7 +26,6 @@ type
     FSabado: THorariosDia;
     FObservers: TDictionary<TDiaSemana, IObservador>;
     FConverterHora: IConverter;
-    FJornadaSemanalExtenso: string;
     FIntervaloAlmocoExtenso: string;
     constructor Create;
     procedure SetID(const pValor: string);
@@ -78,7 +77,7 @@ begin
   FJornadaSemanal := '0';
   FTempoAdmissao := '-> anos; meses; semanas; dias;';
   FIntervaloAlmoco := EmptyStr;
-  FIntervaloAlmocoExtenso := EmptyStr;
+  FIntervaloAlmocoExtenso := '"x" horas e "y" minutos';
   FDesempenho := TDesempenho.Create;
 
   FSegunda := THorariosDia.Create(dsSegunda);
@@ -209,6 +208,7 @@ begin
   if TStringHelpers.VerificarCampoVazio(pValor) then
   begin
     FIntervaloAlmoco := EmptyStr;
+    FIntervaloAlmocoExtenso := '"x" horas e "y" minutos';
     Exit;
   end;
 

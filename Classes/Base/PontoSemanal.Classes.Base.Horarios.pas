@@ -17,7 +17,6 @@ type
     FSaidaFinal: string;
     FDesempenho: TDesempenho;
     FJornada: Integer;
-    FNome: string;
     procedure SetEntrada(const pValor: string);
     procedure SetRetornoAlmoco(const pValor: string);
     procedure SetSaidaAlmoco(const pValor: string);

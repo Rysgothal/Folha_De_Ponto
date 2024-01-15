@@ -232,6 +232,12 @@ begin
   FFolhaDePonto.Add('[Sexta]: ' + TStringHelpers.HashMD5(lSexta));
   FFolhaDePonto.Add('[Sabado]: ' + TStringHelpers.HashMD5(lSabado));
 
+  FFolhaDePonto.Add('[Funcionario-Codigo]: ' + TStringHelpers.HashMD5(lPontoSemanal.ID));
+  FFolhaDePonto.Add('[Funcionario-Nome]: ' + TStringHelpers.HashMD5(lPontoSemanal.Nome));
+  FFolhaDePonto.Add('[Funcionario-Admissao]: ' + TStringHelpers.HashMD5(lPontoSemanal.DataAdmissao));
+  FFolhaDePonto.Add('[Funcionario-Jornada]: ' + TStringHelpers.HashMD5(lPontoSemanal.JornadaSemanal));
+  FFolhaDePonto.Add('[Funcionario-Intervalo]: ' + TStringHelpers.HashMD5(lPontoSemanal.IntervaloAlmoco));
+
   AdicionarLinhaHash(lPontoSemanal.Segunda);
   AdicionarLinhaHash(lPontoSemanal.Terca);
   AdicionarLinhaHash(lPontoSemanal.Quarta);

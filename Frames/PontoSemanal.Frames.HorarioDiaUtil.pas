@@ -8,7 +8,8 @@ uses
   PontoSemanal.Interfaces.Observer.Observador,
   PontoSemanal.Classes.Base.Horarios, PontoSemanal.Helpers.TiposAuxiliares,
   PontoSemanal.Interfaces.Observer.Sujeito, PontoSemanal.Frames.SaldoHorasDia, 
-  PontoSemanal.Helpers.Componentes, System.RegularExpressions, System.StrUtils;
+  PontoSemanal.Helpers.Componentes, System.RegularExpressions, System.StrUtils,
+  System.Generics.Collections;
 
 type
   TProcInserirHorario = procedure(const pValor: string) of object;
@@ -30,7 +31,8 @@ type
     procedure medSaidaFinalExit(Sender: TObject);
   private
     { Private declarations }
-    procedure TratarExcecoes(pE: Exception);
+    function MostrarMensagemDlg(const pMensagem: string; pMsgDlgType: TmsgDlgType; pBotoes: TMsgDlgButtons;
+      pCaptionBotoes: array of string): Integer;
     procedure SairCampo(pProcInserirHorario: TProcInserirHorario; pDiaSemana: THorariosDia; pEdit: TCustomEdit);
     function RetornarDiaSemana: THorariosDia;
     procedure Notificar;
@@ -42,6 +44,7 @@ type
     procedure DefinirCorPadraoComponentes;
     procedure PreencherValoresHorarios(pGroupCollection: TGroupCollection);
     procedure AlterarEditHorarioViolado(pHorario: TRegistroHorario);
+    function ProcurarHorarioIncorreto: Boolean;
     { Public declarations }
   end;
 
@@ -134,6 +137,41 @@ begin
   SairCampo(lDiaSemana.InserirSaidaFinal, lDiaSemana, medSaidaFinal);
 end;
 
+function TfrmHorariosDia.MostrarMensagemDlg(const pMensagem: string; pMsgDlgType: TmsgDlgType; pBotoes: TMsgDlgButtons;
+  pCaptionBotoes: array of string): Integer;
+var
+  lMsgDialog: TForm;
+  lDlgBotao: Tbutton;
+  lCaptionIndex, lBotaoLeft: Integer;
+begin
+  lMsgDialog := CreateMessageDialog(pMensagem, pMsgDlgType, pBotoes);
+  lMsgDialog.Caption := 'Atenção!';
+  lCaptionIndex := 0;
+  lBotaoLeft := 0;
+
+  for var I := 0 to lMsgDialog.ComponentCount - 1 Do
+  begin
+    if not (lMsgDialog.Components[I] is TButton) then
+    begin
+      Continue;
+    end;
+
+    lDlgBotao := TButton(lMsgDialog.Components[I]);
+    lDlgBotao.Width := 110;
+    Inc(lBotaoLeft, lDlgBotao.Width);
+    lDlgBotao.Left := lBotaoLeft;
+
+    if lCaptionIndex <= High(pCaptionBotoes) then
+    begin
+      lDlgBotao.Caption := pCaptionBotoes[lCaptionIndex];
+    end;
+
+    Inc(lCaptionIndex);
+  end;
+
+  Result := lMsgDialog.Showmodal;
+end;
+
 procedure TfrmHorariosDia.Notificar;
 var
   lPontoSemanal: TFolhaPontoSemanalSingleton;
@@ -175,26 +213,53 @@ procedure TfrmHorariosDia.SairCampo(pProcInserirHorario: TProcInserirHorario; pD
   pEdit: TCustomEdit);
 var
   lPontoSemanal: TFolhaPontoSemanalSingleton;
+  lMensagemDlg: Integer;
+  lPossuiHorarioInvalido: Boolean;
+  lEdit: TMaskEdit absolute pEdit;
 begin
   lPontoSemanal := TFolhaPontoSemanalSingleton.ObterInstancia;
+  lPossuiHorarioInvalido := False;
 
   try
-    pProcInserirHorario(pEdit.Text);
-    pDiaSemana.CalcularHorasTrabalhadas;
-    lPontoSemanal.CalcularDesempenho;
+    pProcInserirHorario(lEdit.Text);
+
+//    for var lComponente in Self do
+//    begin
+//      if not (lComponente is TMaskEdit) then
+//      begin
+//        Continue;
+//      end;
+//
+//      if (TMaskEdit(lComponente).Color <> clWindow) and (TMaskEdit(lComponente).Color <> clSkyBlue) then
+//      begin
+//        lPossuiHorarioInvalido := True;
+//      end;
+//    end;
+//
+//    if not lPossuiHorarioInvalido then
+//    begin
+      pDiaSemana.CalcularHorasTrabalhadas;
+      lPontoSemanal.CalcularDesempenho;
+//    end;
+
     Notificar;
   except
     on E: Exception do
     begin
-      TratarExcecoes(E);
-      TComponenteHelpers.Focar(pEdit);
+      lMensagemDlg := MostrarMensagemDlg(E.Message, TMsgDlgType.mtInformation, [mbYes, mbNo],
+        ['Verificar agora', 'Verificar depois']);
+
+      if lMensagemDlg = IDYES then
+      begin
+        TComponenteHelpers.Focar(lEdit);
+        lEdit.Color := clWindow;
+        Exit
+      end;
+
+      lEdit.Color := clGray;
+      frmSaldoHorasDia.Limpar;
     end;
   end;
-end;
-
-procedure TfrmHorariosDia.TratarExcecoes(pE: Exception);
-begin
-  Application.MessageBox(pChar(pE.Message), 'ATENÇÃO', MB_ICONINFORMATION + MB_OK);
 end;
 
 function TfrmHorariosDia.VerificarSePossuiValoresAnotados: Boolean;
@@ -230,6 +295,25 @@ begin
   medSaidaAlmoco.Text := pGroupCollection[3].Value;
   medRetornoAlmoco.Text := pGroupCollection[4].Value;
   medSaidaFinal.Text := pGroupCollection[5].Value;
+end;
+
+function TfrmHorariosDia.ProcurarHorarioIncorreto: Boolean;
+begin
+  Result := False;
+
+  for var lComponente in self do
+  begin
+    if not (lComponente is TMaskEdit) then
+    begin
+      Continue;
+    end;
+
+    if TMaskEdit(lComponente).Color <> clWindow then
+    begin
+      Result := True;
+      Break;
+    end;
+  end;
 end;
 
 end.

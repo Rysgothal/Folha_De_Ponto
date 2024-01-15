@@ -104,7 +104,7 @@ begin
 
   lFolhaPonto := TFolhaPontoSemanalSingleton.ObterInstancia;
   lFolhaPonto.IntervaloAlmoco := edtIntervaloAlmoco.Text;
-  lblTempoExtenso.Caption := TStringHelpers.IntervaloPorExtenso(lFolhaPonto.IntervaloAlmoco);
+  lblTempoExtenso.Caption := lFolhaPonto.IntervaloAlmocoExtenso;
 end;
 
 procedure TfrmDadosFuncionario.edtJornadaSemanalChange(Sender: TObject);
