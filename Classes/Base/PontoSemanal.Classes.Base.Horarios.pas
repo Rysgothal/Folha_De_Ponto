@@ -232,15 +232,22 @@ begin
   end;
 
   AbortarCasoHorarioInvalido(pValor);
-  AbortarCasoHorarioZeradoNaoPermitido(pValor);
-  AbortarCasoHorarioAtualMaiorQueSaidaFinal(pValor);
 
-  if TExceptionHelpers.VerificarHorarioAtualMaiorQueSaidaAlmoco(pValor, SaidaAlmoco) then
+  if (FJornada <> 0) then
   begin
-    CriarException(EHorarioAtualMaiorQueSaidaAlmoco, 'O horário atual está maior que "Saída-Almoço", verifique.');
+    AbortarCasoHorarioZeradoNaoPermitido(pValor);
+    AbortarCasoHorarioAtualMaiorQueSaidaFinal(pValor);
   end;
 
-  AbortarCasoHorarioAtualMaiorQueRetornoAlmoco(pValor);
+  if FTag <> dsSabado then
+  begin
+    if TExceptionHelpers.VerificarHorarioAtualMaiorQueSaidaAlmoco(pValor, SaidaAlmoco) then
+    begin
+      CriarException(EHorarioAtualMaiorQueSaidaAlmoco, 'O horário atual está maior que "Saída-Almoço", verifique.');
+    end;
+
+    AbortarCasoHorarioAtualMaiorQueRetornoAlmoco(pValor);
+  end;
 
   FEntrada := pValor;
 end;
@@ -312,16 +319,23 @@ begin
   end;
 
   AbortarCasoHorarioInvalido(pValor);
-  AbortarCasoHorarioZeradoNaoPermitido(pValor);
-  AbortarCasoHorarioAtualMenorQueEntrada(pValor);
 
-  if TExceptionHelpers.VerificarHorarioAtualMenorQueRetornoAlmoco(pValor, RetornoAlmoco) then
+  if (FJornada <> 0) then
   begin
-    CriarException(EHorarioAtualMenorQueRetornoAlmoco, 'O horário atual está menor que o horário "Retorno-Almoço"' +
-      ', verifique.');
+    AbortarCasoHorarioZeradoNaoPermitido(pValor);
+    AbortarCasoHorarioAtualMenorQueEntrada(pValor);
   end;
 
-  AbortarCasoHorarioAtualMenorQueSaidaAlmoco(pValor);
+  if FTag <> dsSabado then
+  begin
+    if TExceptionHelpers.VerificarHorarioAtualMenorQueRetornoAlmoco(pValor, RetornoAlmoco) then
+    begin
+      CriarException(EHorarioAtualMenorQueRetornoAlmoco, 'O horário atual está menor que o horário "Retorno-Almoço"' +
+        ', verifique.');
+    end;
+
+    AbortarCasoHorarioAtualMenorQueSaidaAlmoco(pValor);
+  end;
 
   FSaidaFinal := pValor;
 end;

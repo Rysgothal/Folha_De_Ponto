@@ -4,6 +4,7 @@ object frmHorariosDia: TfrmHorariosDia
   Width = 547
   Height = 54
   TabOrder = 0
+  OnExit = FrameExit
   PixelsPerInch = 96
   object bvlDivisorTotalHoras: TBevel
     Left = 368

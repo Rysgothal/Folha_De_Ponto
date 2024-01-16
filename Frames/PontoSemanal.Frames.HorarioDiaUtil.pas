@@ -29,13 +29,13 @@ type
     procedure medRetornoAlmocoExit(Sender: TObject);
     procedure medSaidaAlmocoExit(Sender: TObject);
     procedure medSaidaFinalExit(Sender: TObject);
+    procedure FrameExit(Sender: TObject);
   private
     { Private declarations }
     function MostrarMensagemDlg(const pMensagem: string; pMsgDlgType: TmsgDlgType; pBotoes: TMsgDlgButtons;
       pCaptionBotoes: array of string): Integer;
     procedure SairCampo(pProcInserirHorario: TProcInserirHorario; pDiaSemana: THorariosDia; pEdit: TCustomEdit);
     function RetornarDiaSemana: THorariosDia;
-    function RetornarEditsNaoVerificados: TArray<TMaskEdit>;
     procedure Notificar;
   public
     procedure AtivarEventosOnExit;
@@ -46,6 +46,7 @@ type
     procedure PreencherValoresHorarios(pGroupCollection: TGroupCollection);
     procedure AlterarEditHorarioViolado(pHorario: TRegistroHorario);
     function ProcurarHorarioIncorreto: Boolean;
+    function RetornarEditsNaoVerificados: TArray<TMaskEdit>;
     { Public declarations }
   end;
 
@@ -97,6 +98,21 @@ begin
   end;
 end;
 
+procedure TfrmHorariosDia.FrameExit(Sender: TObject);
+var
+  lDiaSemana: THorariosDia;
+begin
+  if TComponenteHelpers.VerificarTodosCamposVazio([medSaidaAlmoco, medRetornoAlmoco]) and
+    not TComponenteHelpers.VerificarTodosCamposVazio([medEntrada, medSaidaFinal]) then
+  begin
+    lDiaSemana := RetornarDiaSemana;
+    medSaidaAlmoco.Text := '00:00';
+    medRetornoAlmoco.text := '00:00';
+    SairCampo(lDiaSemana.InserirSaidaAlmoco, lDiaSemana, medSaidaAlmoco);
+    SairCampo(lDiaSemana.InserirRetornoAlmoco, lDiaSemana, medRetornoAlmoco);
+  end;
+end;
+
 procedure TfrmHorariosDia.Limpar;
 begin
   medEntrada.Clear;
@@ -143,12 +159,12 @@ function TfrmHorariosDia.MostrarMensagemDlg(const pMensagem: string; pMsgDlgType
 var
   lMsgDialog: TForm;
   lDlgBotao: Tbutton;
-  lCaptionIndex, lBotaoLeft: Integer;
+  lCaptionIndex: Integer;
 begin
+  Screen.MessageFont.Size := 10;
   lMsgDialog := CreateMessageDialog(pMensagem, pMsgDlgType, pBotoes);
   lMsgDialog.Caption := 'Atenção!';
   lCaptionIndex := 0;
-  lBotaoLeft := 0;
 
   for var I := 0 to lMsgDialog.ComponentCount - 1 Do
   begin
@@ -158,9 +174,7 @@ begin
     end;
 
     lDlgBotao := TButton(lMsgDialog.Components[I]);
-    lDlgBotao.Width := 110;
-    Inc(lBotaoLeft, lDlgBotao.Width);
-    lDlgBotao.Left := lBotaoLeft;
+    lDlgBotao.Font.Height := -12;
 
     if lCaptionIndex <= High(pCaptionBotoes) then
     begin

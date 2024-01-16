@@ -4,18 +4,14 @@ object dtmPrincipal: TdtmPrincipal
   PixelsPerInch = 96
   object SalvarArquivo: TSaveDialog
     Filter = 'Hist'#243'rico de Ponto(*.txt)|*.txt'
-    InitialDir = 
-      'C:\Users\Lucas Souza\Documents\Embarcadero\Studio\Projects\Exerc' +
-      #237'cio 05'
+    InitialDir = 'D:\GitHub_Lucas\Folha_de_Ponto\FolhasDePonto'
     Title = 'Salvar hist'#243'rico do registro de ponto semanal'
     Left = 123
     Top = 194
   end
   object CarregarArquivo: TOpenDialog
     Filter = 'Hist'#243'rico de Ponto|*.txt'
-    InitialDir = 
-      'C:\Users\Lucas Souza\Documents\Embarcadero\Studio\Projects\Exerc' +
-      #237'cio 05'
+    InitialDir = 'D:\GitHub_Lucas\Folha_de_Ponto\FolhasDePonto'
     Title = 'Abrir hist'#243'rico do registro de ponto semanal'
     Left = 123
     Top = 130

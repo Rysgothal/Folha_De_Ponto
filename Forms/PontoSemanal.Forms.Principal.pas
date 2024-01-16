@@ -47,7 +47,7 @@ type
     procedure AtualizarHorarioSistema;
     procedure ConfigurarObservadores;
     procedure AplicarTagFrame(pFrame: TfrmHorariosDia; pTag: TDiaSemana);
-    function NovoRegistro: Boolean;
+    function NovoRegistro(pCarregandoArquivo: Boolean = False): Boolean;
     procedure LimparFormulario;
     procedure SalvarHistorico;
     procedure CarregarHistorico;
@@ -168,12 +168,6 @@ begin
 
   frmDadosFuncionario.Limpar;
   frmHorasTrabalhadasSemana.Limpar;
-//  frmSegunda.Limpar;
-//  frmTerca.Limpar;
-//  frmQuarta.Limpar;
-//  frmQuinta.Limpar;
-//  frmSexta.Limpar;
-//  frmSabado.Limpar;
   memHistHorario.Clear;
   ConfigurarObservadores;
 end;
@@ -242,21 +236,6 @@ end;
 procedure TfrmPrincipal.CarregarArquivoFolhaDePonto;
 begin
   try
-//    for var lComponente in Self do
-//    begin
-//      if not (lComponente is TMaskEdit) then
-//      begin
-//        Continue;
-//      end;
-//
-//      if (TMaskEdit(lComponente).Color = clGray) then
-//      begin
-//        Application.MessageBox('Ainda possui valores que não foram revisados, verifique', 'Atenção',
-//          MB_OK + MB_ICONINFORMATION);
-//        Exit;
-//      end;
-//    end;
-
     if not dtmPrincipal.CarregarArquivo.Execute then
     begin
       Exit;
@@ -333,7 +312,7 @@ end;
 
 procedure TfrmPrincipal.CarregarHistorico;
 begin
-  if not NovoRegistro then
+  if not NovoRegistro(True) then
   begin
     Exit;
   end;
@@ -498,15 +477,21 @@ begin
   lPontoSemanal.AdicionarObservador(pTag, pFrame.frmSaldoHorasDia);
 end;
 
-function TfrmPrincipal.NovoRegistro: Boolean;
+function TfrmPrincipal.NovoRegistro(pCarregandoArquivo: Boolean): Boolean;
 var
   lPossuiValoresPreenchidos: Boolean;
+  lMsgAuxiliar: string;
 begin
   lPossuiValoresPreenchidos := VerificarPossuiValoresPreenchidos;
 
-  if lPossuiValoresPreenchidos and (Application.MessageBox('Ainda existem valores anotados na Folha de Ponto, ' +
-    'ao criar um novo registro os dados serão sobrescritos.' + sLineBreak + sLineBreak + '> Deseja realmente ' +
-    'criar um novo registro?', 'ATENÇÃO', MB_YESNO + MB_ICONWARNING) = ID_NO) then
+  case pCarregandoArquivo of
+    True: lMsgAuxiliar := 'carregar um registro?';
+    else lMsgAuxiliar := 'criar um novo registro?';
+  end;
+
+  if lPossuiValoresPreenchidos and (Application.MessageBox(PChar('Ainda existem valores anotados na Folha de Ponto, ' +
+    'ao prosseguir os dados serão sobrescritos.' + sLineBreak + sLineBreak + '> Deseja realmente ' + lMsgAuxiliar),
+    'ATENÇÃO', MB_YESNO + MB_ICONWARNING) = ID_NO) then
   begin
     Exit(False);
   end;
@@ -579,18 +564,23 @@ begin
 end;
 
 procedure TfrmPrincipal.Salvar;
+var
+  lEdits: TArray<TMaskEdit>;
 begin
   for var lComponente in Self do
   begin
-    if not (lComponente is TMaskEdit) then
+    if not (lComponente is TfrmHorariosDia) then
     begin
       Continue;
     end;
 
-    if (TMaskEdit(lComponente).Color = clGray) then
+    lEdits := TfrmHorariosDia(lComponente).RetornarEditsNaoVerificados;
+
+    if lEdits <> nil then
     begin
       Application.MessageBox('Ainda possui valores que não foram revisados, verifique', 'Atenção',
         MB_OK + MB_ICONINFORMATION);
+      TComponenteHelpers.Focar(lEdits[0]);
       Exit;
     end;
   end;
