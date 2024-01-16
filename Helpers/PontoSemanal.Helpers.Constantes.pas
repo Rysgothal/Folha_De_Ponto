@@ -16,7 +16,7 @@ type
     const REGEX_SABADO = 'S[a|á]bado';
 
     const REGEX_CODIGO_FUNCIONARIO = '(C[ó|o]digo)\W{0,}(\d{0,7})';
-    const REGEX_NOME_FUNCIONARIO = '(Funcion[á|o]nario)\W{0,}(.*)\R';
+    const REGEX_NOME_FUNCIONARIO = '(Funcion[á|a]rio)\W{0,}(.*)\R';
     const REGEX_ADMISSAO_FUNCIONARIO = '(Admiss[ã|a]o)\W{0,}(\d{2}[\/]\d{2}[\/]\d{4})';
     const REGEX_JORNADA_FUNCIONARIO = '(Jornada\sSemanal)\W{0,}(\d{0,3})';
     const REGEX_INTERVALO_FUNCIONARIO = '(Intervalo\s?Almo[ç|c]o)\W{0,}(\d{2}[\:]\d{2})';
@@ -35,7 +35,7 @@ type
     const REGEX_QUINTA_HORARIOS = REGEX_QUINTA + REGEX_FOLHA_HORARIOS_DIA_UTIL;
     const REGEX_SEXTA_HORARIOS = REGEX_SEXTA + REGEX_FOLHA_HORARIOS_DIA_UTIL;
     const REGEX_SABADO_HORARIOS = REGEX_SABADO + REGEX_FOLHA_HORARIOS_NAO_UTIL;
-    end;
+  end;
 
 implementation
 

@@ -16,23 +16,23 @@ object frmHorariosDia: TfrmHorariosDia
   object lblSaidaFinal: TLabel
     Left = 286
     Top = 0
-    Width = 64
+    Width = 58
     Height = 15
-    Caption = 'Sa'#237'da - Final'
+    Caption = 'Sa'#237'da-Final'
   end
   object lblRetornoAlmoco: TLabel
     Left = 184
     Top = 0
-    Width = 85
+    Width = 89
     Height = 15
-    Caption = 'Retorno almo'#231'o'
+    Caption = 'Retorno-Almo'#231'o'
   end
   object lblSaidaAlmoco: TLabel
     Left = 99
     Top = 0
-    Width = 71
+    Width = 75
     Height = 15
-    Caption = 'Sa'#237'da almo'#231'o'
+    Caption = 'Sa'#237'da-Almo'#231'o'
   end
   object lblEntrada: TLabel
     Left = 23

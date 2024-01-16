@@ -45,30 +45,33 @@ type
   private
     { Private declarations }
     procedure AtualizarHorarioSistema;
-    procedure ConfigurarObservadores;
-    procedure AplicarTagFrame(pFrame: TfrmHorariosDia; pTag: TDiaSemana);
-    function NovoRegistro(pCarregandoArquivo: Boolean = False): Boolean;
-    procedure LimparFormulario;
-    procedure SalvarHistorico;
-    procedure CarregarHistorico;
-    function VerificarPossuiValoresPreenchidos: Boolean;
-    procedure Salvar;
-    procedure PreencherDadosNoMemo;
-    function ConcatenarHorarios(pDia: THorariosDia): string;
-    procedure GravarFolhaDePontoSemanal;
-    procedure DefinirCoresPadraoComponentes;
-    procedure CarregarArquivoFolhaDePonto;
-    procedure BuscarValoresHorariosRegEx;
-    procedure BuscarValoresDadosFuncionario;
-    procedure PreencherValoresDadosFuncionario(pRegex: string; pEdit: TCustomEdit);
-    function VerificarViolacaoFolhaDePonto: Boolean;
-    function RetornarHashDentroArquivo(pPalavraChave: string): string;
     procedure AnalisarFolhaDePontoAlterada;
     procedure AnalisarDiaDaSemanaAlterado(pDiaSemana: THorariosDia);
     procedure AnalisarDadosFuncionarioAlterados;
+    procedure AplicarTagFrame(pFrame: TfrmHorariosDia; pTag: TDiaSemana);
+    procedure BuscarValoresRegEx;
+    procedure BuscarValoresHorariosRegEx;
+    procedure BuscarValoresDadosFuncionarioRegEx;
+    procedure CarregarHistorico;
+    procedure CarregarArquivoFolhaDePonto;
+    procedure ConfigurarObservadores;
+    function ConcatenarHorarios(pDia: THorariosDia): string;
+    procedure DefinirCoresPadraoComponentes;
     procedure DestacarHorariosAlterados(pHorarios: THorariosDia; pDia: string);
     procedure DestacarDadosFuncionarioAlterados(pHashFolha, pHashAtual: string; pEdit: TCustomEdit);
+    procedure GravarFolhaDePontoSemanal;
+    procedure LimparFormulario;
+    function NovoRegistro(pCarregandoArquivo: Boolean = False): Boolean;
+    procedure PreencherDadosNoMemo;
+    procedure PreencherValoresHorariosRegEx(pDiaSemana: TDiaSemana);
+    procedure PreencherValoresDadosFuncionario(pRegex: string; pEdit: TCustomEdit);
+    function RetornarMatchesHorariosRegex(pDiaSemana: TDiaSemana): TMatchCollection;
+    function RetornarHashDentroArquivo(pPalavraChave: string): string;
     function RetornarFrameDia(pDia: TDiaSemana): TfrmHorariosDia;
+    procedure Salvar;
+    procedure SalvarHistorico;
+    function VerificarPossuiValoresPreenchidos: Boolean;
+    function VerificarViolacaoFolhaDePonto: Boolean;
   public
     { Public declarations }
   end;
@@ -111,8 +114,8 @@ begin
   lPontoSemanal := TFolhaPontoSemanalSingleton.ObterInstancia;
 
   try
-    lNomeFuncionario := lPontoSemanal.ID + '_' + StringReplace(lPontoSemanal.Nome, ' ', '_', [rfReplaceAll]) + '.txt';
-    dtmPrincipal.SalvarArquivo.FileName := lNomeFuncionario;
+    lNomeFuncionario := lPontoSemanal.ID + '_' + StringReplace(lPontoSemanal.Nome, ' ', '_', [rfReplaceAll]) + '.TXT';
+    dtmPrincipal.SalvarArquivo.FileName := lNomeFuncionario.ToUpper;
     memHistHorario.FocarCabecalho;
 
     if not dtmPrincipal.SalvarArquivo.Execute then
@@ -120,7 +123,8 @@ begin
       Exit;
     end;
 
-    if (ExtractFileExt(dtmPrincipal.SalvarArquivo.FileName) <> '.txt') and (ExtractFileExt(dtmPrincipal.SalvarArquivo.FileName) <> EmptyStr) then
+    if (ExtractFileExt(dtmPrincipal.SalvarArquivo.FileName).ToUpper <> '.TXT') and
+      (ExtractFileExt(dtmPrincipal.SalvarArquivo.FileName) <> EmptyStr) then
     begin
       Application.MessageBox('A folha de ponto não pode ser salva, a extensão selecionanda não é suportada.' +
         sLineBreak + 'Salve como ".TXT"', 'Atenção', MB_OK + MB_ICONINFORMATION);
@@ -130,7 +134,7 @@ begin
 
     if FileExists(dtmPrincipal.SalvarArquivo.FileName) then
     begin
-      if Application.MessageBox('O Arquivo já existe. Deseja Substitui-lo?', 'Atenção', MB_YESNO +
+      if Application.MessageBox('O arquivo já existe. Deseja substitui-lo?', 'Atenção', MB_YESNO +
         MB_ICONINFORMATION) = ID_NO then
       begin
         Application.MessageBox('Arquivo não foi salvo!', 'Atenção', MB_OK + MB_ICONINFORMATION);
@@ -196,7 +200,7 @@ begin
   NovoRegistro;
 end;
 
-procedure TfrmPrincipal.BuscarValoresDadosFuncionario;
+procedure TfrmPrincipal.BuscarValoresDadosFuncionarioRegEx;
 begin
   PreencherValoresDadosFuncionario(TConstantes.REGEX_CODIGO_FUNCIONARIO, frmDadosFuncionario.edtCodigo);
   PreencherValoresDadosFuncionario(TConstantes.REGEX_NOME_FUNCIONARIO, frmDadosFuncionario.edtNome);
@@ -206,74 +210,60 @@ begin
 end;
 
 procedure TfrmPrincipal.BuscarValoresHorariosRegEx;
-var
-  lDiaNome: string;
-  lMatches: TMatchCollection;
-  lFrame: TfrmHorariosDia;
-  lDiaSemana: TDiaSemana;
 begin
-  lMatches := TRegex.Matches(memHistHorario.Text, TConstantes.REGEX_HORARIOS, [roIgnoreCase]);
+  PreencherValoresHorariosRegEx(dsSegunda);
+  PreencherValoresHorariosRegEx(dsTerca);
+  PreencherValoresHorariosRegEx(dsQuarta);
+  PreencherValoresHorariosRegEx(dsQuinta);
+  PreencherValoresHorariosRegEx(dsSexta);
+  PreencherValoresHorariosRegEx(dsSabado);
+end;
 
-  for var lMatch in lMatches do
-  begin
-    for var lGroup in lMatch.Groups do
-    begin
-      lDiaNome := Copy(lGroup.Value.Trim, 1, 3);
-      lDiaNome := lDiaNome.Replace('á', 'a', [rfReplaceAll]);
-      lDiaSemana := TDiaSemana(IndexStr(lDiaNome, ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab']));
-
-      if lDiaSemana = dsNenhum then
-      begin
-        Continue;
-      end;
-
-      lFrame := RetornarFrameDia(lDiaSemana);
-      lFrame.PreencherValoresHorarios(lMatch.Groups);
-    end;
-  end;
+procedure TfrmPrincipal.BuscarValoresRegEx;
+begin
+  BuscarValoresDadosFuncionarioRegEx;
+  BuscarValoresHorariosRegEx;
 end;
 
 procedure TfrmPrincipal.CarregarArquivoFolhaDePonto;
+var
+  lPassWord: string;
 begin
   try
+    lPassWord := EmptyStr;
+
     if not dtmPrincipal.CarregarArquivo.Execute then
     begin
       Exit;
     end;
 
-    if ExtractFileExt(dtmPrincipal.CarregarArquivo.FileName) <> '.txt' then
+    if ExtractFileExt(dtmPrincipal.CarregarArquivo.FileName).ToUpper <> '.TXT' then
     begin
       Application.MessageBox('O arquivo selecionado não corresponde a extensão suportada (.txt)', 'Atenção', MB_OK +
         MB_ICONINFORMATION);
       Exit;
     end;
 
-    LimparFormulario;
     memHistHorario.Lines.LoadFromFile(dtmPrincipal.CarregarArquivo.FileName);
 
-    if not TRegex.IsMatch(memHistHorario.Text, TConstantes.REGEX_HORARIOS, [roIgnoreCase]) then
+    if TStringHelpers.VerificarCampoVazio(memHistHorario.Text) then
     begin
       memHistHorario.Clear;
-      Application.MessageBox('> Folha de Ponto inválida <' + sLineBreak + 'O Arquivo escolhido não possui nenhum horário',
+      Application.MessageBox('> Folha de Ponto inválida <' + sLineBreak + 'O Arquivo escolhido não possui dados',
         'Atenção', MB_OK + MB_ICONINFORMATION);
       Exit;
     end;
 
-    BuscarValoresDadosFuncionario;
-    BuscarValoresHorariosRegEx;
+    BuscarValoresRegEx;
 
     if VerificarViolacaoFolhaDePonto then
     begin
       LimparFormulario;
-      memHistHorario.Clear;
-
-      var lPassWord: string;
-      lPassWord := EmptyStr;
 
       while lPassWord <> 'gansodeterno' do
       begin
-        lPassWord := InputBox('Arquivo Violada', #9'A Folha de Ponto foi violada, alguns dados podem ter sido' + sLineBreak +
-          'alterados, estarão descatados caso tenham inconformidade. Digite a Palavra-Chave', '');
+        lPassWord := InputBox('Arquivo violadao!', #9'A Folha de Ponto foi violada, alguns dados podem ter sido' +
+          sLineBreak + 'alterados, estarão descatados caso tenham inconformidade. Digite a Palavra-Chave:', '');
 
         if TStringHelpers.VerificarCampoVazio(lPassWord) then
         begin
@@ -288,8 +278,7 @@ begin
       end;
 
       memHistHorario.Lines.LoadFromFile(dtmPrincipal.CarregarArquivo.FileName);
-      BuscarValoresDadosFuncionario;
-      BuscarValoresHorariosRegEx;
+      BuscarValoresRegEx;
       frmDadosFuncionarioedtJornadaSemanalExit(nil);
       AnalisarFolhaDePontoAlterada;
     end;
@@ -425,29 +414,17 @@ begin
 
   lFrame := RetornarFrameDia(pHorarios.Tag);
 
-  if TStringHelpers.VerificarDiferenca(lHashArquivo[0], lHashAtual[0]) then
+  for var I := 0 to Pred(Length(lHashArquivo)) do
   begin
-    lFrame.AlterarEditHorarioViolado(rhEntrada);
-  end;
+    if (TDiaSemana(lFrame.Tag) = dsSabado) and (I in [1, 2]) then
+    begin
+      Continue;
+    end;
 
-  if TStringHelpers.VerificarDiferenca(lHashArquivo[3], lHashAtual[3]) then
-  begin
-    lFrame.AlterarEditHorarioViolado(rhSaidaFinal);
-  end;
-
-  if lFrame = frmSabado then
-  begin
-    Exit;
-  end;
-
-  if TStringHelpers.VerificarDiferenca(lHashArquivo[1], lHashAtual[1]) then
-  begin
-    lFrame.AlterarEditHorarioViolado(rhSaidaAlmoco);
-  end;
-
-  if TStringHelpers.VerificarDiferenca(lHashArquivo[2], lHashAtual[2]) then
-  begin
-    lFrame.AlterarEditHorarioViolado(rhRetornoAlmoco);
+    if TStringHelpers.VerificarDiferenca(lHashArquivo[I], lHashAtual[I]) then
+    begin
+      lFrame.AlterarEditHorarioViolado(TRegistroHorario(I));
+    end;
   end;
 end;
 
@@ -534,6 +511,17 @@ begin
   Tedit(pEdit).OnExit(pEdit);
 end;
 
+procedure TfrmPrincipal.PreencherValoresHorariosRegEx(pDiaSemana: TDiaSemana);
+var
+  lFrame: TfrmHorariosDia;
+begin
+  for var lMatch in RetornarMatchesHorariosRegex(pDiaSemana) do
+  begin
+    lFrame := RetornarFrameDia(pDiaSemana);
+    lFrame.PreencherValoresHorarios(lMatch.Groups);
+  end;
+end;
+
 function TfrmPrincipal.RetornarFrameDia(pDia: TDiaSemana): TfrmHorariosDia;
 begin
   case pDia of
@@ -563,27 +551,45 @@ begin
   end;
 end;
 
+function TfrmPrincipal.RetornarMatchesHorariosRegex(pDiaSemana: TDiaSemana): TMatchCollection;
+var
+  lRegex: string;
+begin
+  case pDiaSemana of
+    dsSegunda: lRegex := TConstantes.REGEX_SEGUNDA_HORARIOS;
+    dsTerca: lRegex := TConstantes.REGEX_TERCA_HORARIOS;
+    dsQuarta: lRegex := TConstantes.REGEX_QUARTA_HORARIOS;
+    dsQuinta: lRegex := TConstantes.REGEX_QUINTA_HORARIOS;
+    dsSexta: lRegex := TConstantes.REGEX_SEXTA_HORARIOS;
+    dsSabado: lRegex := TConstantes.REGEX_SABADO_HORARIOS;
+    else Exit;
+  end;
+
+  Result := TRegex.Matches(memHistHorario.Text, lRegex, [roIgnoreCase]);
+end;
+
 procedure TfrmPrincipal.Salvar;
 var
   lEdits: TArray<TMaskEdit>;
 begin
-  for var lComponente in Self do
-  begin
-    if not (lComponente is TfrmHorariosDia) then
-    begin
-      Continue;
-    end;
-
-    lEdits := TfrmHorariosDia(lComponente).RetornarEditsNaoVerificados;
-
-    if lEdits <> nil then
-    begin
-      Application.MessageBox('Ainda possui valores que não foram revisados, verifique', 'Atenção',
-        MB_OK + MB_ICONINFORMATION);
-      TComponenteHelpers.Focar(lEdits[0]);
-      Exit;
-    end;
-  end;
+  frmDadosFuncionarioedtJornadaSemanalExit(nil);
+//  for var lComponente in Self do
+//  begin
+//    if not (lComponente is TfrmHorariosDia) then
+//    begin
+//      Continue;
+//    end;
+//
+//    lEdits := TfrmHorariosDia(lComponente).RetornarEditsNaoVerificados;
+//
+//    if lEdits <> nil then
+//    begin
+//      Application.MessageBox('Ainda possui valores que não foram revisados, verifique', 'Atenção',
+//        MB_OK + MB_ICONINFORMATION);
+//      TComponenteHelpers.Focar(lEdits[0]);
+//      Exit;
+//    end;
+//  end;
 
   PreencherDadosNoMemo;
   GravarFolhaDePontoSemanal;

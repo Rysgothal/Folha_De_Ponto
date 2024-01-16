@@ -102,15 +102,26 @@ procedure TfrmHorariosDia.FrameExit(Sender: TObject);
 var
   lDiaSemana: THorariosDia;
 begin
+  lDiaSemana := RetornarDiaSemana;
+
   if TComponenteHelpers.VerificarTodosCamposVazio([medSaidaAlmoco, medRetornoAlmoco]) and
     not TComponenteHelpers.VerificarTodosCamposVazio([medEntrada, medSaidaFinal]) then
   begin
-    lDiaSemana := RetornarDiaSemana;
     medSaidaAlmoco.Text := '00:00';
     medRetornoAlmoco.text := '00:00';
     SairCampo(lDiaSemana.InserirSaidaAlmoco, lDiaSemana, medSaidaAlmoco);
     SairCampo(lDiaSemana.InserirRetornoAlmoco, lDiaSemana, medRetornoAlmoco);
   end;
+
+  if (lDiaSemana.Tag = dsSabado) and (lDiaSemana.Jornada = 0) and
+    TComponenteHelpers.VerificarTodosCamposVazio([medEntrada, medSaidaFinal]) then
+  begin
+    medEntrada.Text := '00:00';
+    medSaidaFinal.text := '00:00';
+    SairCampo(lDiaSemana.InserirEntrada, lDiaSemana, medEntrada);
+    SairCampo(lDiaSemana.InserirSaidaFinal, lDiaSemana, medSaidaFinal);
+  end;
+
 end;
 
 procedure TfrmHorariosDia.Limpar;
@@ -282,6 +293,7 @@ begin
       end;
 
       lEdit.Color := clGray;
+      pProcInserirHorario(EmptyStr);
       frmSaldoHorasDia.Limpar;
     end;
   end;
@@ -309,17 +321,17 @@ end;
 
 procedure TfrmHorariosDia.PreencherValoresHorarios(pGroupCollection: TGroupCollection);
 begin
+  medEntrada.Text := pGroupCollection[1].Value;
+
   if TDiaSemana(Self.Tag) = dsSabado then
   begin
-    medEntrada.Text := pGroupCollection[7].Value;
-    medSaidaFinal.Text := pGroupCollection[8].Value;
+    medSaidaFinal.Text := pGroupCollection[2].Value;
     Exit;
   end;
 
-  medEntrada.Text := pGroupCollection[2].Value;
-  medSaidaAlmoco.Text := pGroupCollection[3].Value;
-  medRetornoAlmoco.Text := pGroupCollection[4].Value;
-  medSaidaFinal.Text := pGroupCollection[5].Value;
+  medSaidaAlmoco.Text := pGroupCollection[2].Value;
+  medRetornoAlmoco.Text := pGroupCollection[3].Value;
+  medSaidaFinal.Text := pGroupCollection[4].Value;
 end;
 
 function TfrmHorariosDia.ProcurarHorarioIncorreto: Boolean;
