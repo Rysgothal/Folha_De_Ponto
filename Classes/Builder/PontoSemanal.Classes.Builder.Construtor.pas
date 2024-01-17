@@ -3,13 +3,18 @@ unit PontoSemanal.Classes.Builder.Construtor;
 interface
 
 uses
-  PontoSemanal.Interfaces.Builder.FolhaDePonto, System.Classes, 
+  PontoSemanal.Interfaces.Builder.FolhaDePonto, System.Classes,
   PontoSemanal.Classes.Base.Horarios, PontoSemanal.Helpers.TiposAuxiliares;
 
 type
+  TLayout = array[0..32] of string;
+
+  TLayoutLinhas = (llCodigo = 4, llFuncionario = 5);
+
   TConstrutor = class(TInterfacedObject, IConstrutor)
   private
     FFolhaDePonto: TStringList;
+    FLayout: TLayout;
     function GetFolhaDePonto: TStringList;
     function RetornarLinhaDiaDaSemana(pDia: THorariosDia): string;
     function RetornarLinhaTotalHoras: string;
@@ -18,6 +23,7 @@ type
     function ConcatenarHorarios(pDia: THorariosDia): string;
     function RetornarHashHorario(pRegistroHorario: TRegistroHorario; pDia: THorariosDia): string;
     procedure AdicionarLinhaHash(pDia: THorariosDia);
+    procedure Layout;
   public
     constructor Create;
     property FolhaDePonto: TStringList read GetFolhaDePonto;
@@ -305,6 +311,50 @@ begin
   end;
 
   FFolhaDePonto.Add('[' + lDia + '-SaidaFinal]: ' + RetornarHashHorario(rhSaidaFinal, pDia));
+end;
+
+procedure TConstrutor.Layout;
+  procedure LayoutSetCodigoFuncionar(aValue: string);
+  begin
+    FLayout[4] := FLayout[4].Replace('XXXXXXX', aValue);
+  end;
+begin
+
+  FLayout[0] := ' =====================================';
+  FLayout[1] := ' Registro de Ponto Semanal - Histórico';
+  FLayout[2] := ' =====================================';
+  FLayout[3] := '';
+  FLayout[4] := ' Código...........: XXXXXXX';
+  FLayout[5] := ' Funcionário......: XXXXXXXXXXXXXXXXXXXXXXXXX';
+  FLayout[6] := ' Admissão.........: XXXXXXXXX';
+  FLayout[7] := ' Jornada Semanal..: XXXXXX';
+  FLayout[8] := ' Intervalo Almoço.: XXXXXX';
+  FLayout[9] := '';
+  FLayout[10] := '  ______________________________________________________________________________________';
+  FLayout[11] := ' /                |         |              |                |             |             \';
+  FLayout[12] := ' | DIA DA SEMANA  | ENTRADA | SAÍDA ALMOÇO | RETORNO ALMOÇO | SAÍDA FINAL | TOTAL HORAS |';
+  FLayout[13] := ' |                |         |              |                |             |             |';
+  FLayout[14] := ' |----------------|---------|--------------|----------------|-------------|-------------|';
+  FLayout[15] := ' | Segunda-Feira  |  XX:XX  |    XX:XX     |     XX:XX      |    XX:XX    |    XX:XX    |';
+  FLayout[16] := ' |----------------|---------|--------------|----------------|-------------|-------------|';
+  FLayout[17] := ' | Terça-Feira    |  XX:XX  |    XX:XX     |     XX:XX      |    XX:XX    |    XX:XX    |';
+  FLayout[18] := ' |----------------|---------|--------------|----------------|-------------|-------------|';
+  FLayout[19] := ' | Quarta-Feira   |  XX:XX  |    XX:XX     |     XX:XX      |    XX:XX    |    XX:XX    |';
+  FLayout[20] := ' |----------------|---------|--------------|----------------|-------------|-------------|';
+  FLayout[21] := ' | Quinta-Feira   |  XX:XX  |    XX:XX     |     XX:XX      |    XX:XX    |    XX:XX    |';
+  FLayout[22] := ' |----------------|---------|--------------|----------------|-------------|-------------|';
+  FLayout[23] := ' | Sexta-Feira    |  XX:XX  |    XX:XX     |     XX:XX      |    XX:XX    |    XX:XX    |';
+  FLayout[24] := ' |----------------|---------|--------------|----------------|-------------|-------------|';
+  FLayout[25] := ' | Sábado         |  XX:XX  |      -       |       -        |    XX:XX    |    XX:XX    |';
+  FLayout[26] := ' |----------------|---------|--------------|----------------|-------------|-------------|';
+  FLayout[27] := ' |                                                                                      |';
+  FLayout[28] := ' |                                    Total de horas trabalhadas na semana:    XX:XX    |';
+  FLayout[29] := ' |                                                 Horas/minutos faltantes:    XX:XX    |';
+  FLayout[30] := ' |                                                Horas/minutos excedentes:    XX:XX    |';
+  FLayout[31] := ' |                                                                                      |';
+  FLayout[32] := ' \______________________________________________________________________________________/';
+
+  LayoutSetCodigoFuncionar('0');
 end;
 
 end.

@@ -182,23 +182,20 @@ begin
 end;
 
 procedure TFolhaPontoSemanalSingleton.SetID(const pValor: string);
-var
-  lValor: string;
 begin
-  lValor := pValor;
+  FID := pValor;
 
-  if TStringHelpers.VerificarCampoVazio(lValor) then
+  if TStringHelpers.VerificarCampoVazio(FID) then
   begin
-    FID := EmptyStr;
     Exit;
   end;
 
-  if lValor.ToInteger = 0 then
+  if FID.ToInteger = 0 then
   begin
-    lValor := '1';
+    FID := '1';
   end;
 
-  FID := TStringHelpers.Completar(lValor, 7, '0');
+  FID := TStringHelpers.Completar(FID, 7, '0');
 end;
 
 procedure TFolhaPontoSemanalSingleton.SetIntervaloAlmoco(const pValor: string);

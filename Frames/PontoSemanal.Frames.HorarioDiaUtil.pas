@@ -14,7 +14,38 @@ uses
 type
   TProcInserirHorario = procedure(const pValor: string) of object;
 
+//  TFrameHelper = class helper for TFrame
+//  private
+//    FNomeDoFrame: string;
+//    function GetNomeDoFrame: string;
+//  published
+//    property NomeDoFrame: string read GetNomeDoFrame;
+//  end;
+
+  TFrameHelper = class Helper for TFrame
+  protected
+//    function GetNomeDoFrame: TDiaSemana;
+//    procedure SetNomeDoFrame(const pValor: TDiaSemana);
+  end;
+
+//  TMyThing = class(Tframe)
+//  private
+//    function GetNomeDoFrame: TDiaSemana;
+//  published
+//    property FNomeDoFrame: TDiaSemana read GetNomeDoFrame;
+//  end;
+
   TfrmHorariosDia = class(TFrame, ISujeito)
+  private
+    { Private declarations }
+    function MostrarMensagemDlg(const pMensagem: string; pMsgDlgType: TmsgDlgType; pBotoes: TMsgDlgButtons;
+      pCaptionBotoes: array of string): Integer;
+    procedure SairCampo(pProcInserirHorario: TProcInserirHorario; pDiaSemana: THorariosDia; pEdit: TCustomEdit);
+    function RetornarDiaSemana: THorariosDia;
+    procedure Notificar;
+//    function GetNomeDoFrame: TDiaSemana;
+//    procedure SetNomeDoFrame(const pValor: TDiaSemana);
+  published
     bvlDivisorTotalHoras: TBevel;
     medEntrada: TMaskEdit;
     medSaidaAlmoco: TMaskEdit;
@@ -30,13 +61,7 @@ type
     procedure medSaidaAlmocoExit(Sender: TObject);
     procedure medSaidaFinalExit(Sender: TObject);
     procedure FrameExit(Sender: TObject);
-  private
-    { Private declarations }
-    function MostrarMensagemDlg(const pMensagem: string; pMsgDlgType: TmsgDlgType; pBotoes: TMsgDlgButtons;
-      pCaptionBotoes: array of string): Integer;
-    procedure SairCampo(pProcInserirHorario: TProcInserirHorario; pDiaSemana: THorariosDia; pEdit: TCustomEdit);
-    function RetornarDiaSemana: THorariosDia;
-    procedure Notificar;
+//    property NomeDoFrame: TDiaSemana read GetNomeDoFrame write SetNomeDoFrame;
   public
     procedure AtivarEventosOnExit;
     function VerificarSePossuiValoresAnotados: Boolean;
@@ -69,7 +94,7 @@ begin
     else Exit;
   end;
 
-  lEdit.Color := clSkyBlue;
+  lEdit.Color := $006969D6;
 end;
 
 procedure TfrmHorariosDia.AtivarEventosOnExit;
@@ -121,8 +146,12 @@ begin
     SairCampo(lDiaSemana.InserirEntrada, lDiaSemana, medEntrada);
     SairCampo(lDiaSemana.InserirSaidaFinal, lDiaSemana, medSaidaFinal);
   end;
-
 end;
+
+//function TfrmHorariosDia.GetNomeDoFrame: TDiaSemana;
+//begin
+//  Result := NomeDoFrame;
+//end;
 
 procedure TfrmHorariosDia.Limpar;
 begin
@@ -298,6 +327,11 @@ begin
     end;
   end;
 end;
+
+//procedure TfrmHorariosDia.SetNomeDoFrame(const pValor: TDiaSemana);
+//begin
+//  NomeDoFrame := pValor;
+//end;
 
 function TfrmHorariosDia.VerificarSePossuiValoresAnotados: Boolean;
 var

@@ -74,20 +74,30 @@ begin
   try
     lFolhaPonto := TFolhaPontoSemanalSingleton.ObterInstancia;
     lFolhaPonto.DataAdmissao := edtAdmissao.Text;
+    // lFolhaPonto
     edtAdmissao.Text := lFolhaPonto.DataAdmissao;
     lblAnosMesesSemanasDias.Caption := lFolhaPonto.TempoAdmissao;
   except
     on E: Exception do
     begin
-      Application.MessageBox(PChar(E.Message), 'Atenção', MB_OKCANCEL + MB_ICONWARNING);
+      Application.MessageBox(PChar(E.Message), 'Atenção', MB_OK + MB_ICONINFORMATION);
       TComponenteHelpers.Focar(edtAdmissao);
     end;
   end;
 end;
 
 procedure TfrmDadosFuncionario.edtCodigoChange(Sender: TObject);
+var
+  lFolhaPonto: TFolhaPontoSemanalSingleton;
 begin
+  edtCodigo.SomenteNumero;
   TComponenteHelpers.DigitarSomenteNumeros(edtCodigo);
+  lFolhaPonto := TFolhaPontoSemanalSingleton.ObterInstancia;
+  if edtCodigo.Text <> lFolhaPonto.ID then
+  begin
+//        ChamarCalcular;
+    ShowMessage('Chamar calcular');
+  end;
 end;
 
 procedure TfrmDadosFuncionario.edtCodigoExit(Sender: TObject);
@@ -98,10 +108,11 @@ begin
     lFolhaPonto := TFolhaPontoSemanalSingleton.ObterInstancia;
     lFolhaPonto.ID := edtCodigo.Text;
     edtCodigo.Text := lFolhaPonto.ID;
+
   except
     on E: Exception do
     begin
-      Application.MessageBox(PChar(E.Message), 'Atenção', MB_OKCANCEL + MB_ICONWARNING);
+      Application.MessageBox(PChar(E.Message), 'Atenção', MB_OK + MB_ICONINFORMATION);
       TComponenteHelpers.Focar(edtCodigo);
     end;
   end;
@@ -125,7 +136,7 @@ begin
   except
     on E: Exception do
     begin
-      Application.MessageBox(PChar(E.Message), 'Atenção', MB_OKCANCEL + MB_ICONWARNING);
+      Application.MessageBox(PChar(E.Message), 'Atenção', MB_OK + MB_ICONINFORMATION);
       TComponenteHelpers.Focar(edtIntervaloAlmoco);
     end;
   end;
@@ -146,7 +157,7 @@ begin
   except
     on E: Exception do
     begin
-      Application.MessageBox(PChar(E.Message), 'Atenção', MB_OKCANCEL + MB_ICONWARNING);
+      Application.MessageBox(PChar(E.Message), 'Atenção', MB_OK + MB_ICONINFORMATION);
       TComponenteHelpers.Focar(edtJornadaSemanal);
     end;
   end;
@@ -167,7 +178,7 @@ begin
   except
     on E: Exception do
     begin
-      Application.MessageBox(PChar(E.Message), 'Atenção', MB_OKCANCEL + MB_ICONWARNING);
+      Application.MessageBox(PChar(E.Message), 'Atenção', MB_OK + MB_ICONINFORMATION);
       TComponenteHelpers.Focar(edtNome);
     end;
   end;

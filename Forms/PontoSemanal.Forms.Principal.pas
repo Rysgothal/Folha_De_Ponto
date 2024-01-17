@@ -60,7 +60,7 @@ type
     procedure DestacarHorariosAlterados(pHorarios: THorariosDia; pDia: string);
     procedure DestacarDadosFuncionarioAlterados(pHashFolha, pHashAtual: string; pEdit: TCustomEdit);
     procedure GravarFolhaDePontoSemanal;
-    procedure LimparFormulario;
+    procedure Limpar;
     function NovoRegistro(pCarregandoArquivo: Boolean = False): Boolean;
     procedure PreencherDadosNoMemo;
     procedure PreencherValoresHorariosRegEx(pDiaSemana: TDiaSemana);
@@ -154,7 +154,7 @@ begin
   end;
 end;
 
-procedure TfrmPrincipal.LimparFormulario;
+procedure TfrmPrincipal.Limpar;
 var
   lPontoSemanal: TFolhaPontoSemanalSingleton;
 begin
@@ -191,7 +191,7 @@ end;
 
 procedure TfrmPrincipal.btnGerSalHistClick(Sender: TObject);
 begin
-  ActiveControl  := btnGerSalHist;
+  ActiveControl := btnGerSalHist;
   SalvarHistorico;
 end;
 
@@ -211,12 +211,10 @@ end;
 
 procedure TfrmPrincipal.BuscarValoresHorariosRegEx;
 begin
-  PreencherValoresHorariosRegEx(dsSegunda);
-  PreencherValoresHorariosRegEx(dsTerca);
-  PreencherValoresHorariosRegEx(dsQuarta);
-  PreencherValoresHorariosRegEx(dsQuinta);
-  PreencherValoresHorariosRegEx(dsSexta);
-  PreencherValoresHorariosRegEx(dsSabado);
+  for var lDiaSemana := Low(TDiaSemana) to High(TDiaSemana) do
+  begin
+    PreencherValoresHorariosRegEx(lDiaSemana);
+  end;
 end;
 
 procedure TfrmPrincipal.BuscarValoresRegEx;
@@ -258,11 +256,11 @@ begin
 
     if VerificarViolacaoFolhaDePonto then
     begin
-      LimparFormulario;
+      Limpar;
 
       while lPassWord <> 'gansodeterno' do
       begin
-        lPassWord := InputBox('Arquivo violadao!', #9'A Folha de Ponto foi violada, alguns dados podem ter sido' +
+        lPassWord := InputBox('Arquivo violado!', #9'A Folha de Ponto foi violada, alguns dados podem ter sido' +
           sLineBreak + 'alterados, estarão descatados caso tenham inconformidade. Digite a Palavra-Chave:', '');
 
         if TStringHelpers.VerificarCampoVazio(lPassWord) then
@@ -318,6 +316,7 @@ procedure TfrmPrincipal.ConfigurarObservadores;
 var
   lPontoSemanal: TFolhaPontoSemanalSingleton;
 begin
+//  frmSegunda.NomeDoFrame := dsSegunda;
   AplicarTagFrame(frmSegunda, dsSegunda);
   AplicarTagFrame(frmTerca, dsTerca);
   AplicarTagFrame(frmQuarta, dsQuarta);
@@ -394,7 +393,7 @@ begin
     Exit;
   end;
 
-  lEdit.Color := clSkyBlue;
+  lEdit.Color := $006969D6;
 end;
 
 procedure TfrmPrincipal.DestacarHorariosAlterados(pHorarios: THorariosDia; pDia: string);
@@ -459,6 +458,8 @@ var
   lPossuiValoresPreenchidos: Boolean;
   lMsgAuxiliar: string;
 begin
+  Result := True;
+
   lPossuiValoresPreenchidos := VerificarPossuiValoresPreenchidos;
 
   case pCarregandoArquivo of
@@ -473,9 +474,12 @@ begin
     Exit(False);
   end;
 
-  LimparFormulario;
-  TComponenteHelpers.Focar(frmDadosFuncionario.edtCodigo);
-  Result := True
+  Limpar;
+
+  if not pCarregandoArquivo then
+  begin
+    TComponenteHelpers.Focar(frmDadosFuncionario.edtCodigo);
+  end;
 end;
 
 procedure TfrmPrincipal.PreencherDadosNoMemo;
@@ -508,7 +512,7 @@ begin
   end;
 
   pEdit.Text := lRegex.Match(memHistHorario.Text).Groups[2].Value;
-  Tedit(pEdit).OnExit(pEdit);
+  TEdit(pEdit).OnExit(pEdit);
 end;
 
 procedure TfrmPrincipal.PreencherValoresHorariosRegEx(pDiaSemana: TDiaSemana);
@@ -572,24 +576,24 @@ procedure TfrmPrincipal.Salvar;
 var
   lEdits: TArray<TMaskEdit>;
 begin
-  frmDadosFuncionarioedtJornadaSemanalExit(nil);
-//  for var lComponente in Self do
-//  begin
-//    if not (lComponente is TfrmHorariosDia) then
-//    begin
-//      Continue;
-//    end;
-//
-//    lEdits := TfrmHorariosDia(lComponente).RetornarEditsNaoVerificados;
-//
-//    if lEdits <> nil then
-//    begin
-//      Application.MessageBox('Ainda possui valores que não foram revisados, verifique', 'Atenção',
-//        MB_OK + MB_ICONINFORMATION);
-//      TComponenteHelpers.Focar(lEdits[0]);
-//      Exit;
-//    end;
-//  end;
+//  frmDadosFuncionarioedtJornadaSemanalExit(nil);
+  for var lComponente in Self do
+  begin
+    if not (lComponente is TfrmHorariosDia) then
+    begin
+      Continue;
+    end;
+
+    lEdits := TfrmHorariosDia(lComponente).RetornarEditsNaoVerificados;
+
+    if lEdits <> nil then
+    begin
+      Application.MessageBox('Ainda possui valores que não foram revisados, verifique', 'Atenção',
+        MB_OK + MB_ICONINFORMATION);
+      TComponenteHelpers.Focar(lEdits[0]);
+      Exit;
+    end;
+  end;
 
   PreencherDadosNoMemo;
   GravarFolhaDePontoSemanal;

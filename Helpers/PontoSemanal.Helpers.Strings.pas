@@ -104,8 +104,6 @@ var
   lHoras, lMinutos: Integer;
   lIntervalo: TDateTime;
 begin
-  Result := '"x" horas e "y" minutos';
-
   if not TryStrToTime(pValor, lIntervalo) then
   begin
     Exit;
@@ -113,6 +111,11 @@ begin
 
   lHoras := SplitString(pValor, ':')[0].ToInteger;
   lMinutos := SplitString(pValor, ':')[1].ToInteger;
+
+  if (lHoras = 0) and (lMinutos = 0) then
+  begin
+    Exit('"x" horas e "y" minutos');
+  end;
 
   case lHoras of
     0: ;

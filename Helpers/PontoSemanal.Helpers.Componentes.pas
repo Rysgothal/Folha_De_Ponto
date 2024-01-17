@@ -26,6 +26,11 @@ type
     procedure FocarCabecalho;
   end;
 
+  TCustomEditHelper = class Helper for TCustomEdit
+  public
+    procedure SomenteNumero;
+  end;
+
 implementation
 
 uses
@@ -126,6 +131,13 @@ procedure TMemoHelper.FocarCabecalho;
 begin
   SelStart := 1;
   SelLength := 1;
+end;
+
+{ TCustomEditHelper }
+
+procedure TCustomEditHelper.SomenteNumero;
+begin
+  Text := TStringHelpers.DigitarSomenteNumeros(Text);
 end;
 
 end.
