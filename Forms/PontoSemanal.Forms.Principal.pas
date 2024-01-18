@@ -652,7 +652,7 @@ begin
   I := 0;
   lHashArquivo := RetornarHashDentroArquivo('[Folha]');
 
-  while I < 34 do
+  while I < 36 do
   begin
     memHistHorario.Lines.Delete(memHistHorario.Lines.Count - 1);
     Inc(I);
