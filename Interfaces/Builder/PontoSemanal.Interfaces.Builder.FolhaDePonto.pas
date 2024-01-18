@@ -18,7 +18,6 @@ type
     procedure ConstruirHorarioSabado;
     procedure ConstruirSaldoDeHoras;
     procedure ConstruirRodape;
-    procedure ConstruirLinhaDivisaoHorarios;
     function GetFolhaDePonto: TStringList;
   end;
 

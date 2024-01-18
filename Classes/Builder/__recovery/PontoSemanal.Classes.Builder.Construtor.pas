@@ -132,8 +132,8 @@ begin
 
   lValorAgrupado := TRegex.Match(FLayout.Layout.Text, lRegex).Value;
   lValorAgrupado := lValorAgrupado.Replace('-Feira', EmptyStr, [rfReplaceAll]);
-  lValorAgrupado := lValorAgrupado.Replace('Á', 'c', [rfReplaceAll]);
-  lValorAgrupado := lValorAgrupado.Replace('·', 'a', [rfReplaceAll]);
+  lValorAgrupado := lValorAgrupado.Replace('√ß', 'c', [rfReplaceAll]);
+  lValorAgrupado := lValorAgrupado.Replace('√°', 'a', [rfReplaceAll]);
 
   Result := lValorAgrupado.Trim;
 end;
@@ -328,7 +328,7 @@ begin
   FLayout.CarregarLayoutTituloHorarios;
 //  FFolhaDePonto.Add('  ______________________________________________________________________________________');
 //  FFolhaDePonto.Add(' /                |         |              |                |             |             \ ');
-//  FFolhaDePonto.Add(' | DIA DA SEMANA  | ENTRADA | SAÕDA ALMO«O | RETORNO ALMO«O | SAÕDA FINAL | TOTAL HORAS | ');
+//  FFolhaDePonto.Add(' | DIA DA SEMANA  | ENTRADA | SA√çDA ALMO√áO | RETORNO ALMO√áO | SA√çDA FINAL | TOTAL HORAS | ');
 //  FFolhaDePonto.Add(' |                |         |              |                |             |             | ');
 //  ConstruirLinhaDivisaoHorarios;
 end;
@@ -380,23 +380,23 @@ end;
 //begin
 //
 //  FLayout[0] := ' =====================================';
-//  FLayout[1] := ' Registro de Ponto Semanal - HistÛrico';
+//  FLayout[1] := ' Registro de Ponto Semanal - Hist√≥rico';
 //  FLayout[2] := ' =====================================';
 //  FLayout[3] := ' ';
-//  FLayout[4] := ' CÛdigo...........: XXXXXXX';
-//  FLayout[5] := ' Funcion·rio......: XXXXXXXXXXXXXXXXXXXXXXXXX';
-//  FLayout[6] := ' Admiss„o.........: XXXXXXXXX';
+//  FLayout[4] := ' C√≥digo...........: XXXXXXX';
+//  FLayout[5] := ' Funcion√°rio......: XXXXXXXXXXXXXXXXXXXXXXXXX';
+//  FLayout[6] := ' Admiss√£o.........: XXXXXXXXX';
 //  FLayout[7] := ' Jornada Semanal..: XXXXXX';
-//  FLayout[8] := ' Intervalo AlmoÁo.: XXXXXX';
+//  FLayout[8] := ' Intervalo Almo√ßo.: XXXXXX';
 //  FLayout[9] := ' ';
 //  FLayout[10] := '  ______________________________________________________________________________________  ';
 //  FLayout[11] := ' /                |         |              |                |             |             \ ';
-//  FLayout[12] := ' | DIA DA SEMANA  | ENTRADA | SAÕDA ALMO«O | RETORNO ALMO«O | SAÕDA FINAL | TOTAL HORAS | ';
+//  FLayout[12] := ' | DIA DA SEMANA  | ENTRADA | SA√çDA ALMO√áO | RETORNO ALMO√áO | SA√çDA FINAL | TOTAL HORAS | ';
 //  FLayout[13] := ' |                |         |              |                |             |             | ';
 //  FLayout[14] := ' |----------------|---------|--------------|----------------|-------------|-------------| ';
 //  FLayout[15] := ' | Segunda-Feira  |  XX:XX  |    XX:XX     |     XX:XX      |    XX:XX    |    XX:XX    | ';
 //  FLayout[16] := ' |----------------|---------|--------------|----------------|-------------|-------------| ';
-//  FLayout[17] := ' | TerÁa-Feira    |  XX:XX  |    XX:XX     |     XX:XX      |    XX:XX    |    XX:XX    | ';
+//  FLayout[17] := ' | Ter√ßa-Feira    |  XX:XX  |    XX:XX     |     XX:XX      |    XX:XX    |    XX:XX    | ';
 //  FLayout[18] := ' |----------------|---------|--------------|----------------|-------------|-------------| ';
 //  FLayout[19] := ' | Quarta-Feira   |  XX:XX  |    XX:XX     |     XX:XX      |    XX:XX    |    XX:XX    | ';
 //  FLayout[20] := ' |----------------|---------|--------------|----------------|-------------|-------------| ';
@@ -404,7 +404,7 @@ end;
 //  FLayout[22] := ' |----------------|---------|--------------|----------------|-------------|-------------| ';
 //  FLayout[23] := ' | Sexta-Feira    |  XX:XX  |    XX:XX     |     XX:XX      |    XX:XX    |    XX:XX    | ';
 //  FLayout[24] := ' |----------------|---------|--------------|----------------|-------------|-------------| ';
-//  FLayout[25] := ' | S·bado         |  XX:XX  |      -       |       -        |    XX:XX    |    XX:XX    | ';
+//  FLayout[25] := ' | S√°bado         |  XX:XX  |      -       |       -        |    XX:XX    |    XX:XX    | ';
 //  FLayout[26] := ' |----------------|---------|--------------|----------------|-------------|-------------| ';
 //  FLayout[27] := ' |                                                                                      | ';
 //  FLayout[28] := ' |                                    Total de horas trabalhadas na semana:    XX:XX    | ';

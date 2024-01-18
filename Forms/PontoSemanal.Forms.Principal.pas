@@ -66,7 +66,7 @@ type
     procedure PreencherValoresHorariosRegEx(pDiaSemana: TDiaSemana);
     procedure PreencherValoresDadosFuncionario(pRegex: string; pEdit: TCustomEdit);
     function RetornarMatchesHorariosRegex(pDiaSemana: TDiaSemana): TMatchCollection;
-    function RetornarHashDentroArquivo(pPalavraChave: string): string;
+//    function RetornarHashDentroArquivo(pPalavraChave: string): string;
     function RetornarFrameDia(pDia: TDiaSemana): TfrmHorariosDia;
     procedure Salvar;
     procedure SalvarHistorico;
@@ -352,9 +352,9 @@ begin
   lPontoSemanal := TFolhaPontoSemanalSingleton.ObterInstancia;
 
   lHashFolha := [
-    RetornarHashDentroArquivo('Funcionario-Codigo'), RetornarHashDentroArquivo('Funcionario-Nome'),
-    RetornarHashDentroArquivo('Funcionario-Admissao'), RetornarHashDentroArquivo('Funcionario-Jornada'),
-    RetornarHashDentroArquivo('Funcionario-Intervalo')
+//    RetornarHashDentroArquivo('Funcionario-Codigo'), RetornarHashDentroArquivo('Funcionario-Nome'),
+//    RetornarHashDentroArquivo('Funcionario-Admissao'), RetornarHashDentroArquivo('Funcionario-Jornada'),
+//    RetornarHashDentroArquivo('Funcionario-Intervalo')
   ];
 
   lHashAtual := [
@@ -378,7 +378,7 @@ begin
   lHashDiaAtual := ConcatenarHorarios(pDiaSemana);
   lHashDiaAtual := TStringHelpers.HashMD5(lHashDiaAtual);
 
-  if RetornarHashDentroArquivo('[' + lNomeDia + ']') <> lHashDiaAtual then
+//  if RetornarHashDentroArquivo('[' + lNomeDia + ']') <> lHashDiaAtual then
   begin
     DestacarHorariosAlterados(pDiaSemana, lNomeDia);
   end;
@@ -402,8 +402,8 @@ var
   lFrame: TfrmHorariosDia;
 begin
   lHashArquivo := [
-    RetornarHashDentroArquivo('[' + pDia + '-Entrada]'), RetornarHashDentroArquivo('[' + pDia + '-SaidaAlmoco]'),
-    RetornarHashDentroArquivo('[' + pDia + '-RetornoAlmoco]'), RetornarHashDentroArquivo('[' + pDia + '-SaidaFinal]')
+//    RetornarHashDentroArquivo('[' + pDia + '-Entrada]'), RetornarHashDentroArquivo('[' + pDia + '-SaidaAlmoco]'),
+//    RetornarHashDentroArquivo('[' + pDia + '-RetornoAlmoco]'), RetornarHashDentroArquivo('[' + pDia + '-SaidaFinal]')
   ];
 
   lHashAtual := [
@@ -539,21 +539,21 @@ begin
   end;
 end;
 
-function TfrmPrincipal.RetornarHashDentroArquivo(pPalavraChave: string): string;
-begin
-  for var I := 0 to Pred(memHistHorario.Lines.Count) do
-  begin
-    Result := memHistHorario.Lines[I];
-
-    if not Result.Contains(pPalavraChave) then
-    begin
-      Continue;
-    end;
-
-    Result := Copy(Result, Pos(':', Result) + 1, Length(Result)).Trim;
-    Break;
-  end;
-end;
+//function TfrmPrincipal.RetornarHashDentroArquivo(pPalavraChave: string): string;
+//begin
+//  for var I := 0 to Pred(memHistHorario.Lines.Count) do
+//  begin
+//    Result := memHistHorario.Lines[I];
+//
+//    if not Result.Contains(pPalavraChave) then
+//    begin
+//      Continue;
+//    end;
+//
+//    Result := Copy(Result, Pos(':', Result) + 1, Length(Result)).Trim;
+//    Break;
+//  end;
+//end;
 
 function TfrmPrincipal.RetornarMatchesHorariosRegex(pDiaSemana: TDiaSemana): TMatchCollection;
 var
@@ -649,18 +649,26 @@ var
   lHashArquivo, lHashAtual: string;
   I: Integer;
 begin
-  I := 0;
-  lHashArquivo := RetornarHashDentroArquivo('[Folha]');
+  I := Pred(memHistHorario.Lines.Count);
+  Result := False;
 
-  while I < 36 do
+  while I >= 0 do
   begin
-    memHistHorario.Lines.Delete(memHistHorario.Lines.Count - 1);
-    Inc(I);
-  end;
-  memHistHorario.FocarCabecalho;
+    lHashArquivo := memHistHorario.Lines[I];
+    memHistHorario.Lines.Delete(I);
+    lHashAtual := TStringHelpers.HashMD5(memHistHorario.Text);
+    Dec(I);
 
-  lHashAtual := TStringHelpers.HashMD5(memHistHorario.Text);
-  Result := TStringHelpers.VerificarDiferenca(lHashArquivo, lHashAtual);
+    if TStringHelpers.VerificarDiferenca(lHashArquivo, lHashArquivo) then
+    begin
+      Exit(True);
+    end;
+  end;
+
+  memHistHorario.FocarCabecalho;
+//
+//  lHashAtual := TStringHelpers.HashMD5(memHistHorario.Text);
+//  Result := TStringHelpers.VerificarDiferenca(lHashArquivo, lHashAtual);
 end;
 
 procedure TfrmPrincipal.tmrHorarioTimer(Sender: TObject);
