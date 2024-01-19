@@ -30,7 +30,6 @@ type
     constructor Create;
     procedure SetID(const pValor: string);
     procedure SetDataAdmissao(const pValor: string);
-    procedure CalcularTempoAdmissao;
     procedure SetJornadaSemanal(const pValor: string);
     procedure SetIntervaloAlmoco(const pValor: string);
     procedure DistribuirHorarios(pValor: Integer);
@@ -54,6 +53,7 @@ type
     property Observers: TDictionary<TDiaSemana, IObservador> read FObservers;
     property ConverterHora: IConverter read FConverterHora write FConverterHora;
     procedure AdicionarObservador(pDiaSemana: TDiaSemana; pObservador: IObservador);
+    procedure CalcularTempoAdmissao;
     procedure CalcularDesempenho;
     procedure Limpar;
   end;
@@ -158,7 +158,7 @@ begin
 
   if TStringHelpers.VerificarCampoVazio(pValor) then
   begin
-    CalcularTempoAdmissao;
+//    CalcularTempoAdmissao;
     Exit;
   end;
 
@@ -178,7 +178,7 @@ begin
   end;
 
   FDataAdmissao := pValor;
-  CalcularTempoAdmissao;
+//  CalcularTempoAdmissao;
 end;
 
 procedure TFolhaPontoSemanalSingleton.SetID(const pValor: string);

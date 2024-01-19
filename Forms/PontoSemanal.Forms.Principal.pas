@@ -44,11 +44,13 @@ type
     procedure btnCarregarHistClick(Sender: TObject);
   private
     { Private declarations }
+    FDadoAlterado: Boolean;
     procedure AtualizarHorarioSistema;
     procedure AnalisarFolhaDePontoAlterada;
     procedure AnalisarDiaDaSemanaAlterado(pDiaSemana: THorariosDia);
     procedure AnalisarDadosFuncionarioAlterados;
     procedure AplicarTagFrame(pFrame: TfrmHorariosDia; pTag: TDiaSemana);   // Verificar
+    procedure AplicarDadoNaoAlterado;
     procedure BuscarValoresRegEx;
     procedure BuscarValoresHorariosRegEx;
     procedure BuscarValoresDadosFuncionarioRegEx;
@@ -68,7 +70,7 @@ type
     function RetornarFrameDia(pDia: TDiaSemana): TfrmHorariosDia;
     procedure Salvar;
     procedure SalvarHistorico;
-    function VerificarPossuiValoresPreenchidos: Boolean;
+    function VerificarAlteracaoDeValorFolhaPonto: Boolean;
     function VerificarViolacaoFolhaDePonto: Boolean;
     function VerificarHashNaFolhaComAtual(pHashAtual: string): Boolean;
   public
@@ -90,6 +92,7 @@ uses
 procedure TfrmPrincipal.FormCreate(Sender: TObject);
 begin
   tmrHorario.Enabled := True;
+  FDadoAlterado := False;
   sttsbarSistemaInfo.Panels[0].Text := FormatDateTime('ddddddd', Date);
   ConfigurarObservadores;
 end;
@@ -169,6 +172,7 @@ begin
     end;
   end;
 
+  FDadoAlterado := False;
   frmDadosFuncionario.Limpar;
   frmHorasTrabalhadasSemana.Limpar;
   memHistHorario.Clear;
@@ -304,6 +308,7 @@ begin
   end;
 
   CarregarArquivoFolhaDePonto;
+  AplicarDadoNaoAlterado;
 end;
 
 procedure TfrmPrincipal.ConfigurarObservadores;
@@ -427,6 +432,21 @@ begin
   AnalisarDiaDaSemanaAlterado(lPontoSemanal.Sabado);
 end;
 
+procedure TfrmPrincipal.AplicarDadoNaoAlterado;
+begin
+  frmDadosFuncionario.FDadoAlterado := False;
+
+  for var lFrame in Self do
+  begin
+    if not (lFrame is TfrmHorariosDia) then
+    begin
+      Continue;
+    end;
+
+    TfrmHorariosDia(lFrame).FDadoAlterado := False;
+  end;
+end;
+
 procedure TfrmPrincipal.AplicarTagFrame(pFrame: TfrmHorariosDia; pTag: TDiaSemana);
 var
   lPontoSemanal: TFolhaPontoSemanalSingleton;
@@ -440,19 +460,18 @@ end;
 
 function TfrmPrincipal.NovoRegistro(pCarregandoArquivo: Boolean): Boolean;
 var
-  lPossuiValoresPreenchidos: Boolean;
+  lHouveValoresAlterados: Boolean;
   lMsgAuxiliar: string;
 begin
   Result := True;
-
-  lPossuiValoresPreenchidos := VerificarPossuiValoresPreenchidos;
+  lHouveValoresAlterados := VerificarAlteracaoDeValorFolhaPonto;
 
   case pCarregandoArquivo of
     True: lMsgAuxiliar := 'carregar um registro?';
     else lMsgAuxiliar := 'criar um novo registro?';
   end;
 
-  if lPossuiValoresPreenchidos and (Application.MessageBox(PChar('Ainda existem valores anotados na Folha de Ponto, ' +
+  if lHouveValoresAlterados and (Application.MessageBox(PChar('Alguns valores foram alterados na Folha de Ponto, ' +
     'ao prosseguir os dados serão sobrescritos.' + sLineBreak + sLineBreak + '> Deseja realmente ' + lMsgAuxiliar),
     'ATENÇÃO', MB_YESNO + MB_ICONWARNING) = ID_NO) then
   begin
@@ -465,6 +484,8 @@ begin
   begin
     TComponenteHelpers.Focar(frmDadosFuncionario.edtCodigo);
   end;
+
+  AplicarDadoNaoAlterado;
 end;
 
 procedure TfrmPrincipal.PreencherDadosNoMemo;
@@ -580,6 +601,7 @@ begin
   if lTodosCamposPreenchidos then
   begin
     Salvar;
+    AplicarDadoNaoAlterado;
     Exit;
   end;
 
@@ -602,28 +624,28 @@ begin
   end;
 end;
 
-function TfrmPrincipal.VerificarPossuiValoresPreenchidos: Boolean;
+function TfrmPrincipal.VerificarAlteracaoDeValorFolhaPonto: Boolean;
 begin
   Result := False;
 
-  if frmDadosFuncionario.VerificarSePossuiValoresAnotados then
+  if frmDadosFuncionario.FDadoAlterado then
   begin
     Exit(True);
   end;
 
-  for var I := 0 to Pred(Self.ComponentCount) do
+  for var lFrame in Self do
   begin
     if Result then
     begin
       Break;
     end;
 
-    if not (Self.Components[I] is TfrmHorariosDia) then
+    if not (lFrame is TfrmHorariosDia) then
     begin
       Continue;
     end;
 
-    Result := TfrmHorariosDia(Self.Components[I]).VerificarSePossuiValoresAnotados;
+    Result := TfrmHorariosDia(lFrame).FDadoAlterado;
   end;
 end;
 

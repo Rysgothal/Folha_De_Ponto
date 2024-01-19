@@ -9,44 +9,13 @@ uses
   PontoSemanal.Classes.Base.Horarios, PontoSemanal.Helpers.TiposAuxiliares,
   PontoSemanal.Interfaces.Observer.Sujeito, PontoSemanal.Frames.SaldoHorasDia, 
   PontoSemanal.Helpers.Componentes, System.RegularExpressions, System.StrUtils,
-  System.Generics.Collections;
+  System.Generics.Collections, PontoSemanal.Helpers.Strings;
 
 type
   TProcInserirHorario = procedure(const pValor: string) of object;
 
-//  TFrameHelper = class helper for TFrame
-//  private
-//    FNomeDoFrame: string;
-//    function GetNomeDoFrame: string;
-//  published
-//    property NomeDoFrame: string read GetNomeDoFrame;
-//  end;
-
-  TFrameHelper = class Helper for TFrame
-  protected
-//    function GetNomeDoFrame: TDiaSemana;
-//    procedure SetNomeDoFrame(const pValor: TDiaSemana);
-  end;
-
-//  TMyThing = class(Tframe)
-//  private
-//    function GetNomeDoFrame: TDiaSemana;
-//  published
-//    property FNomeDoFrame: TDiaSemana read GetNomeDoFrame;
-//  end;
-
   TfrmHorariosDia = class(TFrame, ISujeito)
-  private
-    { Private declarations }
-    function MostrarMensagemDlg(const pMensagem: string; pMsgDlgType: TmsgDlgType; pBotoes: TMsgDlgButtons;
-      pCaptionBotoes: array of string): Integer;
-    procedure SairCampo(pProcInserirHorario: TProcInserirHorario; pDiaSemana: THorariosDia; pEdit: TCustomEdit);
-    function RetornarDiaSemana: THorariosDia;
-    procedure Notificar;
-//    function GetNomeDoFrame: TDiaSemana;
-//    procedure SetNomeDoFrame(const pValor: TDiaSemana);
-  published
-    bvlDivisorTotalHoras: TBevel;
+  bvlDivisorTotalHoras: TBevel;
     medEntrada: TMaskEdit;
     medSaidaAlmoco: TMaskEdit;
     medRetornoAlmoco: TMaskEdit;
@@ -61,8 +30,17 @@ type
     procedure medSaidaAlmocoExit(Sender: TObject);
     procedure medSaidaFinalExit(Sender: TObject);
     procedure FrameExit(Sender: TObject);
-//    property NomeDoFrame: TDiaSemana read GetNomeDoFrame write SetNomeDoFrame;
+  private
+    { Private declarations }
+    function MostrarMensagemDlg(const pMensagem: string; pMsgDlgType: TmsgDlgType; pBotoes: TMsgDlgButtons;
+      pCaptionBotoes: array of string): Integer;
+    procedure SairCampo(pProcInserirHorario: TProcInserirHorario; pDiaSemana: THorariosDia; pEdit: TCustomEdit);
+    function RetornarDiaSemana: THorariosDia;
+    procedure Notificar;
+    function VerificarDadoAlterado(pValorNovo, pValorAntes: string): Boolean;
   public
+    FDadoAlterado: Boolean;
+    constructor Create(AOwner: TComponent); reintroduce; overload;
     procedure AtivarEventosOnExit;
     function VerificarSePossuiValoresAnotados: Boolean;
     function VerificarTodosValoresAnotados: Boolean;
@@ -103,6 +81,12 @@ begin
   medSaidaAlmoco.OnExit(medSaidaAlmoco);
   medRetornoAlmoco.OnExit(medRetornoAlmoco);
   medSaidaFinal.OnExit(medSaidaFinal);
+end;
+
+constructor TfrmHorariosDia.Create(AOwner: TComponent);
+begin
+  Create(AOwner);
+  FDadoAlterado := False;
 end;
 
 procedure TfrmHorariosDia.DefinirCorPadraoComponentes;
@@ -148,11 +132,6 @@ begin
   end;
 end;
 
-//function TfrmHorariosDia.GetNomeDoFrame: TDiaSemana;
-//begin
-//  Result := NomeDoFrame;
-//end;
-
 procedure TfrmHorariosDia.Limpar;
 begin
   medEntrada.Clear;
@@ -167,6 +146,8 @@ var
   lDiaSemana: THorariosDia;
 begin
   lDiaSemana := RetornarDiaSemana;
+
+  FDadoAlterado := VerificarDadoAlterado(medEntrada.Text, lDiaSemana.Entrada);
   SairCampo(lDiaSemana.InserirEntrada, lDiaSemana, medEntrada);
 end;
 
@@ -175,6 +156,7 @@ var
   lDiaSemana: THorariosDia;
 begin
   lDiaSemana := RetornarDiaSemana;
+  FDadoAlterado := VerificarDadoAlterado(medRetornoAlmoco.Text, lDiaSemana.RetornoAlmoco);
   SairCampo(lDiaSemana.InserirRetornoAlmoco, lDiaSemana, medRetornoAlmoco);
 end;
 
@@ -183,6 +165,7 @@ var
   lDiaSemana: THorariosDia;
 begin
   lDiaSemana := RetornarDiaSemana;
+  FDadoAlterado := VerificarDadoAlterado(medSaidaAlmoco.Text, lDiaSemana.SaidaAlmoco);
   SairCampo(lDiaSemana.InserirSaidaAlmoco, lDiaSemana, medSaidaAlmoco);
 end;
 
@@ -191,6 +174,7 @@ var
   lDiaSemana: THorariosDia;
 begin
   lDiaSemana := RetornarDiaSemana;
+  FDadoAlterado := VerificarDadoAlterado(medSaidaFinal.Text, lDiaSemana.SaidaFinal);
   SairCampo(lDiaSemana.InserirSaidaFinal, lDiaSemana, medSaidaFinal);
 end;
 
@@ -328,10 +312,17 @@ begin
   end;
 end;
 
-//procedure TfrmHorariosDia.SetNomeDoFrame(const pValor: TDiaSemana);
-//begin
-//  NomeDoFrame := pValor;
-//end;
+function TfrmHorariosDia.VerificarDadoAlterado(pValorNovo, pValorAntes: string): Boolean;
+begin
+  Result := True;
+
+  if FDadoAlterado then
+  begin
+    Exit;
+  end;
+
+  Result := TStringHelpers.VerificarDiferenca(pValorNovo, pValorAntes);
+end;
 
 function TfrmHorariosDia.VerificarSePossuiValoresAnotados: Boolean;
 var

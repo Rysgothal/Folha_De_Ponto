@@ -34,8 +34,12 @@ type
     procedure edtIntervaloAlmocoExit(Sender: TObject);
   private
     { Private declarations }
+    function VerificarDadoAlterado(pValorNovo, pValorAntes: string): Boolean;
   public
     { Public declarations }
+    FDadoAlterado: Boolean;
+    constructor Create(AOwner: TComponent); reintroduce; overload;
+
     procedure Limpar;
     function VerificarSePossuiValoresAnotados: Boolean;
     function VerificarTodosValoresAnotados: Boolean;
@@ -49,6 +53,13 @@ uses
   PontoSemanal.Helpers.Strings, System.Generics.Collections;
 
 {$R *.dfm}
+
+constructor TfrmDadosFuncionario.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+
+  FDadoAlterado := False;
+end;
 
 procedure TfrmDadosFuncionario.DefinirCorPadraoComponentes;
 begin
@@ -64,7 +75,7 @@ end;
 
 procedure TfrmDadosFuncionario.edtAdmissaoChange(Sender: TObject);
 begin
-  TComponenteHelpers.FormatarData(edtAdmissao);
+  edtAdmissao.FormatarData;
 end;
 
 procedure TfrmDadosFuncionario.edtAdmissaoExit(Sender: TObject);
@@ -73,9 +84,10 @@ var
 begin
   try
     lFolhaPonto := TFolhaPontoSemanalSingleton.ObterInstancia;
+    FDadoAlterado := VerificarDadoAlterado(edtAdmissao.Text, lFolhaPonto.DataAdmissao);
+
     lFolhaPonto.DataAdmissao := edtAdmissao.Text;
-    // lFolhaPonto
-    edtAdmissao.Text := lFolhaPonto.DataAdmissao;
+    lFolhaPonto.CalcularTempoAdmissao;
     lblAnosMesesSemanasDias.Caption := lFolhaPonto.TempoAdmissao;
   except
     on E: Exception do
@@ -87,28 +99,18 @@ begin
 end;
 
 procedure TfrmDadosFuncionario.edtCodigoChange(Sender: TObject);
-var
-  lFolhaPonto: TFolhaPontoSemanalSingleton;
 begin
-  edtCodigo.SomenteNumero;
-  TComponenteHelpers.DigitarSomenteNumeros(edtCodigo);
-  lFolhaPonto := TFolhaPontoSemanalSingleton.ObterInstancia;
-  if edtCodigo.Text <> lFolhaPonto.ID then
-  begin
-//        ChamarCalcular;
-    ShowMessage('Chamar calcular');
-  end;
+  edtCodigo.AceitarSomenteNumeros;
 end;
 
 procedure TfrmDadosFuncionario.edtCodigoExit(Sender: TObject);
 var
   lFolhaPonto: TFolhaPontoSemanalSingleton;
 begin
-  try
+   try
     lFolhaPonto := TFolhaPontoSemanalSingleton.ObterInstancia;
+    FDadoAlterado := VerificarDadoAlterado(edtCodigo.Text, lFolhaPonto.ID);
     lFolhaPonto.ID := edtCodigo.Text;
-    edtCodigo.Text := lFolhaPonto.ID;
-
   except
     on E: Exception do
     begin
@@ -120,7 +122,7 @@ end;
 
 procedure TfrmDadosFuncionario.edtIntervaloAlmocoChange(Sender: TObject);
 begin
-  TComponenteHelpers.FormatarHorario(edtIntervaloAlmoco);
+  edtIntervaloAlmoco.FormatarHorario;
 end;
 
 procedure TfrmDadosFuncionario.edtIntervaloAlmocoExit(Sender: TObject);
@@ -128,9 +130,10 @@ var
   lFolhaPonto: TFolhaPontoSemanalSingleton;
 begin
   try
-    TComponenteHelpers.FormatarIntervalo(edtIntervaloAlmoco);
-
     lFolhaPonto := TFolhaPontoSemanalSingleton.ObterInstancia;
+    edtIntervaloAlmoco.FormatarIntervalo;
+
+    FDadoAlterado := VerificarDadoAlterado(edtIntervaloAlmoco.Text, lFolhaPonto.IntervaloAlmoco);
     lFolhaPonto.IntervaloAlmoco := edtIntervaloAlmoco.Text;
     lblTempoExtenso.Caption := lFolhaPonto.IntervaloAlmocoExtenso;
   except
@@ -144,7 +147,7 @@ end;
 
 procedure TfrmDadosFuncionario.edtJornadaSemanalChange(Sender: TObject);
 begin
-  TComponenteHelpers.DigitarSomenteNumeros(edtJornadaSemanal);
+  edtJornadaSemanal.AceitarSomenteNumeros;
 end;
 
 procedure TfrmDadosFuncionario.edtJornadaSemanalExit(Sender: TObject);
@@ -153,6 +156,8 @@ var
 begin
   try
     lFolhaPonto := TFolhaPontoSemanalSingleton.ObterInstancia;
+
+    FDadoAlterado := VerificarDadoAlterado(edtJornadaSemanal.Text, lFolhaPonto.JornadaSemanal);
     lFolhaPonto.JornadaSemanal := edtJornadaSemanal.Text;
   except
     on E: Exception do
@@ -165,7 +170,7 @@ end;
 
 procedure TfrmDadosFuncionario.edtNomeChange(Sender: TObject);
 begin
-  TComponenteHelpers.DigitarSomenteLetras(edtNome);
+  edtNome.AceitarSomenteLetras;
 end;
 
 procedure TfrmDadosFuncionario.edtNomeExit(Sender: TObject);
@@ -174,6 +179,7 @@ var
 begin
   try
     lFolhaPonto := TFolhaPontoSemanalSingleton.ObterInstancia;
+    FDadoAlterado := VerificarDadoAlterado(edtNome.Text, lFolhaPonto.Nome);
     lFolhaPonto.Nome := edtNome.Text;
   except
     on E: Exception do
@@ -193,6 +199,18 @@ begin
   edtJornadaSemanal.Clear;
   lblAnosMesesSemanasDias.Caption := '-> anos; meses; semanas; dias.';
   lblTempoExtenso.Caption := '"x" horas e "y" minutos';
+end;
+
+function TfrmDadosFuncionario.VerificarDadoAlterado(pValorNovo, pValorAntes: string): Boolean;
+begin
+  Result := True;
+
+  if FDadoAlterado then
+  begin
+    Exit;
+  end;
+
+  Result := TStringHelpers.VerificarDiferenca(pValorNovo, pValorAntes);
 end;
 
 function TfrmDadosFuncionario.VerificarSePossuiValoresAnotados: Boolean;

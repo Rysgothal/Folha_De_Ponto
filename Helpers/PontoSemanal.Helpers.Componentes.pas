@@ -8,16 +8,8 @@ uses
 type
   TComponenteHelpers = class abstract
   public
-    class procedure DigitarSomenteNumeros(const pEdit: TCustomEdit);
-    class procedure DigitarSomenteLetras(const pEdit: TCustomEdit);
-    class procedure Completar(const pEdit: TCustomEdit; pQuantidade: Integer; pValorAPreencher: Char = ' ');
-    class function VerificarCampoVazio(const pEdit: TCustomEdit): Boolean;
     class function VerificarTodosCamposVazio(const pEdits: TArray<TCustomEdit>): Boolean;
     class function VerificarEditVazio(const pEdits: TArray<TCustomEdit>): TCustomEdit;
-    class procedure FormatarData(const pEdit: TCustomEdit);
-    class procedure MoverFinal(const pEdit: TCustomEdit);
-    class procedure FormatarIntervalo(const pEdit: TCustomEdit);
-    class procedure FormatarHorario(const pEdit: TCustomEdit);
     class procedure Focar(const pEdit: TWinControl);
   end;
 
@@ -28,7 +20,14 @@ type
 
   TCustomEditHelper = class Helper for TCustomEdit
   public
-    procedure SomenteNumero;
+    procedure AceitarSomenteNumeros;
+    procedure AceitarSomenteLetras;
+    procedure Completar(pQuantidade: Integer; pValorAPreencher: Char = ' ');
+    function CampoVazio: Boolean;
+    procedure FormatarData;
+    procedure MoverFinal;
+    procedure FormatarIntervalo;
+    procedure FormatarHorario;
   end;
 
 implementation
@@ -38,21 +37,6 @@ uses
 
 { TComponenteHelpers }
 
-class procedure TComponenteHelpers.Completar(const pEdit: TCustomEdit; pQuantidade: Integer; pValorAPreencher: Char = ' ');
-begin
-  pEdit.Text := TStringHelpers.Completar(pEdit.Text, pQuantidade, pValorAPreencher);
-end;
-
-class procedure TComponenteHelpers.DigitarSomenteLetras(const pEdit: TCustomEdit);
-begin
-  pEdit.Text := TStringHelpers.DigitarSomenteLetras(pEdit.Text);
-end;
-
-class procedure TComponenteHelpers.DigitarSomenteNumeros(const pEdit: TCustomEdit);
-begin
-  pEdit.Text := TStringHelpers.DigitarSomenteNumeros(pEdit.Text);
-end;
-
 class procedure TComponenteHelpers.Focar(const pEdit: TWinControl);
 begin
   if pEdit.CanFocus then
@@ -61,40 +45,13 @@ begin
   end;
 end;
 
-class procedure TComponenteHelpers.FormatarData(const pEdit: TCustomEdit);
-begin
-  pEdit.Text := TStringHelpers.FormatarData(pEdit.Text);
-  MoverFinal(pEdit);
-end;
-
-class procedure TComponenteHelpers.FormatarHorario(const pEdit: TCustomEdit);
-begin
-  pEdit.Text := TStringHelpers.FormatarHorario(pEdit.Text);
-  MoverFinal(pEdit);
-end;
-
-class procedure TComponenteHelpers.FormatarIntervalo(const pEdit: TCustomEdit);
-begin
-  if VerificarCampoVazio(pEdit) then
-  begin
-    Exit;
-  end;
-
-  Completar(pEdit, 4, '0');
-end;
-
-class procedure TComponenteHelpers.MoverFinal(const pEdit: TCustomEdit);
-begin
-  pEdit.SelStart := Length(pEdit.Text);
-end;
-
 class function TComponenteHelpers.VerificarEditVazio(const pEdits: TArray<TCustomEdit>): TCustomEdit;
 begin
   Result := nil;
 
   for var lComponente in pEdits do
   begin
-    if not VerificarCampoVazio(lComponente) then
+    if not lComponente.CampoVazio then
     begin
       Continue;
     end;
@@ -110,7 +67,7 @@ begin
 
   for var lComponente in pEdits do
   begin
-    if VerificarCampoVazio(lComponente) then
+    if lComponente.CampoVazio then
     begin
       Continue;
     end;
@@ -118,11 +75,6 @@ begin
     Result := False;
     Break;
   end;
-end;
-
-class function TComponenteHelpers.VerificarCampoVazio(const pEdit: TCustomEdit): Boolean;
-begin
-  Result := TStringHelpers.VerificarCampoVazio(pEdit.Text);
 end;
 
 { TMemoHelper }
@@ -135,9 +87,51 @@ end;
 
 { TCustomEditHelper }
 
-procedure TCustomEditHelper.SomenteNumero;
+procedure TCustomEditHelper.AceitarSomenteLetras;
+begin
+  Text := TStringHelpers.DigitarSomenteLetras(Text);
+end;
+
+procedure TCustomEditHelper.AceitarSomenteNumeros;
 begin
   Text := TStringHelpers.DigitarSomenteNumeros(Text);
+end;
+
+function TCustomEditHelper.CampoVazio: Boolean;
+begin
+  Result := TStringHelpers.VerificarCampoVazio(Text);
+end;
+
+procedure TCustomEditHelper.Completar(pQuantidade: Integer; pValorAPreencher: Char);
+begin
+  Text := TStringHelpers.Completar(Text, pQuantidade, pValorAPreencher);
+end;
+
+procedure TCustomEditHelper.FormatarData;
+begin
+  Text := TStringHelpers.FormatarData(Text);
+  MoverFinal;
+end;
+
+procedure TCustomEditHelper.FormatarHorario;
+begin
+  Text := TStringHelpers.FormatarHorario(Text);
+  MoverFinal;
+end;
+
+procedure TCustomEditHelper.FormatarIntervalo;
+begin
+  if CampoVazio then
+  begin
+    Exit;
+  end;
+
+  Completar(4, '0');
+end;
+
+procedure TCustomEditHelper.MoverFinal;
+begin
+  SelStart := Length(Text);
 end;
 
 end.
