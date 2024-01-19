@@ -5,6 +5,7 @@ interface
 type
   TConstantes = class abstract
   public
+    const REGEX_PEGAR_HASH = '[a-zA-Z0-9]{32}';
     const REGEX_NAO_PALAVRAS = '\W{0,}?';
     const REGEX_NAO_DIGITOS = '\D{0,}?';
     const REGEX_HORARIO_VALIDO = '([0,1][0-9]:[0-5][0-9]|[2][0-3]:[0-5][0-9])';

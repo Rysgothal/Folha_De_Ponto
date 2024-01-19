@@ -10,7 +10,7 @@ type
   private
     FLayout: TStringList;
     procedure AlterarValor(pValor: string; pLinha: Integer; pValorAntigo: string); overload;
-    procedure AlterarValor(pValor: THorarios; pLinha: Integer); overload;
+    procedure AlterarValor(pValor: TLayoutHorarios; pLinha: Integer); overload;
     procedure AlterarValorEntrada(pValor: string; pLinha: Integer);
     procedure AlterarValorSaidaAlmoco(pValor: string; pLinha: Integer);
     procedure AlterarValorRetornoAlmoco(pValor: string; pLinha: Integer);
@@ -21,12 +21,12 @@ type
     procedure SetAdmissao(const pValor: string);
     procedure SetJornadaSemanal(const pValor: string);
     procedure SetIntervaloAlmoco(const pValor: string);
-    procedure SetSegunda(const pValor: THorarios);
-    procedure SetTerca(const pValor: THorarios);
-    procedure SetQuarta(const pValor: THorarios);
-    procedure SetQuinta(const pValor: THorarios);
-    procedure SetSexta(const pValor: THorarios);
-    procedure SetSabado(const pValor: THorarios);
+    procedure SetSegunda(const pValor: TLayoutHorarios);
+    procedure SetTerca(const pValor: TLayoutHorarios);
+    procedure SetQuarta(const pValor: TLayoutHorarios);
+    procedure SetQuinta(const pValor: TLayoutHorarios);
+    procedure SetSexta(const pValor: TLayoutHorarios);
+    procedure SetSabado(const pValor: TLayoutHorarios);
     procedure SetTotalHorasSemana(const pValor: string);
     procedure SetHorasFaltantes(const pValor: string);
     procedure SetHorasExcedentes(const pValor: string);
@@ -38,12 +38,12 @@ type
     property Admissao: string write SetAdmissao;
     property JornadaSemanal: string write SetJornadaSemanal;
     property IntervaloAlmoco: string write SetIntervaloAlmoco;
-    property Segunda: THorarios write SetSegunda;
-    property Terca: THorarios write SetTerca;
-    property Quarta: THorarios write SetQuarta;
-    property Quinta: THorarios write SetQuinta;
-    property Sexta: THorarios write SetSexta;
-    property Sabado: THorarios write SetSabado;
+    property Segunda: TLayoutHorarios write SetSegunda;
+    property Terca: TLayoutHorarios write SetTerca;
+    property Quarta: TLayoutHorarios write SetQuarta;
+    property Quinta: TLayoutHorarios write SetQuinta;
+    property Sexta: TLayoutHorarios write SetSexta;
+    property Sabado: TLayoutHorarios write SetSabado;
     property TotalHorasSemana: string write SetTotalHorasSemana;
     property HorasFaltantes: string write SetHorasFaltantes;
     property HorasExcedentes: string write SetHorasExcedentes;
@@ -72,7 +72,7 @@ begin
   Layout[pLinha] := StringReplace(Layout[pLinha], pValorAntigo, pValor, [rfReplaceAll]);
 end;
 
-procedure TLayout.AlterarValor(pValor: THorarios; pLinha: Integer);
+procedure TLayout.AlterarValor(pValor: TLayoutHorarios; pLinha: Integer);
 begin
   AlterarValorEntrada(pValor.Entrada, pLinha);
   AlterarValorSaidaAlmoco(pValor.SaidaAlmoco, pLinha);
@@ -228,32 +228,32 @@ begin
   AlterarValor(pValor, Ord(llJornada), 'X');
 end;
 
-procedure TLayout.SetSegunda(const pValor: THorarios);
+procedure TLayout.SetSegunda(const pValor: TLayoutHorarios);
 begin
   AlterarValor(pValor, Ord(llSegunda));
 end;
 
-procedure TLayout.SetTerca(const pValor: THorarios);
+procedure TLayout.SetTerca(const pValor: TLayoutHorarios);
 begin
   AlterarValor(pValor, Ord(llTerca));
 end;
 
-procedure TLayout.SetQuarta(const pValor: THorarios);
+procedure TLayout.SetQuarta(const pValor: TLayoutHorarios);
 begin
   AlterarValor(pValor, Ord(llQuarta));
 end;
 
-procedure TLayout.SetQuinta(const pValor: THorarios);
+procedure TLayout.SetQuinta(const pValor: TLayoutHorarios);
 begin
   AlterarValor(pValor, Ord(llQuinta));
 end;
 
-procedure TLayout.SetSexta(const pValor: THorarios);
+procedure TLayout.SetSexta(const pValor: TLayoutHorarios);
 begin
   AlterarValor(pValor, Ord(llSexta));
 end;
 
-procedure TLayout.SetSabado(const pValor: THorarios);
+procedure TLayout.SetSabado(const pValor: TLayoutHorarios);
 begin
   AlterarValor(pValor, Ord(llSabado));
 end;

@@ -17,7 +17,7 @@ type
     Minutos: Integer;
   end;
 
-  THorarios = record
+  TLayoutHorarios = record
     Entrada: string;
     SaidaAlmoco: string;
     RetornoAlmoco: string;
