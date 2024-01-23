@@ -3,7 +3,7 @@ unit PontoSemanal.Helpers.Componentes;
 interface
 
 uses
-  Vcl.StdCtrls, Vcl.Controls;
+  Vcl.StdCtrls, Vcl.Controls, System.SysUtils;
 
 type
   TComponenteHelpers = class abstract
@@ -23,6 +23,7 @@ type
     procedure AceitarSomenteNumeros;
     procedure AceitarSomenteLetras;
     procedure Completar(pQuantidade: Integer; pValorAPreencher: Char = ' ');
+    procedure Repor(pValorAPreencher: Char = '0');
     function CampoVazio: Boolean;
     procedure FormatarData;
     procedure MoverFinal;
@@ -132,6 +133,11 @@ end;
 procedure TCustomEditHelper.MoverFinal;
 begin
   SelStart := Length(Text);
+end;
+
+procedure TCustomEditHelper.Repor(pValorAPreencher: Char);
+begin
+  Text := StringReplace(Text, '_', pValorAPreencher, [rfReplaceAll]);
 end;
 
 end.

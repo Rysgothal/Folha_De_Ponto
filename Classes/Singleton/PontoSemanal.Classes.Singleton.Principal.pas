@@ -238,7 +238,7 @@ begin
     raise EJornadaSemanalInvalida.Create('A jornada semanal inserida está incorreta, verifique.');
   end;
 
-  if lValor > 44 then // Fazer Confg
+  if lValor > Configuracao.MaxJornadaSemanalLei.ToInteger then
   begin
     raise EJornadaSemanalNaoPermitidaLei.Create('A jornada semanal informada não é aceita pela Lei, verifique...');
   end;

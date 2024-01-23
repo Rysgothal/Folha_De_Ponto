@@ -113,15 +113,15 @@ var
 begin
   lDiaSemana := RetornarDiaSemana;
 
-  if TComponenteHelpers.VerificarTodosCamposVazio([medSaidaAlmoco, medRetornoAlmoco]) and
-    not TComponenteHelpers.VerificarTodosCamposVazio([medEntrada, medSaidaFinal]) then
-  begin
-    medSaidaAlmoco.Text := '00:00';
-    medRetornoAlmoco.text := '00:00';
-    SairCampo(lDiaSemana.InserirSaidaAlmoco, lDiaSemana, medSaidaAlmoco);
-    SairCampo(lDiaSemana.InserirRetornoAlmoco, lDiaSemana, medRetornoAlmoco);
-  end;
-
+//  if TComponenteHelpers.VerificarTodosCamposVazio([medSaidaAlmoco, medRetornoAlmoco]) and
+//    not TComponenteHelpers.VerificarTodosCamposVazio([medEntrada, medSaidaFinal]) then
+//  begin
+//    medSaidaAlmoco.Text := '00:00';
+//    medRetornoAlmoco.text := '00:00';
+//    SairCampo(lDiaSemana.InserirSaidaAlmoco, lDiaSemana, medSaidaAlmoco);
+//    SairCampo(lDiaSemana.InserirRetornoAlmoco, lDiaSemana, medRetornoAlmoco);
+//  end;
+//
   if (lDiaSemana.Tag = dsSabado) and (lDiaSemana.Jornada = 0) and
     TComponenteHelpers.VerificarTodosCamposVazio([medEntrada, medSaidaFinal]) then
   begin
@@ -276,15 +276,20 @@ begin
   lPontoSemanal := TFolhaPontoSemanalSingleton.ObterInstancia;
 
   try
+    if lPontoSemanal.Configuracao.AutoCompletar then
+    begin
+      lEdit.Repor;
+    end;
+
     pProcInserirHorario(lEdit.Text);
 
-    for var lComponente in RetornarEditsNaoVerificados do
-    begin
-      if lComponente = lEdit then
-      begin
-        lComponente.Color := clWindow;
-      end;
-    end;
+//    for var lComponente in RetornarEditsNaoVerificados do
+//    begin
+//      if lComponente = lEdit then
+//      begin
+    lEdit.Color := clWindow;
+//      end;
+//    end;
 
     if RetornarEditsNaoVerificados = nil then
     begin
