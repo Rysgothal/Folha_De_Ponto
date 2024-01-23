@@ -3,7 +3,8 @@ unit PontoSemanal.Helpers.Strings;
 interface
 
 uses
-  System.SysUtils, System.Classes, PontoSemanal.Helpers.Constantes;
+  System.SysUtils, System.Classes, PontoSemanal.Helpers.Constantes,
+  PontoSemanal.Helpers.TiposAuxiliares;
 
 type
   TPositions = array of Integer;
@@ -25,14 +26,36 @@ type
     class function FormatarHorario(const pValor: string): string;
     class function HashMD5(pValor: string): string;
     class function VerificarDiferenca(pValor, pValorCompara: string): Boolean;
+    class function AgruparHorarios(pTexto: string; pDiaSemana: TDiaSemana): string;
   end;
 
 implementation
 
 uses
-  System.Math, System.StrUtils, System.Hash;
+  System.Math, System.StrUtils, System.Hash, System.RegularExpressions;
 
 { TStringHelpers }
+
+class function TStringHelpers.AgruparHorarios(pTexto: string; pDiaSemana: TDiaSemana): string;
+var
+  lRegex, lValorAgrupado: string;
+begin
+  case pDiaSemana of
+    dsSegunda: lRegex := TConstantes.REGEX_SEGUNDA_HORARIOS;
+    dsTerca: lRegex := TConstantes.REGEX_TERCA_HORARIOS;
+    dsQuarta: lRegex := TConstantes.REGEX_QUARTA_HORARIOS;
+    dsQuinta: lRegex := TConstantes.REGEX_QUINTA_HORARIOS;
+    dsSexta: lRegex := TConstantes.REGEX_SEXTA_HORARIOS;
+    dsSabado: lRegex := TConstantes.REGEX_SABADO_HORARIOS;
+  end;
+
+  lValorAgrupado := TRegex.Match(pTexto, lRegex).Value;
+  lValorAgrupado := lValorAgrupado.Replace('-Feira', EmptyStr, [rfReplaceAll]);
+  lValorAgrupado := lValorAgrupado.Replace('ç', 'c', [rfReplaceAll]);
+  lValorAgrupado := lValorAgrupado.Replace('á', 'a', [rfReplaceAll]);
+
+  Result := lValorAgrupado.Trim;
+end;
 
 class function TStringHelpers.Completar(const pValor: string; pQuantidade: Integer; pValorAPreencher: Char): string;
 begin

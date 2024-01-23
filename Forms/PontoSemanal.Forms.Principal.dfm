@@ -41,7 +41,12 @@ object frmPrincipal: TfrmPrincipal
       ExplicitTop = 17
       ExplicitWidth = 541
       ExplicitHeight = 126
+      inherited edtNome: TEdit
+        Width = 426
+        ExplicitWidth = 426
+      end
       inherited edtJornadaSemanal: TEdit
+        Text = '44'
         OnExit = frmDadosFuncionarioedtJornadaSemanalExit
       end
     end
@@ -100,6 +105,26 @@ object frmPrincipal: TfrmPrincipal
       ExplicitTop = 17
       ExplicitWidth = 541
       ExplicitHeight = 55
+      inherited medEntrada: TMaskEdit
+        Width = 71
+        Text = '22:00'
+        ExplicitWidth = 71
+      end
+      inherited medSaidaAlmoco: TMaskEdit
+        Width = 71
+        Text = '01:30'
+        ExplicitWidth = 71
+      end
+      inherited medRetornoAlmoco: TMaskEdit
+        Width = 71
+        Text = '02:30'
+        ExplicitWidth = 71
+      end
+      inherited medSaidaFinal: TMaskEdit
+        Width = 71
+        Text = '08:00'
+        ExplicitWidth = 71
+      end
     end
   end
   object gbxHorasTrabalhadas: TGroupBox
@@ -383,7 +408,7 @@ object frmPrincipal: TfrmPrincipal
     Font.Height = -17
     Font.Name = 'Segoe UI'
     Font.Style = []
-    ImageIndex = 0
+    ImageIndex = 2
     Images = dtmPrincipal.imglistIcones
     ParentFont = False
     TabOrder = 10
@@ -402,7 +427,7 @@ object frmPrincipal: TfrmPrincipal
     Font.Height = -17
     Font.Name = 'Segoe UI'
     Font.Style = []
-    ImageIndex = 2
+    ImageIndex = 1
     Images = dtmPrincipal.imglistIcones
     ParentBiDiMode = False
     ParentDoubleBuffered = False
@@ -421,16 +446,27 @@ object frmPrincipal: TfrmPrincipal
     Font.Height = -17
     Font.Name = 'Segoe UI'
     Font.Style = []
-    ImageIndex = 1
+    ImageIndex = 0
     Images = dtmPrincipal.imglistIcones
     ParentFont = False
     TabOrder = 12
     OnClick = btnGerSalHistClick
   end
+  object btnConfiguracoes: TBitBtn
+    Left = 516
+    Top = 121
+    Width = 28
+    Height = 25
+    ImageIndex = 3
+    Images = dtmPrincipal.imglistIcones
+    TabOrder = 13
+    Visible = False
+    OnClick = btnConfiguracoesClick
+  end
   object tmrHorario: TTimer
     Enabled = False
     OnTimer = tmrHorarioTimer
-    Left = 496
-    Top = 96
+    Left = 440
+    Top = 112
   end
 end

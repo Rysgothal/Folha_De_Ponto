@@ -29,6 +29,11 @@ type
     procedure AbortarCasoHorarioZeradoNaoPermitido(const pValor: string);
     procedure AbortarCasoHorarioAtualMenorQueSaidaAlmoco(const pValor: string);
     function VerificarHorarioVazio(const pValor: string): Boolean;
+    procedure SetEntradaTurnoTradicional(const pValor: string);
+    procedure SetRetornoAlmocoTurnoTradicional(const pValor: string);
+    procedure SetSaidaAlmocoTurnoTradicional(const pValor: string);
+    procedure SetSaidaFinalTurnoTradicional(const pValor: string);
+    function RetornarHorario(pHorario: string): TDateTime;
   public
     constructor Create(pTag: TDiaSemana);
     destructor Destroy; override;
@@ -51,16 +56,25 @@ type
 implementation
 
 uses
-  PontoSemanal.Helpers.Strings;
+  PontoSemanal.Helpers.Strings, System.DateUtils, System.StrUtils, System.Math;
 
 { TDiaHorarios }
 
 procedure THorariosDia.CalcularHorasTrabalhadas;
 var
-  lHorasTrabalhadas, lSaldoHoras: TTime;
+  lHorasCalculo, lSaldoCalculo: THorarioSeparado;
+  lJornada: TTime;
+  lEntrada, lSaidaAlmoco, lRetornoAlmoco, lSaidaFinal, lHorasTrabalhadas, lSaldoHoras: TDateTime;
   lVerificarPeriodoManha, lVerificarPeriodoTarde, lSemAlmoco, lSaidaAlmocoNulo, lRetornoAlmocoNulo: Boolean;
 begin
+  lEntrada := RetornarHorario(Entrada);
+  lSaidaAlmoco := RetornarHorario(SaidaAlmoco);
+  lRetornoAlmoco := RetornarHorario(RetornoAlmoco);
+  lSaidaFinal := RetornarHorario(SaidaFinal);
+
   lHorasTrabalhadas := 0;
+  lJornada := 0;
+  lJornada := IncHour(lJornada, Jornada);
 
   lSaidaAlmocoNulo := (SaidaAlmoco = EmptyStr) or (SaidaAlmoco = '00:00');
   lRetornoAlmocoNulo := (RetornoAlmoco = EmptyStr) or (RetornoAlmoco = '00:00');
@@ -69,27 +83,52 @@ begin
   lVerificarPeriodoTarde := (SaidaFinal <> EmptyStr) and not lRetornoAlmocoNulo;
   lSemAlmoco := (Entrada <> EmptyStr) and (SaidaFinal <> EmptyStr) and lSaidaAlmocoNulo and lRetornoAlmocoNulo;
 
+  if (lEntrada > lSaidaAlmoco) and not lSemAlmoco then
+  begin
+    lSaidaAlmoco := lSaidaAlmoco.IncDay;
+  end;
+
+  if (lSaidaAlmoco > lRetornoAlmoco) and not lSemAlmoco then
+  begin
+    lRetornoAlmoco := lRetornoAlmoco.IncDay;
+  end;
+
+  if (lSemAlmoco and (lEntrada > lSaidaFinal)) or (not lSemAlmoco and (lRetornoAlmoco > lSaidaFinal)) then
+  begin
+    lSaidaFinal := lSaidaFinal.IncDay;
+  end;
+
   if lVerificarPeriodoManha then
   begin
-    lHorasTrabalhadas := StrToTime(SaidaAlmoco) - StrToTime(Entrada);
+    lHorasCalculo.Minutos := MinutesBetween(lSaidaAlmoco, lEntrada);
   end;
 
   if lVerificarPeriodoTarde then
   begin
-    lHorasTrabalhadas := lHorasTrabalhadas + (StrToTime(SaidaFinal) - StrToTime(RetornoAlmoco));
+    lHorasCalculo.Minutos := lHorasCalculo.Minutos + MinutesBetween(lSaidaFinal, lRetornoAlmoco);
   end;
 
   if lSemAlmoco then
   begin
-    lHorasTrabalhadas :=  StrToTime(FSaidaFinal) - StrToTime(FEntrada);
+    lHorasCalculo.Minutos := MinutesBetween(lSaidaFinal, lEntrada);
   end;
 
-  if (FEntrada = EmptyStr) and (FSaidaFinal = EmptyStr) then
+  lHorasCalculo.Horas := lHorasCalculo.Minutos div 60;
+  lHorasCalculo.Minutos := lHorasCalculo.Minutos mod 60;
+
+  if (lEntrada <> 0) or (lSaidaFinal <> 0) then
   begin
-    lHorasTrabalhadas := 0;
+    lHorasTrabalhadas := StrToDateTime(
+      lHorasCalculo.Horas.ToString.PadLeft(2, '0') + ':' + lHorasCalculo.Minutos.ToString.PadLeft(2, '0')
+    );
   end;
 
-  lSaldoHoras := lHorasTrabalhadas - StrToTime(IntToStr(Jornada));
+  lSaldoCalculo.Horas := MinutesBetween(lJornada, lHorasTrabalhadas) div 60;
+  lSaldoCalculo.Minutos := MinutesBetween(lJornada, lHorasTrabalhadas) mod 60;
+
+  lSaldoHoras := StrToDateTime(
+    lSaldoCalculo.Horas.ToString.PadLeft(2, '0') + ':' + lSaldoCalculo.Minutos.ToString.PadLeft(2, '0')
+  );
 
   Desempenho.TotalTrabalhado := FormatDateTime('hh:mm', lHorasTrabalhadas);
   Desempenho.SaldoHoras := FormatDateTime('hh:mm', lSaldoHoras);
@@ -172,6 +211,86 @@ begin
   Result := lNome;
 end;
 
+function THorariosDia.RetornarHorario(pHorario: string): TDateTime;
+begin
+  case pHorario.Trim <> EmptyStr of
+    True: Result := StrToDateTime(pHorario);
+    else Result := 0;
+  end;
+end;
+
+procedure THorariosDia.SetSaidaFinalTurnoTradicional(const pValor: string);
+begin
+  if (FJornada <> 0) then
+  begin
+    AbortarCasoHorarioZeradoNaoPermitido(pValor);
+    AbortarCasoHorarioAtualMenorQueEntrada(pValor);
+  end;
+
+  if FTag <> dsSabado then
+  begin
+    if TExceptionHelpers.VerificarHorarioAtualMenorQueRetornoAlmoco(pValor, RetornoAlmoco) then
+    begin
+      CriarException(EHorarioAtualMenorQueRetornoAlmoco, 'O horário atual está menor que o horário "Retorno-Almoço"' + ', verifique.');
+    end;
+
+    AbortarCasoHorarioAtualMenorQueSaidaAlmoco(pValor);
+  end;
+end;
+
+procedure THorariosDia.SetSaidaAlmocoTurnoTradicional(const pValor: string);
+begin
+  if TExceptionHelpers.VerificarHorarioRetornoAlmocoNaoZerado(pValor, RetornoAlmoco) then
+  begin
+    CriarException(EHorarioRetornoAlmocoNaoZerado, 'O horário atual não pode ser aceito, já que o horário "Retorno-Almoço"' + ' não está zerado, verifique.');
+  end;
+
+  if TExceptionHelpers.VerificarHorarioRetornoAlmocoZerado(pValor, RetornoAlmoco) then
+  begin
+    CriarException(EHorarioRetornoAlmocoZerado, 'O horário atual não pode ser aceito, já que o horário "Retorno-Almoço"' + ' está zerado, verifique.');
+  end;
+
+  AbortarCasoHorarioAtualMaiorQueRetornoAlmoco(pValor);
+  AbortarCasoHorarioAtualMaiorQueSaidaFinal(pValor);
+  AbortarCasoHorarioAtualMenorQueEntrada(pValor);
+end;
+
+procedure THorariosDia.SetRetornoAlmocoTurnoTradicional(const pValor: string);
+begin
+  if TExceptionHelpers.VerificarHorarioSaidaAlmocoNaoZerado(pValor, SaidaAlmoco) then
+  begin
+    CriarException(EHorarioSaidaAlmocoNaoZerado, 'O horário atual não pode ser aceito, já que o horário "Saída-Almoço"' + ' não está zerado, verifique.');
+  end;
+
+  if TExceptionHelpers.VerificarHorarioSaidaAlmocoZerado(pValor, SaidaAlmoco) then
+  begin
+    CriarException(EHorarioSaidaAlmocoZerado, 'O horário atual não pode ser aceito, já que o horário "Saída-Almoço"' + ' está zerado, verifique.');
+  end;
+
+  AbortarCasoHorarioAtualMaiorQueSaidaFinal(pValor);
+  AbortarCasoHorarioAtualMenorQueSaidaAlmoco(pValor);
+  AbortarCasoHorarioAtualMenorQueEntrada(pValor);
+end;
+
+procedure THorariosDia.SetEntradaTurnoTradicional(const pValor: string);
+begin
+  if (FJornada <> 0) then
+  begin
+    AbortarCasoHorarioZeradoNaoPermitido(pValor);
+    AbortarCasoHorarioAtualMaiorQueSaidaFinal(pValor);
+  end;
+
+  if FTag <> dsSabado then
+  begin
+    if TExceptionHelpers.VerificarHorarioAtualMaiorQueSaidaAlmoco(pValor, SaidaAlmoco) then
+    begin
+      CriarException(EHorarioAtualMaiorQueSaidaAlmoco, 'O horário atual está maior que "Saída-Almoço", verifique.');
+    end;
+
+    AbortarCasoHorarioAtualMaiorQueRetornoAlmoco(pValor);
+  end;
+end;
+
 procedure THorariosDia.AbortarCasoHorarioAtualMenorQueSaidaAlmoco(const pValor: string);
 begin
   if TExceptionHelpers.VerificarHorarioAtualMenorQueSaidaAlmoco(pValor, SaidaAlmoco) then
@@ -232,22 +351,7 @@ begin
   end;
 
   AbortarCasoHorarioInvalido(pValor);
-
-  if (FJornada <> 0) then
-  begin
-    AbortarCasoHorarioZeradoNaoPermitido(pValor);
-    AbortarCasoHorarioAtualMaiorQueSaidaFinal(pValor);
-  end;
-
-  if FTag <> dsSabado then
-  begin
-    if TExceptionHelpers.VerificarHorarioAtualMaiorQueSaidaAlmoco(pValor, SaidaAlmoco) then
-    begin
-      CriarException(EHorarioAtualMaiorQueSaidaAlmoco, 'O horário atual está maior que "Saída-Almoço", verifique.');
-    end;
-
-    AbortarCasoHorarioAtualMaiorQueRetornoAlmoco(pValor);
-  end;
+//  SetEntradaTurnoTradicional(pValor);
 
   FEntrada := pValor;
 end;
@@ -261,22 +365,8 @@ begin
   end;
 
   AbortarCasoHorarioInvalido(pValor);
-
-  if TExceptionHelpers.VerificarHorarioSaidaAlmocoNaoZerado(pValor, SaidaAlmoco) then
-  begin
-    CriarException(EHorarioSaidaAlmocoNaoZerado, 'O horário atual não pode ser aceito, já que o horário "Saída-Almoço"' +
-      ' não está zerado, verifique.');
-  end;
-
-  if TExceptionHelpers.VerificarHorarioSaidaAlmocoZerado(pValor, SaidaAlmoco) then
-  begin
-    CriarException(EHorarioSaidaAlmocoZerado, 'O horário atual não pode ser aceito, já que o horário "Saída-Almoço"' +
-      ' está zerado, verifique.');
-  end;
-
-  AbortarCasoHorarioAtualMaiorQueSaidaFinal(pValor);
   AbortarCasoHorarioAtualMenorQueSaidaAlmoco(pValor);
-  AbortarCasoHorarioAtualMenorQueEntrada(pValor);
+//  SetRetornoAlmocoTurnoTradicional(pValor);
 
   FRetornoAlmoco := pValor;
 end;
@@ -290,22 +380,8 @@ begin
   end;
 
   AbortarCasoHorarioInvalido(pValor);
-
-  if TExceptionHelpers.VerificarHorarioRetornoAlmocoNaoZerado(pValor, RetornoAlmoco) then
-  begin
-    CriarException(EHorarioRetornoAlmocoNaoZerado, 'O horário atual não pode ser aceito, já que o horário "Retorno-Almoço"' +
-      ' não está zerado, verifique.');
-  end;
-
-  if TExceptionHelpers.VerificarHorarioRetornoAlmocoZerado(pValor, RetornoAlmoco) then
-  begin
-    CriarException(EHorarioRetornoAlmocoZerado, 'O horário atual não pode ser aceito, já que o horário "Retorno-Almoço"' +
-      ' está zerado, verifique.');
-  end;
-
   AbortarCasoHorarioAtualMaiorQueRetornoAlmoco(pValor);
-  AbortarCasoHorarioAtualMaiorQueSaidaFinal(pValor);
-  AbortarCasoHorarioAtualMenorQueEntrada(pValor);
+//  SetSaidaAlmocoTurnoTradicional(pValor);
 
   FSaidaAlmoco := pValor;
 end;
@@ -319,23 +395,7 @@ begin
   end;
 
   AbortarCasoHorarioInvalido(pValor);
-
-  if (FJornada <> 0) then
-  begin
-    AbortarCasoHorarioZeradoNaoPermitido(pValor);
-    AbortarCasoHorarioAtualMenorQueEntrada(pValor);
-  end;
-
-  if FTag <> dsSabado then
-  begin
-    if TExceptionHelpers.VerificarHorarioAtualMenorQueRetornoAlmoco(pValor, RetornoAlmoco) then
-    begin
-      CriarException(EHorarioAtualMenorQueRetornoAlmoco, 'O horário atual está menor que o horário "Retorno-Almoço"' +
-        ', verifique.');
-    end;
-
-    AbortarCasoHorarioAtualMenorQueSaidaAlmoco(pValor);
-  end;
+//  SetSaidaFinalTurnoTradicional(pValor);
 
   FSaidaFinal := pValor;
 end;

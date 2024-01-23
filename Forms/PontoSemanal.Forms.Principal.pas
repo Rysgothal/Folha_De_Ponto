@@ -10,7 +10,8 @@ uses
   PontoSemanal.Helpers.Componentes, PontoSemanal.Classes.Base.Horarios,
   PontoSemanal.Classes.Builder.Diretor,
   PontoSemanal.Interfaces.Builder.FolhaDePonto,
-  PontoSemanal.Classes.Builder.Construtor, PontoSemanal.Helpers.Constantes;
+  PontoSemanal.Classes.Builder.Construtor, PontoSemanal.Helpers.Constantes, Vcl.Buttons,
+  PontoSemanal.Forms.Configuracoes;
 
 type
   TfrmPrincipal = class(TForm)
@@ -36,29 +37,32 @@ type
     btnNovoRegistro: TButton;
     btnCarregarHist: TButton;
     btnGerSalHist: TButton;
+    btnConfiguracoes: TBitBtn;
     procedure tmrHorarioTimer(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure frmDadosFuncionarioedtJornadaSemanalExit(Sender: TObject);
     procedure btnNovoRegistroClick(Sender: TObject);
     procedure btnGerSalHistClick(Sender: TObject);
     procedure btnCarregarHistClick(Sender: TObject);
+    procedure btnConfiguracoesClick(Sender: TObject);
   private
     { Private declarations }
+    FDadoAlterado: Boolean;
     procedure AtualizarHorarioSistema;
     procedure AnalisarFolhaDePontoAlterada;
     procedure AnalisarDiaDaSemanaAlterado(pDiaSemana: THorariosDia);
     procedure AnalisarDadosFuncionarioAlterados;
-    procedure AplicarTagFrame(pFrame: TfrmHorariosDia; pTag: TDiaSemana);
+    procedure AplicarTagFrame(pFrame: TfrmHorariosDia; pTag: TDiaSemana);   // Verificar
+    procedure AplicarDadoNaoAlterado;
     procedure BuscarValoresRegEx;
     procedure BuscarValoresHorariosRegEx;
     procedure BuscarValoresDadosFuncionarioRegEx;
     procedure CarregarHistorico;
-    procedure CarregarArquivoFolhaDePonto;
-    procedure ConfigurarObservadores;
-    function ConcatenarHorarios(pDia: THorariosDia): string;
+    procedure CarregarArquivoFolhaDePonto;                                  // Verificar
+    procedure ConfigurarObservadores;                                       // Verificar
     procedure DefinirCoresPadraoComponentes;
-    procedure DestacarHorariosAlterados(pHorarios: THorariosDia; pDia: string);
-    procedure DestacarDadosFuncionarioAlterados(pHashFolha, pHashAtual: string; pEdit: TCustomEdit);
+    procedure DestacarHorariosAlterados(pHorarios: THorariosDia);
+    procedure DestacarDadosFuncionarioAlterados(pHashIguais: Boolean; pEdit: TCustomEdit);
     procedure GravarFolhaDePontoSemanal;
     procedure Limpar;
     function NovoRegistro(pCarregandoArquivo: Boolean = False): Boolean;
@@ -66,12 +70,12 @@ type
     procedure PreencherValoresHorariosRegEx(pDiaSemana: TDiaSemana);
     procedure PreencherValoresDadosFuncionario(pRegex: string; pEdit: TCustomEdit);
     function RetornarMatchesHorariosRegex(pDiaSemana: TDiaSemana): TMatchCollection;
-    function RetornarHashDentroArquivo(pPalavraChave: string): string;
     function RetornarFrameDia(pDia: TDiaSemana): TfrmHorariosDia;
     procedure Salvar;
     procedure SalvarHistorico;
-    function VerificarPossuiValoresPreenchidos: Boolean;
+    function VerificarAlteracaoDeValorFolhaPonto: Boolean;
     function VerificarViolacaoFolhaDePonto: Boolean;
+    function VerificarHashNaFolhaComAtual(pHashAtual: string): Boolean;
   public
     { Public declarations }
   end;
@@ -91,6 +95,7 @@ uses
 procedure TfrmPrincipal.FormCreate(Sender: TObject);
 begin
   tmrHorario.Enabled := True;
+  FDadoAlterado := False;
   sttsbarSistemaInfo.Panels[0].Text := FormatDateTime('ddddddd', Date);
   ConfigurarObservadores;
 end;
@@ -170,6 +175,7 @@ begin
     end;
   end;
 
+  FDadoAlterado := False;
   frmDadosFuncionario.Limpar;
   frmHorasTrabalhadasSemana.Limpar;
   memHistHorario.Clear;
@@ -187,6 +193,16 @@ end;
 procedure TfrmPrincipal.btnCarregarHistClick(Sender: TObject);
 begin
   CarregarHistorico;
+end;
+
+procedure TfrmPrincipal.btnConfiguracoesClick(Sender: TObject);
+begin
+  if not Assigned(frmConfiguracoes) then
+  begin
+    frmConfiguracoes := TfrmConfiguracoes.Create(Self);
+  end;
+
+  frmConfiguracoes.ShowModal;
 end;
 
 procedure TfrmPrincipal.btnGerSalHistClick(Sender: TObject);
@@ -305,18 +321,13 @@ begin
   end;
 
   CarregarArquivoFolhaDePonto;
-end;
-
-function TfrmPrincipal.ConcatenarHorarios(pDia: THorariosDia): string;
-begin
-  Result := pDia.Entrada + pDia.SaidaAlmoco + pDia.RetornoAlmoco + pDia.SaidaFinal;
+  AplicarDadoNaoAlterado;
 end;
 
 procedure TfrmPrincipal.ConfigurarObservadores;
 var
   lPontoSemanal: TFolhaPontoSemanalSingleton;
 begin
-//  frmSegunda.NomeDoFrame := dsSegunda;
   AplicarTagFrame(frmSegunda, dsSegunda);
   AplicarTagFrame(frmTerca, dsTerca);
   AplicarTagFrame(frmQuarta, dsQuarta);
@@ -347,48 +358,43 @@ end;
 procedure TfrmPrincipal.AnalisarDadosFuncionarioAlterados;
 var
   lPontoSemanal: TFolhaPontoSemanalSingleton;
-  lHashFolha, lHashAtual: TArray<string>;
+  lHashIguais: TArray<Boolean>;
 begin
   lPontoSemanal := TFolhaPontoSemanalSingleton.ObterInstancia;
 
-  lHashFolha := [
-    RetornarHashDentroArquivo('Funcionario-Codigo'), RetornarHashDentroArquivo('Funcionario-Nome'),
-    RetornarHashDentroArquivo('Funcionario-Admissao'), RetornarHashDentroArquivo('Funcionario-Jornada'),
-    RetornarHashDentroArquivo('Funcionario-Intervalo')
+  lHashIguais := [
+    VerificarHashNaFolhaComAtual(TStringHelpers.HashMD5(lPontoSemanal.ID)),
+    VerificarHashNaFolhaComAtual(TStringHelpers.HashMD5(lPontoSemanal.Nome)),
+    VerificarHashNaFolhaComAtual(TStringHelpers.HashMD5(lPontoSemanal.DataAdmissao)),
+    VerificarHashNaFolhaComAtual(TStringHelpers.HashMD5(lPontoSemanal.JornadaSemanal)),
+    VerificarHashNaFolhaComAtual(TStringHelpers.HashMD5(lPontoSemanal.IntervaloAlmoco))
   ];
 
-  lHashAtual := [
-    TStringHelpers.HashMD5(lPontoSemanal.ID), TStringHelpers.HashMD5(lPontoSemanal.Nome),
-    TStringHelpers.HashMD5(lPontoSemanal.DataAdmissao), TStringHelpers.HashMD5(lPontoSemanal.JornadaSemanal),
-    TStringHelpers.HashMD5(lPontoSemanal.IntervaloAlmoco)
-  ];
-
-  DestacarDadosFuncionarioAlterados(lHashFolha[0], lHashAtual[0], frmDadosFuncionario.edtCodigo);
-  DestacarDadosFuncionarioAlterados(lHashFolha[1], lHashAtual[1], frmDadosFuncionario.edtNome);
-  DestacarDadosFuncionarioAlterados(lHashFolha[2], lHashAtual[2], frmDadosFuncionario.edtAdmissao);
-  DestacarDadosFuncionarioAlterados(lHashFolha[3], lHashAtual[3], frmDadosFuncionario.edtJornadaSemanal);
-  DestacarDadosFuncionarioAlterados(lHashFolha[4], lHashAtual[4], frmDadosFuncionario.edtIntervaloAlmoco);
+  DestacarDadosFuncionarioAlterados(lHashIguais[0], frmDadosFuncionario.edtCodigo);
+  DestacarDadosFuncionarioAlterados(lHashIguais[1], frmDadosFuncionario.edtNome);
+  DestacarDadosFuncionarioAlterados(lHashIguais[2], frmDadosFuncionario.edtAdmissao);
+  DestacarDadosFuncionarioAlterados(lHashIguais[3], frmDadosFuncionario.edtJornadaSemanal);
+  DestacarDadosFuncionarioAlterados(lHashIguais[4], frmDadosFuncionario.edtIntervaloAlmoco);
 end;
 
 procedure TfrmPrincipal.AnalisarDiaDaSemanaAlterado(pDiaSemana: THorariosDia);
 var
-  lNomeDia, lHashDiaAtual: string;
+  lHashDiaAtual: string;
 begin
-  lNomeDia := pDiaSemana.PegarNomeDaSemana;
-  lHashDiaAtual := ConcatenarHorarios(pDiaSemana);
+  lHashDiaAtual := TStringHelpers.AgruparHorarios(memHistHorario.Text, pDiaSemana.Tag);
   lHashDiaAtual := TStringHelpers.HashMD5(lHashDiaAtual);
 
-  if RetornarHashDentroArquivo('[' + lNomeDia + ']') <> lHashDiaAtual then
+  if not VerificarHashNaFolhaComAtual(lHashDiaAtual) then
   begin
-    DestacarHorariosAlterados(pDiaSemana, lNomeDia);
+    DestacarHorariosAlterados(pDiaSemana);
   end;
 end;
 
-procedure TfrmPrincipal.DestacarDadosFuncionarioAlterados(pHashFolha, pHashAtual: string; pEdit: TCustomEdit);
+procedure TfrmPrincipal.DestacarDadosFuncionarioAlterados(pHashIguais: Boolean; pEdit: TCustomEdit);
 var
   lEdit: TEdit absolute pEdit;
 begin
-  if not TStringHelpers.VerificarDiferenca(pHashFolha, pHashAtual) then
+  if pHashIguais then
   begin
     Exit;
   end;
@@ -396,31 +402,28 @@ begin
   lEdit.Color := $006969D6;
 end;
 
-procedure TfrmPrincipal.DestacarHorariosAlterados(pHorarios: THorariosDia; pDia: string);
+procedure TfrmPrincipal.DestacarHorariosAlterados(pHorarios: THorariosDia);
 var
-  lHashArquivo, lHashAtual: TArray<string>;
+  lHashIguais: TArray<Boolean>;
   lFrame: TfrmHorariosDia;
 begin
-  lHashArquivo := [
-    RetornarHashDentroArquivo('[' + pDia + '-Entrada]'), RetornarHashDentroArquivo('[' + pDia + '-SaidaAlmoco]'),
-    RetornarHashDentroArquivo('[' + pDia + '-RetornoAlmoco]'), RetornarHashDentroArquivo('[' + pDia + '-SaidaFinal]')
-  ];
-
-  lHashAtual := [
-    TStringHelpers.HashMD5(pHorarios.Entrada), TStringHelpers.HashMD5(pHorarios.SaidaAlmoco),
-    TStringHelpers.HashMD5(pHorarios.RetornoAlmoco), TStringHelpers.HashMD5(pHorarios.SaidaFinal)
+  lHashIguais := [
+    VerificarHashNaFolhaComAtual(TStringHelpers.HashMD5(pHorarios.Entrada)),
+    VerificarHashNaFolhaComAtual(TStringHelpers.HashMD5(pHorarios.SaidaAlmoco)),
+    VerificarHashNaFolhaComAtual(TStringHelpers.HashMD5(pHorarios.RetornoAlmoco)),
+    VerificarHashNaFolhaComAtual(TStringHelpers.HashMD5(pHorarios.SaidaFinal))
   ];
 
   lFrame := RetornarFrameDia(pHorarios.Tag);
 
-  for var I := 0 to Pred(Length(lHashArquivo)) do
+  for var I := 0 to Pred(Length(lHashIguais)) do
   begin
-    if (TDiaSemana(lFrame.Tag) = dsSabado) and (I in [1, 2]) then
+    if (pHorarios.Tag = dsSabado) and (I in [1, 2]) then
     begin
-      Continue;
+      Break;
     end;
 
-    if TStringHelpers.VerificarDiferenca(lHashArquivo[I], lHashAtual[I]) then
+    if not lHashIguais[I] then
     begin
       lFrame.AlterarEditHorarioViolado(TRegistroHorario(I));
     end;
@@ -442,6 +445,21 @@ begin
   AnalisarDiaDaSemanaAlterado(lPontoSemanal.Sabado);
 end;
 
+procedure TfrmPrincipal.AplicarDadoNaoAlterado;
+begin
+  frmDadosFuncionario.FDadoAlterado := False;
+
+  for var lFrame in Self do
+  begin
+    if not (lFrame is TfrmHorariosDia) then
+    begin
+      Continue;
+    end;
+
+    TfrmHorariosDia(lFrame).FDadoAlterado := False;
+  end;
+end;
+
 procedure TfrmPrincipal.AplicarTagFrame(pFrame: TfrmHorariosDia; pTag: TDiaSemana);
 var
   lPontoSemanal: TFolhaPontoSemanalSingleton;
@@ -455,19 +473,18 @@ end;
 
 function TfrmPrincipal.NovoRegistro(pCarregandoArquivo: Boolean): Boolean;
 var
-  lPossuiValoresPreenchidos: Boolean;
+  lHouveValoresAlterados: Boolean;
   lMsgAuxiliar: string;
 begin
   Result := True;
-
-  lPossuiValoresPreenchidos := VerificarPossuiValoresPreenchidos;
+  lHouveValoresAlterados := VerificarAlteracaoDeValorFolhaPonto;
 
   case pCarregandoArquivo of
     True: lMsgAuxiliar := 'carregar um registro?';
     else lMsgAuxiliar := 'criar um novo registro?';
   end;
 
-  if lPossuiValoresPreenchidos and (Application.MessageBox(PChar('Ainda existem valores anotados na Folha de Ponto, ' +
+  if lHouveValoresAlterados and (Application.MessageBox(PChar('Alguns valores foram alterados na Folha de Ponto, ' +
     'ao prosseguir os dados serão sobrescritos.' + sLineBreak + sLineBreak + '> Deseja realmente ' + lMsgAuxiliar),
     'ATENÇÃO', MB_YESNO + MB_ICONWARNING) = ID_NO) then
   begin
@@ -480,6 +497,8 @@ begin
   begin
     TComponenteHelpers.Focar(frmDadosFuncionario.edtCodigo);
   end;
+
+  AplicarDadoNaoAlterado;
 end;
 
 procedure TfrmPrincipal.PreencherDadosNoMemo;
@@ -539,22 +558,6 @@ begin
   end;
 end;
 
-function TfrmPrincipal.RetornarHashDentroArquivo(pPalavraChave: string): string;
-begin
-  for var I := 0 to Pred(memHistHorario.Lines.Count) do
-  begin
-    Result := memHistHorario.Lines[I];
-
-    if not Result.Contains(pPalavraChave) then
-    begin
-      Continue;
-    end;
-
-    Result := Copy(Result, Pos(':', Result) + 1, Length(Result)).Trim;
-    Break;
-  end;
-end;
-
 function TfrmPrincipal.RetornarMatchesHorariosRegex(pDiaSemana: TDiaSemana): TMatchCollection;
 var
   lRegex: string;
@@ -576,7 +579,6 @@ procedure TfrmPrincipal.Salvar;
 var
   lEdits: TArray<TMaskEdit>;
 begin
-//  frmDadosFuncionarioedtJornadaSemanalExit(nil);
   for var lComponente in Self do
   begin
     if not (lComponente is TfrmHorariosDia) then
@@ -612,6 +614,7 @@ begin
   if lTodosCamposPreenchidos then
   begin
     Salvar;
+    AplicarDadoNaoAlterado;
     Exit;
   end;
 
@@ -619,48 +622,69 @@ begin
     'ATENÇÃO', MB_OK + MB_ICONINFORMATION);
 end;
 
-function TfrmPrincipal.VerificarPossuiValoresPreenchidos: Boolean;
+function TfrmPrincipal.VerificarHashNaFolhaComAtual(pHashAtual: string): Boolean;
 begin
   Result := False;
 
-  if frmDadosFuncionario.VerificarSePossuiValoresAnotados then
+  for var lMatch in TRegEx.Matches(memHistHorario.Text, TConstantes.REGEX_PEGAR_HASH) do
+  begin
+    Result := lMatch.Value.Trim = pHashAtual;
+
+    if Result then
+    begin
+      Break;
+    end;
+  end;
+end;
+
+function TfrmPrincipal.VerificarAlteracaoDeValorFolhaPonto: Boolean;
+begin
+  Result := False;
+
+  if frmDadosFuncionario.FDadoAlterado then
   begin
     Exit(True);
   end;
 
-  for var I := 0 to Pred(Self.ComponentCount) do
+  for var lFrame in Self do
   begin
     if Result then
     begin
       Break;
     end;
 
-    if not (Self.Components[I] is TfrmHorariosDia) then
+    if not (lFrame is TfrmHorariosDia) then
     begin
       Continue;
     end;
 
-    Result := TfrmHorariosDia(Self.Components[I]).VerificarSePossuiValoresAnotados;
+    Result := TfrmHorariosDia(lFrame).FDadoAlterado;
   end;
 end;
 
 function TfrmPrincipal.VerificarViolacaoFolhaDePonto: Boolean;
 var
-  lHashArquivo, lHashAtual: string;
+  lHashAtual, lLinhaRemovida: string;
   I: Integer;
 begin
-  I := 0;
-  lHashArquivo := RetornarHashDentroArquivo('[Folha]');
+  I := Pred(memHistHorario.Lines.Count);
+  Result := True;
 
-  while I < 36 do
+  while I >= 0 do
   begin
-    memHistHorario.Lines.Delete(memHistHorario.Lines.Count - 1);
-    Inc(I);
-  end;
-  memHistHorario.FocarCabecalho;
+    lLinhaRemovida := memHistHorario.Lines[I];
+    memHistHorario.Lines.Delete(I);
+    lHashAtual := TStringHelpers.HashMD5(memHistHorario.Text);
+    memHistHorario.Lines.Insert(I, lLinhaRemovida);
+    Dec(I);
 
-  lHashAtual := TStringHelpers.HashMD5(memHistHorario.Text);
-  Result := TStringHelpers.VerificarDiferenca(lHashArquivo, lHashAtual);
+    if VerificarHashNaFolhaComAtual(lHashAtual) then
+    begin
+      Exit(False);
+    end;
+  end;
+
+  memHistHorario.FocarCabecalho;
 end;
 
 procedure TfrmPrincipal.tmrHorarioTimer(Sender: TObject);

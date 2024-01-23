@@ -6,7 +6,8 @@ uses
   PontoSemanal.Classes.Base.Horarios, PontoSemanal.Helpers.TiposAuxiliares,
   System.Generics.Collections, PontoSemanal.Interfaces.Observer.Observador,
   PontoSemanal.Classes.Base.Desempenho,
-  PontoSemanal.Interfaces.Bridge.Converter;
+  PontoSemanal.Interfaces.Bridge.Converter,
+  PontoSemanal.Classes.Base.Configuracoes;
 
 type
   TFolhaPontoSemanalSingleton = class
@@ -27,10 +28,10 @@ type
     FObservers: TDictionary<TDiaSemana, IObservador>;
     FConverterHora: IConverter;
     FIntervaloAlmocoExtenso: string;
+    FConfiguracao: TConfiguracao;
     constructor Create;
     procedure SetID(const pValor: string);
     procedure SetDataAdmissao(const pValor: string);
-    procedure CalcularTempoAdmissao;
     procedure SetJornadaSemanal(const pValor: string);
     procedure SetIntervaloAlmoco(const pValor: string);
     procedure DistribuirHorarios(pValor: Integer);
@@ -53,7 +54,9 @@ type
     property Sabado: THorariosDia read FSabado write FSabado;
     property Observers: TDictionary<TDiaSemana, IObservador> read FObservers;
     property ConverterHora: IConverter read FConverterHora write FConverterHora;
+    property Configuracao: TConfiguracao read FConfiguracao write FConfiguracao;
     procedure AdicionarObservador(pDiaSemana: TDiaSemana; pObservador: IObservador);
+    procedure CalcularTempoAdmissao;
     procedure CalcularDesempenho;
     procedure Limpar;
   end;
@@ -89,6 +92,7 @@ begin
 
   FObservers := TDictionary<TDiaSemana, IObservador>.Create;
   FConverterHora := TConverter.Create;
+  FConfiguracao := TConfiguracao.Create;
 end;
 
 class function TFolhaPontoSemanalSingleton.ObterInstancia: TFolhaPontoSemanalSingleton;
@@ -158,7 +162,7 @@ begin
 
   if TStringHelpers.VerificarCampoVazio(pValor) then
   begin
-    CalcularTempoAdmissao;
+//    CalcularTempoAdmissao;
     Exit;
   end;
 
@@ -178,7 +182,7 @@ begin
   end;
 
   FDataAdmissao := pValor;
-  CalcularTempoAdmissao;
+//  CalcularTempoAdmissao;
 end;
 
 procedure TFolhaPontoSemanalSingleton.SetID(const pValor: string);

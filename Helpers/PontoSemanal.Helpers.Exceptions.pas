@@ -101,9 +101,9 @@ end;
 
 class function TExceptionHelpers.VerificarHorarioInvalido(pValor: string): Boolean;
 var
-  vTime: TDateTime;
+  lTime: TDateTime;
 begin
-  Result := not TryStrToTime(pValor, vTime);
+  Result := not TryStrToTime(pValor, lTime);
 end;
 
 class function TExceptionHelpers.VerificarHorarioRetornoAlmocoNaoZerado(pValor: string; pRetornoAlmoco: string): Boolean;
