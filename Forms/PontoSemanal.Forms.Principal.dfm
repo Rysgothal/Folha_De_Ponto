@@ -460,7 +460,6 @@ object frmPrincipal: TfrmPrincipal
     ImageIndex = 3
     Images = dtmPrincipal.imglistIcones
     TabOrder = 13
-    Visible = False
     OnClick = btnConfiguracoesClick
   end
   object tmrHorario: TTimer
