@@ -62,16 +62,19 @@ uses
 
 procedure THorariosDia.CalcularHorasTrabalhadas;
 var
-  lHorasCalculo: THorarioSeparado;
-  lSaldoHoras: TTime;
-  lEntrada, lSaidaAlmoco, lRetornoAlmoco, lSaidaFinal, lHorasTrabalhadas: TDateTime;
+  lHorasCalculo, lSaldoCalculo: THorarioSeparado;
+  lJornada: TTime;
+  lEntrada, lSaidaAlmoco, lRetornoAlmoco, lSaidaFinal, lHorasTrabalhadas, lSaldoHoras: TDateTime;
   lVerificarPeriodoManha, lVerificarPeriodoTarde, lSemAlmoco, lSaidaAlmocoNulo, lRetornoAlmocoNulo: Boolean;
 begin
   lEntrada := RetornarHorario(Entrada);
   lSaidaAlmoco := RetornarHorario(SaidaAlmoco);
   lRetornoAlmoco := RetornarHorario(RetornoAlmoco);
   lSaidaFinal := RetornarHorario(SaidaFinal);
+
   lHorasTrabalhadas := 0;
+  lJornada := 0;
+  lJornada := IncHour(lJornada, Jornada);
 
   lSaidaAlmocoNulo := (SaidaAlmoco = EmptyStr) or (SaidaAlmoco = '00:00');
   lRetornoAlmocoNulo := (RetornoAlmoco = EmptyStr) or (RetornoAlmoco = '00:00');
@@ -80,19 +83,19 @@ begin
   lVerificarPeriodoTarde := (SaidaFinal <> EmptyStr) and not lRetornoAlmocoNulo;
   lSemAlmoco := (Entrada <> EmptyStr) and (SaidaFinal <> EmptyStr) and lSaidaAlmocoNulo and lRetornoAlmocoNulo;
 
-  if lEntrada > lSaidaAlmoco then
+  if (lEntrada > lSaidaAlmoco) and not lSemAlmoco then
   begin
-    lSaidaAlmoco := IncDay(lSaidaAlmoco, 1);
+    lSaidaAlmoco := lSaidaAlmoco.IncDay;
   end;
 
-  if lSaidaAlmoco > lRetornoAlmoco then
+  if (lSaidaAlmoco > lRetornoAlmoco) and not lSemAlmoco then
   begin
-    lRetornoAlmoco := IncDay(lRetornoAlmoco, 1);
+    lRetornoAlmoco := lRetornoAlmoco.IncDay;
   end;
 
-  if lRetornoAlmoco > lSaidaFinal then
+  if (lSemAlmoco and (lEntrada > lSaidaFinal)) or (not lSemAlmoco and (lRetornoAlmoco > lSaidaFinal)) then
   begin
-    lSaidaFinal := IncDay(lSaidaFinal, 1);
+    lSaidaFinal := lSaidaFinal.IncDay;
   end;
 
   if lVerificarPeriodoManha then
@@ -115,13 +118,20 @@ begin
 
   if (lEntrada <> 0) or (lSaidaFinal <> 0) then
   begin
-    lHorasTrabalhadas := StrToDateTime(lHorasCalculo.Horas.ToString.PadLeft(2, '0') + ':' + lHorasCalculo.Minutos.ToString.PadLeft(2, '0'));
+    lHorasTrabalhadas := StrToDateTime(
+      lHorasCalculo.Horas.ToString.PadLeft(2, '0') + ':' + lHorasCalculo.Minutos.ToString.PadLeft(2, '0')
+    );
   end;
 
-  lSaldoHoras := HoursBetween(Jornada, lHorasTrabalhadas) ;
+  lSaldoCalculo.Horas := MinutesBetween(lJornada, lHorasTrabalhadas) div 60;
+  lSaldoCalculo.Minutos := MinutesBetween(lJornada, lHorasTrabalhadas) mod 60;
+
+  lSaldoHoras := StrToDateTime(
+    lSaldoCalculo.Horas.ToString.PadLeft(2, '0') + ':' + lSaldoCalculo.Minutos.ToString.PadLeft(2, '0')
+  );
 
   Desempenho.TotalTrabalhado := FormatDateTime('hh:mm', lHorasTrabalhadas);
-  Desempenho.SaldoHoras := FormatDateTime('hh:mm', lSaldoHorasaddsadsads);
+  Desempenho.SaldoHoras := FormatDateTime('hh:mm', lSaldoHoras);
   FDesempenho.AtualizarCumprimento(Jornada);
 end;
 
@@ -211,8 +221,6 @@ end;
 
 procedure THorariosDia.SetSaidaFinalTurnoTradicional(const pValor: string);
 begin
-  AbortarCasoHorarioInvalido(pValor);
-
   if (FJornada <> 0) then
   begin
     AbortarCasoHorarioZeradoNaoPermitido(pValor);
@@ -232,8 +240,6 @@ end;
 
 procedure THorariosDia.SetSaidaAlmocoTurnoTradicional(const pValor: string);
 begin
-  AbortarCasoHorarioInvalido(pValor);
-
   if TExceptionHelpers.VerificarHorarioRetornoAlmocoNaoZerado(pValor, RetornoAlmoco) then
   begin
     CriarException(EHorarioRetornoAlmocoNaoZerado, 'O horário atual não pode ser aceito, já que o horário "Retorno-Almoço"' + ' não está zerado, verifique.');
@@ -251,8 +257,6 @@ end;
 
 procedure THorariosDia.SetRetornoAlmocoTurnoTradicional(const pValor: string);
 begin
-  AbortarCasoHorarioInvalido(pValor);
-
   if TExceptionHelpers.VerificarHorarioSaidaAlmocoNaoZerado(pValor, SaidaAlmoco) then
   begin
     CriarException(EHorarioSaidaAlmocoNaoZerado, 'O horário atual não pode ser aceito, já que o horário "Saída-Almoço"' + ' não está zerado, verifique.');
@@ -346,9 +350,7 @@ begin
     Exit;
   end;
 
-//  AbortarCasoHorarioInvalido(pValor);
-
-
+  AbortarCasoHorarioInvalido(pValor);
 //  SetEntradaTurnoTradicional(pValor);
 
   FEntrada := pValor;
@@ -362,6 +364,8 @@ begin
     Exit;
   end;
 
+  AbortarCasoHorarioInvalido(pValor);
+  AbortarCasoHorarioAtualMenorQueSaidaAlmoco(pValor);
 //  SetRetornoAlmocoTurnoTradicional(pValor);
 
   FRetornoAlmoco := pValor;
@@ -375,6 +379,8 @@ begin
     Exit;
   end;
 
+  AbortarCasoHorarioInvalido(pValor);
+  AbortarCasoHorarioAtualMaiorQueRetornoAlmoco(pValor);
 //  SetSaidaAlmocoTurnoTradicional(pValor);
 
   FSaidaAlmoco := pValor;
@@ -388,6 +394,7 @@ begin
     Exit;
   end;
 
+  AbortarCasoHorarioInvalido(pValor);
 //  SetSaidaFinalTurnoTradicional(pValor);
 
   FSaidaFinal := pValor;

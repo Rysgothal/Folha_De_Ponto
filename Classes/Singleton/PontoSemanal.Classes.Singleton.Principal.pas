@@ -6,7 +6,8 @@ uses
   PontoSemanal.Classes.Base.Horarios, PontoSemanal.Helpers.TiposAuxiliares,
   System.Generics.Collections, PontoSemanal.Interfaces.Observer.Observador,
   PontoSemanal.Classes.Base.Desempenho,
-  PontoSemanal.Interfaces.Bridge.Converter;
+  PontoSemanal.Interfaces.Bridge.Converter,
+  PontoSemanal.Classes.Base.Configuracoes;
 
 type
   TFolhaPontoSemanalSingleton = class
@@ -27,6 +28,7 @@ type
     FObservers: TDictionary<TDiaSemana, IObservador>;
     FConverterHora: IConverter;
     FIntervaloAlmocoExtenso: string;
+    FConfiguracao: TConfiguracao;
     constructor Create;
     procedure SetID(const pValor: string);
     procedure SetDataAdmissao(const pValor: string);
@@ -52,6 +54,7 @@ type
     property Sabado: THorariosDia read FSabado write FSabado;
     property Observers: TDictionary<TDiaSemana, IObservador> read FObservers;
     property ConverterHora: IConverter read FConverterHora write FConverterHora;
+    property Configuracao: TConfiguracao read FConfiguracao write FConfiguracao;
     procedure AdicionarObservador(pDiaSemana: TDiaSemana; pObservador: IObservador);
     procedure CalcularTempoAdmissao;
     procedure CalcularDesempenho;
@@ -89,6 +92,7 @@ begin
 
   FObservers := TDictionary<TDiaSemana, IObservador>.Create;
   FConverterHora := TConverter.Create;
+  FConfiguracao := TConfiguracao.Create;
 end;
 
 class function TFolhaPontoSemanalSingleton.ObterInstancia: TFolhaPontoSemanalSingleton;

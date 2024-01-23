@@ -23,7 +23,8 @@ uses
   PontoSemanal.Classes.Builder.Diretor in 'Classes\Builder\PontoSemanal.Classes.Builder.Diretor.pas',
   PontoSemanal.Classes.Builder.Construtor in 'Classes\Builder\PontoSemanal.Classes.Builder.Construtor.pas',
   PontoSemanal.Helpers.Constantes in 'Helpers\PontoSemanal.Helpers.Constantes.pas',
-  PontoSemanal.Classes.Builder.Layout in 'Classes\Builder\PontoSemanal.Classes.Builder.Layout.pas';
+  PontoSemanal.Classes.Builder.Layout in 'Classes\Builder\PontoSemanal.Classes.Builder.Layout.pas',
+  PontoSemanal.Forms.Configuracoes in 'Forms\PontoSemanal.Forms.Configuracoes.pas' {frmConfiguracoes};
 
 {$R *.res}
 

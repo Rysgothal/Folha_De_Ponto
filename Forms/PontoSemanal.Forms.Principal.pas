@@ -10,7 +10,8 @@ uses
   PontoSemanal.Helpers.Componentes, PontoSemanal.Classes.Base.Horarios,
   PontoSemanal.Classes.Builder.Diretor,
   PontoSemanal.Interfaces.Builder.FolhaDePonto,
-  PontoSemanal.Classes.Builder.Construtor, PontoSemanal.Helpers.Constantes;
+  PontoSemanal.Classes.Builder.Construtor, PontoSemanal.Helpers.Constantes, Vcl.Buttons,
+  PontoSemanal.Forms.Configuracoes;
 
 type
   TfrmPrincipal = class(TForm)
@@ -36,12 +37,14 @@ type
     btnNovoRegistro: TButton;
     btnCarregarHist: TButton;
     btnGerSalHist: TButton;
+    btnConfiguracoes: TBitBtn;
     procedure tmrHorarioTimer(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure frmDadosFuncionarioedtJornadaSemanalExit(Sender: TObject);
     procedure btnNovoRegistroClick(Sender: TObject);
     procedure btnGerSalHistClick(Sender: TObject);
     procedure btnCarregarHistClick(Sender: TObject);
+    procedure btnConfiguracoesClick(Sender: TObject);
   private
     { Private declarations }
     FDadoAlterado: Boolean;
@@ -190,6 +193,16 @@ end;
 procedure TfrmPrincipal.btnCarregarHistClick(Sender: TObject);
 begin
   CarregarHistorico;
+end;
+
+procedure TfrmPrincipal.btnConfiguracoesClick(Sender: TObject);
+begin
+  if not Assigned(frmConfiguracoes) then
+  begin
+    frmConfiguracoes := TfrmConfiguracoes.Create(Self);
+  end;
+
+  frmConfiguracoes.ShowModal;
 end;
 
 procedure TfrmPrincipal.btnGerSalHistClick(Sender: TObject);
