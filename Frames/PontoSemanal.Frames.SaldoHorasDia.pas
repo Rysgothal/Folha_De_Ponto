@@ -7,7 +7,7 @@ uses
   Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls,
   PontoSemanal.Interfaces.Observer.Observador,
   PontoSemanal.Classes.Base.Horarios, PontoSemanal.Helpers.TiposAuxiliares,
-  PontoSemanal.Classes.Base.Desempenho;
+  PontoSemanal.Classes.Base.Desempenho, Vcl.Buttons;
 
 type
   TfrmSaldoHorasDia = class(TFrame, IObservador)
@@ -15,6 +15,10 @@ type
     edtSaldoHora: TEdit;
     lblDesempenho: TLabel;
     lblTotalHora: TLabel;
+    btnMais: TSpeedButton;
+    btnMenos: TSpeedButton;
+    procedure btnMaisClick(Sender: TObject);
+    procedure btnMenosClick(Sender: TObject);
   private
     { Private declarations }
     function RetornarDesempenhoDiaSemana: TDesempenho;
@@ -23,11 +27,13 @@ type
     procedure ConfigurarSaldoHorasNegativa;
     procedure ConfigurarComponentes(pCor: TColor; pLetraDesempenho, pLetraRosto: Char);
     procedure ConfigurarSaldoDeHoras(lDesempenho: TDesempenho);
+    function RetornarDiaSemana: THorariosDia;
   public
     { Public declarations }
     procedure Atualizar(const pValoresVazios: Boolean);
     procedure Limpar;
     procedure DefinirCorPadraoComponentes;
+    procedure HabilitarAjusteHorario(pHabilitar: Boolean);
   end;
 
 implementation
@@ -83,6 +89,17 @@ begin
   edtSaldoHora.Color := clInfoBk;
 end;
 
+procedure TfrmSaldoHorasDia.HabilitarAjusteHorario(pHabilitar: Boolean);
+begin
+  btnMais.Visible := pHabilitar;
+  btnMenos.Visible := pHabilitar;
+
+  case pHabilitar of
+    True: edtSaldoHora.Text := RetornarDiaSemana.Jornada.ToString.PadLeft(2, '0') + ':00';
+    else edtSaldoHora.Text := RetornarDiaSemana.Desempenho.SaldoHoras;
+  end;
+end;
+
 procedure TfrmSaldoHorasDia.Limpar;
 begin
   ConfigurarComponentes(clWindowText, #0, #0);
@@ -97,6 +114,24 @@ begin
     chRegular: ConfigurarSaldoHorasNeutra;
     chAbaixo: ConfigurarSaldoHorasNegativa;
   end;
+end;
+
+procedure TfrmSaldoHorasDia.btnMaisClick(Sender: TObject);
+var
+  lPontoSemanal: TFolhaPontoSemanalSingleton;
+begin
+  lPontoSemanal := TFolhaPontoSemanalSingleton.ObterInstancia;
+  lPontoSemanal.DistribuirHorarios(RetornarDiaSemana.Tag, RetornarDiaSemana.Jornada + 1);
+  edtSaldoHora.Text := RetornarDiaSemana.Jornada.ToString.PadLeft(2, '0') + ':00';
+end;
+
+procedure TfrmSaldoHorasDia.btnMenosClick(Sender: TObject);
+var
+  lPontoSemanal: TFolhaPontoSemanalSingleton;
+begin
+  lPontoSemanal := TFolhaPontoSemanalSingleton.ObterInstancia;
+  lPontoSemanal.DistribuirHorarios(RetornarDiaSemana.Tag, RetornarDiaSemana.Jornada - 1);
+  edtSaldoHora.Text := RetornarDiaSemana.Jornada.ToString.PadLeft(2, '0') + ':00';
 end;
 
 procedure TfrmSaldoHorasDia.ConfigurarComponentes(pCor: TColor; pLetraDesempenho: Char; pLetraRosto: Char);
@@ -127,6 +162,22 @@ begin
     dsSexta: Result := lPontoSemanal.Sexta.Desempenho;
     dsSabado: Result := lPontoSemanal.Sabado.Desempenho;
     else Result := lPontoSemanal.Desempenho;
+  end;
+end;
+
+function TfrmSaldoHorasDia.RetornarDiaSemana: THorariosDia;
+var
+  lPontoSemanal: TFolhaPontoSemanalSingleton;
+begin
+  lPontoSemanal := TFolhaPontoSemanalSingleton.ObterInstancia;
+
+  case TDiaSemana(Self.Tag) of
+    dsSegunda: Result := lPontoSemanal.Segunda;
+    dsTerca: Result := lPontoSemanal.Terca;
+    dsQuarta: Result := lPontoSemanal.Quarta;
+    dsQuinta: Result := lPontoSemanal.Quinta;
+    dsSexta: Result := lPontoSemanal.Sexta;
+    else Result := lPontoSemanal.Sabado;
   end;
 end;
 

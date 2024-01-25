@@ -159,6 +159,7 @@ begin
 
     FDadoAlterado := VerificarDadoAlterado(edtJornadaSemanal.Text, lFolhaPonto.JornadaSemanal);
     lFolhaPonto.JornadaSemanal := edtJornadaSemanal.Text;
+    lFolhaPonto.DistribuirHorarios;
   except
     on E: Exception do
     begin

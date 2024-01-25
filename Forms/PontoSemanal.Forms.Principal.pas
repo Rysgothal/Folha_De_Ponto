@@ -360,7 +360,7 @@ begin
     frmConfiguracoes := TfrmConfiguracoes.Create(Self);
   end;
 
-  frmConfiguracoes.ShowModal;
+  frmConfiguracoes.Show;
 end;
 
 procedure TfrmPrincipal.AnalisarDadosFuncionarioAlterados;

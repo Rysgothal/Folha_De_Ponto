@@ -34,7 +34,6 @@ type
     procedure SetDataAdmissao(const pValor: string);
     procedure SetJornadaSemanal(const pValor: string);
     procedure SetIntervaloAlmoco(const pValor: string);
-    procedure DistribuirHorarios(pValor: Integer);
   public
     class function ObterInstancia: TFolhaPontoSemanalSingleton;
     destructor Destroy; override;
@@ -56,6 +55,8 @@ type
     property ConverterHora: IConverter read FConverterHora write FConverterHora;
     property Configuracao: TConfiguracao read FConfiguracao write FConfiguracao;
     procedure AdicionarObservador(pDiaSemana: TDiaSemana; pObservador: IObservador);
+    procedure DistribuirHorarios(pDiaSemana: TDiaSemana; pValor: Integer); overload;
+    procedure DistribuirHorarios; overload;
     procedure CalcularTempoAdmissao;
     procedure CalcularDesempenho;
     procedure Limpar;
@@ -119,18 +120,39 @@ begin
   inherited;
 end;
 
-procedure TFolhaPontoSemanalSingleton.DistribuirHorarios(pValor: Integer);
+procedure TFolhaPontoSemanalSingleton.DistribuirHorarios(pDiaSemana: TDiaSemana; pValor: Integer);
+var
+  lNovaJornada: Integer;
+begin
+  case pDiaSemana of
+    dsSegunda: Segunda.Jornada := pValor;
+    dsTerca: Terca.Jornada := pValor;
+    dsQuarta: Quarta.Jornada := pValor;
+    dsQuinta: Quinta.Jornada := pValor;
+    dsSexta: Sexta.Jornada := pValor;
+    dsSabado: Sabado.Jornada := pValor;
+  end;
+
+  lNovaJornada := Segunda.Jornada + Terca.Jornada + Quarta.Jornada + Quinta.Jornada + Sexta.Jornada + Sabado.Jornada;
+  JornadaSemanal := lNovaJornada.ToString;
+end;
+
+procedure TFolhaPontoSemanalSingleton.DistribuirHorarios;
 var
   lJornadaDiaria: Integer;
 begin
-  lJornadaDiaria := pValor div 5;
+  if FJornadaSemanal.IsEmpty then
+  begin
+    raise EJornadaSemanalInvalida.Create('A jornada semanal não foi preenchida');
+  end;
 
+  lJornadaDiaria := FJornadaSemanal.ToInteger div 5;
   Segunda.Jornada := lJornadaDiaria;
   Terca.Jornada := lJornadaDiaria;
   Quarta.Jornada := lJornadaDiaria;
   Quinta.Jornada := lJornadaDiaria;
   Sexta.Jornada := lJornadaDiaria;
-  Sabado.Jornada := pValor mod 5;
+  Sabado.Jornada := FJornadaSemanal.ToInteger mod 5;
 end;
 
 procedure TFolhaPontoSemanalSingleton.Limpar;
@@ -162,7 +184,6 @@ begin
 
   if TStringHelpers.VerificarCampoVazio(pValor) then
   begin
-//    CalcularTempoAdmissao;
     Exit;
   end;
 
@@ -182,7 +203,6 @@ begin
   end;
 
   FDataAdmissao := pValor;
-//  CalcularTempoAdmissao;
 end;
 
 procedure TFolhaPontoSemanalSingleton.SetID(const pValor: string);
@@ -244,7 +264,6 @@ begin
   end;
 
   FJornadaSemanal := pValor;
-  DistribuirHorarios(lValor);
 end;
 
 procedure TFolhaPontoSemanalSingleton.AdicionarObservador(pDiaSemana: TDiaSemana; pObservador: IObservador);

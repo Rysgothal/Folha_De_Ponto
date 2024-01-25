@@ -31,6 +31,36 @@ object frmSaldoHorasDia: TfrmSaldoHorasDia
     Font.Style = [fsBold]
     ParentFont = False
   end
+  object btnMais: TSpeedButton
+    Left = 124
+    Top = 0
+    Width = 23
+    Height = 22
+    Caption = #203
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -12
+    Font.Name = 'Wingdings 2'
+    Font.Style = []
+    ParentFont = False
+    Visible = False
+    OnClick = btnMaisClick
+  end
+  object btnMenos: TSpeedButton
+    Left = 100
+    Top = 0
+    Width = 23
+    Height = 22
+    Caption = #172
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = 18
+    Font.Name = 'Wingdings 3'
+    Font.Style = []
+    ParentFont = False
+    Visible = False
+    OnClick = btnMenosClick
+  end
   object edtTotalHora: TEdit
     Left = -1
     Top = 21

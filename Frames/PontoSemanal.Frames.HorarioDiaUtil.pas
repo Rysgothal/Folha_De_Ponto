@@ -9,7 +9,7 @@ uses
   PontoSemanal.Classes.Base.Horarios, PontoSemanal.Helpers.TiposAuxiliares,
   PontoSemanal.Interfaces.Observer.Sujeito, PontoSemanal.Frames.SaldoHorasDia, 
   PontoSemanal.Helpers.Componentes, System.RegularExpressions, System.StrUtils,
-  System.Generics.Collections, PontoSemanal.Helpers.Strings;
+  System.Generics.Collections, PontoSemanal.Helpers.Strings, Vcl.Buttons;
 
 type
   TProcInserirHorario = procedure(const pValor: string) of object;
@@ -50,6 +50,7 @@ type
     procedure AlterarEditHorarioViolado(pHorario: TRegistroHorario);
     function ProcurarHorarioIncorreto: Boolean;
     function RetornarEditsNaoVerificados: TArray<TMaskEdit>;
+    procedure HabilitarAjusteHorario(pHabilitar: Boolean);
     { Public declarations }
   end;
 
@@ -104,6 +105,24 @@ begin
     begin
       TfrmSaldoHorasDia(Components[I]).DefinirCorPadraoComponentes;
     end;
+  end;
+end;
+
+procedure TfrmHorariosDia.HabilitarAjusteHorario(pHabilitar: Boolean);
+var
+  lDiaSemana: THorariosDia;
+begin
+  Limpar;
+  lDiaSemana := RetornarDiaSemana;
+  frmSaldoHorasDia.HabilitarAjusteHorario(pHabilitar);
+
+  if not pHabilitar then
+  begin
+    medEntrada.Text := lDiaSemana.Entrada;
+    medSaidaAlmoco.Text := lDiaSemana.SaidaAlmoco;
+    medRetornoAlmoco.Text := lDiaSemana.RetornoAlmoco;
+    medSaidaFinal.Text := lDiaSemana.SaidaFinal;
+    AtivarEventosOnExit;
   end;
 end;
 

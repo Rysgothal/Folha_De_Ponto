@@ -1,7 +1,7 @@
 object frmConfiguracoes: TfrmConfiguracoes
   Left = 0
   Top = 0
-  BorderIcons = [biSystemMenu]
+  BorderIcons = []
   BorderStyle = bsSingle
   Caption = 'Folha de Ponto - Configura'#231#245'es'
   ClientHeight = 148
@@ -12,6 +12,7 @@ object frmConfiguracoes: TfrmConfiguracoes
   Font.Height = -12
   Font.Name = 'Segoe UI'
   Font.Style = []
+  FormStyle = fsStayOnTop
   Position = poMainFormCenter
   OnClose = FormClose
   OnCreate = FormCreate
@@ -31,7 +32,6 @@ object frmConfiguracoes: TfrmConfiguracoes
     Height = 17
     Caption = 'Hor'#225'rio de almo'#231'o aos s'#225'bados'
     TabOrder = 0
-    OnClick = chkHorarioAlmocoSabadoClick
   end
   object chkAutoCompletar: TCheckBox
     Left = 8
@@ -43,7 +43,6 @@ object frmConfiguracoes: TfrmConfiguracoes
     ParentShowHint = False
     ShowHint = True
     TabOrder = 1
-    OnClick = chkAutoCompletarClick
   end
   object edtCargaSemanalMax: TEdit
     Left = 8
@@ -60,6 +59,32 @@ object frmConfiguracoes: TfrmConfiguracoes
     TabOrder = 2
     TextHint = 'hh'
     OnChange = edtCargaSemanalMaxChange
-    OnExit = edtCargaSemanalMaxExit
+  end
+  object btnDistribuirHorarios: TButton
+    Left = 8
+    Top = 119
+    Width = 113
+    Height = 25
+    Caption = 'Distribuir Hor'#225'rios'
+    TabOrder = 3
+    OnClick = btnDistribuirHorariosClick
+  end
+  object btnConfirmar: TButton
+    Left = 297
+    Top = 119
+    Width = 73
+    Height = 25
+    Caption = 'Confirmar'
+    TabOrder = 4
+    OnClick = btnConfirmarClick
+  end
+  object btnCancelar: TButton
+    Left = 233
+    Top = 119
+    Width = 62
+    Height = 25
+    Caption = 'Cancelar'
+    TabOrder = 5
+    OnClick = btnCancelarClick
   end
 end
