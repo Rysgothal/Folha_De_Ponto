@@ -32,11 +32,13 @@ type
     FPossuiAlmocoSabado: Boolean;
     FAutoCompletar: Boolean;
     FMaxJornadaSemanalLei: string;
+    FPossuiTurnoNoturno: Boolean;
   public
     constructor Create;
     property PossuiAlmocoSabado: Boolean read FPossuiAlmocoSabado write FPossuiAlmocoSabado;
     property AutoCompletar: Boolean read FAutoCompletar write FAutoCompletar;
     property MaxJornadaSemanalLei: string read FMaxJornadaSemanalLei write FMaxJornadaSemanalLei;
+    property PossuiTurnoNoturno: Boolean read FPossuiTurnoNoturno write FPossuiTurnoNoturno;
   end;
 
 implementation
@@ -48,6 +50,7 @@ begin
   FPossuiAlmocoSabado := False;
   FAutoCompletar := False;
   FMaxJornadaSemanalLei := '44';
+  FPossuiTurnoNoturno := False;
 end;
 
 end.

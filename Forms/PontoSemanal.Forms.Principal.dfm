@@ -178,6 +178,18 @@ object frmPrincipal: TfrmPrincipal
         ExplicitWidth = 33
         ExplicitHeight = 36
       end
+      inherited btnMais: TSpeedButton
+        Left = 340
+        Top = 99
+        ExplicitLeft = 340
+        ExplicitTop = 99
+      end
+      inherited btnMenos: TSpeedButton
+        Left = 332
+        Top = 101
+        ExplicitLeft = 332
+        ExplicitTop = 101
+      end
       inherited edtTotalHora: TEdit
         Left = 27
         Top = 32

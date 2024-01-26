@@ -28,6 +28,9 @@ type
     procedure ConfigurarComponentes(pCor: TColor; pLetraDesempenho, pLetraRosto: Char);
     procedure ConfigurarSaldoDeHoras(lDesempenho: TDesempenho);
     function RetornarDiaSemana: THorariosDia;
+    procedure AdicionarHoraDiaria;
+    procedure ReduzirHoraDiaria;
+    procedure AjustarHoraDiaria(pValor: Integer);
   public
     { Public declarations }
     procedure Atualizar(const pValoresVazios: Boolean);
@@ -39,7 +42,7 @@ type
 implementation
 
 uses
-  PontoSemanal.Classes.Singleton.Principal;
+  PontoSemanal.Classes.Singleton.Principal, PontoSemanal.Forms.Principal;
 
 {$R *.dfm}
 
@@ -100,6 +103,38 @@ begin
   end;
 end;
 
+procedure TfrmSaldoHorasDia.ReduzirHoraDiaria;
+begin
+  AjustarHoraDiaria(Pred(RetornarDiaSemana.Jornada))
+end;
+
+procedure TfrmSaldoHorasDia.AdicionarHoraDiaria;
+begin
+  AjustarHoraDiaria(Succ(RetornarDiaSemana.Jornada))
+end;
+
+
+procedure TfrmSaldoHorasDia.AjustarHoraDiaria(pValor: Integer);
+var
+  lPontoSemanal: TFolhaPontoSemanalSingleton;
+  lHorariosDia: THorariosDia;
+begin
+  lPontoSemanal := TFolhaPontoSemanalSingleton.ObterInstancia;
+  lHorariosDia := RetornarDiaSemana;
+
+  try
+    lPontoSemanal.DistribuirHorarios(lHorariosDia.Tag, pValor);
+    edtSaldoHora.Text := lHorariosDia.Jornada.ToString.PadLeft(2, '0') + ':00';
+    frmPrincipal.frmDadosFuncionario.edtJornadaSemanal.Text := lPontoSemanal.JornadaSemanal;
+  except
+    on E: Exception do
+    begin
+      Application.MessageBox(PChar(E.Message + sLineBreak + 'Distribua o horário corretamente'), 'Atenção', MB_OK +
+        MB_ICONINFORMATION);
+    end;
+  end;
+end;
+
 procedure TfrmSaldoHorasDia.Limpar;
 begin
   ConfigurarComponentes(clWindowText, #0, #0);
@@ -117,21 +152,13 @@ begin
 end;
 
 procedure TfrmSaldoHorasDia.btnMaisClick(Sender: TObject);
-var
-  lPontoSemanal: TFolhaPontoSemanalSingleton;
 begin
-  lPontoSemanal := TFolhaPontoSemanalSingleton.ObterInstancia;
-  lPontoSemanal.DistribuirHorarios(RetornarDiaSemana.Tag, RetornarDiaSemana.Jornada + 1);
-  edtSaldoHora.Text := RetornarDiaSemana.Jornada.ToString.PadLeft(2, '0') + ':00';
+  AdicionarHoraDiaria;
 end;
 
 procedure TfrmSaldoHorasDia.btnMenosClick(Sender: TObject);
-var
-  lPontoSemanal: TFolhaPontoSemanalSingleton;
 begin
-  lPontoSemanal := TFolhaPontoSemanalSingleton.ObterInstancia;
-  lPontoSemanal.DistribuirHorarios(RetornarDiaSemana.Tag, RetornarDiaSemana.Jornada - 1);
-  edtSaldoHora.Text := RetornarDiaSemana.Jornada.ToString.PadLeft(2, '0') + ':00';
+  ReduzirHoraDiaria;
 end;
 
 procedure TfrmSaldoHorasDia.ConfigurarComponentes(pCor: TColor; pLetraDesempenho: Char; pLetraRosto: Char);

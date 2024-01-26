@@ -17,6 +17,7 @@ type
     FSaidaFinal: string;
     FDesempenho: TDesempenho;
     FJornada: Integer;
+    FTurnoNoturno: Boolean;
     procedure SetEntrada(const pValor: string);
     procedure SetRetornoAlmoco(const pValor: string);
     procedure SetSaidaAlmoco(const pValor: string);
@@ -44,6 +45,7 @@ type
     property SaidaFinal: string read FSaidaFinal write SetSaidaFinal;
     property Desempenho: TDesempenho read FDesempenho write FDesempenho;
     property Jornada: Integer read FJornada write FJornada;
+    property TurnoNoturno: Boolean read FTurnoNoturno write FTurnoNoturno;
     procedure InserirEntrada(const pValor: string);
     procedure InserirSaidaAlmoco(const pValor: string);
     procedure InserirRetornoAlmoco(const pValor: string);
@@ -86,16 +88,25 @@ begin
   if (lEntrada > lSaidaAlmoco) and not lSemAlmoco then
   begin
     lSaidaAlmoco := lSaidaAlmoco.IncDay;
+    lRetornoAlmoco := lRetornoAlmoco.IncDay;
+    lSaidaFinal := lSaidaFinal.IncDay;
   end;
 
   if (lSaidaAlmoco > lRetornoAlmoco) and not lSemAlmoco then
   begin
     lRetornoAlmoco := lRetornoAlmoco.IncDay;
+    lSaidaFinal := lSaidaFinal.IncDay;
   end;
 
   if (lSemAlmoco and (lEntrada > lSaidaFinal)) or (not lSemAlmoco and (lRetornoAlmoco > lSaidaFinal)) then
   begin
     lSaidaFinal := lSaidaFinal.IncDay;
+  end;
+
+  if HoursBetween(lSaidaFinal, lEntrada) > 20 then
+  begin
+    raise ETotalTrabalhadoMaisDeUmDia.Create('O total trabalhado ao longo do dia foi além do permitido, ' +
+      'verifique seu horário');
   end;
 
   if lVerificarPeriodoManha then
@@ -139,6 +150,11 @@ constructor THorariosDia.Create(pTag: TDiaSemana);
 begin
   FTag := pTag;
   FDesempenho := TDesempenho.Create;
+  FEntrada := EmptyStr;
+  FSaidaAlmoco := EmptyStr;
+  FRetornoAlmoco := EmptyStr;
+  FSaidaFinal := EmptyStr;
+  FTurnoNoturno := True;
   FJornada := 0;
 end;
 
@@ -180,6 +196,7 @@ begin
   FRetornoAlmoco := EmptyStr;
   FSaidaFinal := EmptyStr;
   FDesempenho.Limpar;
+  FTurnoNoturno := True;
   FJornada := 0;
 end;
 
@@ -351,12 +368,18 @@ begin
   end;
 
   AbortarCasoHorarioInvalido(pValor);
-//  SetEntradaTurnoTradicional(pValor);
+
+  if not TurnoNoturno then
+  begin
+    SetEntradaTurnoTradicional(pValor);
+  end;
 
   FEntrada := pValor;
 end;
 
 procedure THorariosDia.SetRetornoAlmoco(const pValor: string);
+var
+  lValor: TDateTime;
 begin
   if VerificarHorarioVazio(pValor) then
   begin
@@ -365,13 +388,24 @@ begin
   end;
 
   AbortarCasoHorarioInvalido(pValor);
-  AbortarCasoHorarioAtualMenorQueSaidaAlmoco(pValor);
-//  SetRetornoAlmocoTurnoTradicional(pValor);
+  lValor := StrToDateTime(pValor);
+
+  if not SaidaAlmoco.IsEmpty and (HoursBetween(StrToTime(SaidaAlmoco), lValor) >= 3) then
+  begin
+    AbortarCasoHorarioAtualMenorQueSaidaAlmoco(pValor);
+  end;
+
+  if not TurnoNoturno then
+  begin
+    SetRetornoAlmocoTurnoTradicional(pValor);
+  end;
 
   FRetornoAlmoco := pValor;
 end;
 
 procedure THorariosDia.SetSaidaAlmoco(const pValor: string);
+var
+  lValor: TDateTime;
 begin
   if VerificarHorarioVazio(pValor) then
   begin
@@ -380,8 +414,17 @@ begin
   end;
 
   AbortarCasoHorarioInvalido(pValor);
-  AbortarCasoHorarioAtualMaiorQueRetornoAlmoco(pValor);
-//  SetSaidaAlmocoTurnoTradicional(pValor);
+  lValor := StrToDateTime(pValor);
+
+  if not RetornoAlmoco.IsEmpty and (HoursBetween(StrToTime(RetornoAlmoco), lValor) >= 3) then
+  begin
+    AbortarCasoHorarioAtualMaiorQueRetornoAlmoco(pValor);
+  end;
+
+  if not TurnoNoturno then
+  begin
+    SetSaidaAlmocoTurnoTradicional(pValor);
+  end;
 
   FSaidaAlmoco := pValor;
 end;
@@ -395,7 +438,11 @@ begin
   end;
 
   AbortarCasoHorarioInvalido(pValor);
-//  SetSaidaFinalTurnoTradicional(pValor);
+
+  if not TurnoNoturno then
+  begin
+    SetSaidaFinalTurnoTradicional(pValor);
+  end;
 
   FSaidaFinal := pValor;
 end;

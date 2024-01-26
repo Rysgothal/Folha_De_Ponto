@@ -122,8 +122,10 @@ end;
 
 procedure TFolhaPontoSemanalSingleton.DistribuirHorarios(pDiaSemana: TDiaSemana; pValor: Integer);
 var
-  lNovaJornada: Integer;
+  lNovaJornada, lJornadaAnterior: Integer;
 begin
+  lJornadaAnterior := JornadaSemanal.ToInteger;
+
   case pDiaSemana of
     dsSegunda: Segunda.Jornada := pValor;
     dsTerca: Terca.Jornada := pValor;
@@ -134,7 +136,17 @@ begin
   end;
 
   lNovaJornada := Segunda.Jornada + Terca.Jornada + Quarta.Jornada + Quinta.Jornada + Sexta.Jornada + Sabado.Jornada;
-  JornadaSemanal := lNovaJornada.ToString;
+
+  try
+    JornadaSemanal := lNovaJornada.ToString;
+  except
+    on E: Exception do
+    begin
+      JornadaSemanal := lJornadaAnterior.ToString;
+      DistribuirHorarios;
+      raise ExceptClass(E.ClassType).Create(E.Message);
+    end;
+  end;
 end;
 
 procedure TFolhaPontoSemanalSingleton.DistribuirHorarios;
