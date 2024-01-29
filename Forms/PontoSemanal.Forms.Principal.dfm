@@ -46,7 +46,6 @@ object frmPrincipal: TfrmPrincipal
         ExplicitWidth = 426
       end
       inherited edtJornadaSemanal: TEdit
-        Text = '44'
         OnExit = frmDadosFuncionarioedtJornadaSemanalExit
       end
     end
@@ -93,7 +92,7 @@ object frmPrincipal: TfrmPrincipal
     HeaderFont.Name = 'Segoe UI'
     HeaderFont.Style = [fsBold]
     ParentFont = False
-    TabOrder = 2
+    TabOrder = 3
     inline frmSegunda: TfrmHorariosDia
       Left = 2
       Top = 17
@@ -106,24 +105,20 @@ object frmPrincipal: TfrmPrincipal
       ExplicitWidth = 541
       ExplicitHeight = 55
       inherited medEntrada: TMaskEdit
-        Width = 71
-        Text = '22:00'
-        ExplicitWidth = 71
+        Width = 70
+        ExplicitWidth = 70
       end
       inherited medSaidaAlmoco: TMaskEdit
-        Width = 71
-        Text = '01:30'
-        ExplicitWidth = 71
+        Width = 70
+        ExplicitWidth = 70
       end
       inherited medRetornoAlmoco: TMaskEdit
-        Width = 71
-        Text = '02:30'
-        ExplicitWidth = 71
+        Width = 70
+        ExplicitWidth = 70
       end
       inherited medSaidaFinal: TMaskEdit
-        Width = 71
-        Text = '08:00'
-        ExplicitWidth = 71
+        Width = 70
+        ExplicitWidth = 70
       end
     end
   end
@@ -145,7 +140,7 @@ object frmPrincipal: TfrmPrincipal
     HeaderFont.Name = 'Segoe UI'
     HeaderFont.Style = [fsBold]
     ParentFont = False
-    TabOrder = 8
+    TabOrder = 9
     TabStop = True
     inline frmHorasTrabalhadasSemana: TfrmSaldoHorasDia
       Left = 2
@@ -177,6 +172,18 @@ object frmPrincipal: TfrmPrincipal
         ExplicitTop = 30
         ExplicitWidth = 33
         ExplicitHeight = 36
+      end
+      inherited btnMais: TSpeedButton
+        Left = 340
+        Top = 99
+        ExplicitLeft = 340
+        ExplicitTop = 99
+      end
+      inherited btnMenos: TSpeedButton
+        Left = 332
+        Top = 101
+        ExplicitLeft = 332
+        ExplicitTop = 101
       end
       inherited edtTotalHora: TEdit
         Left = 27
@@ -220,7 +227,7 @@ object frmPrincipal: TfrmPrincipal
     HeaderFont.Name = 'Segoe UI'
     HeaderFont.Style = [fsBold]
     ParentFont = False
-    TabOrder = 3
+    TabOrder = 4
     inline frmTerca: TfrmHorariosDia
       Left = 2
       Top = 17
@@ -252,7 +259,7 @@ object frmPrincipal: TfrmPrincipal
     HeaderFont.Name = 'Segoe UI'
     HeaderFont.Style = [fsBold]
     ParentFont = False
-    TabOrder = 4
+    TabOrder = 5
     inline frmQuarta: TfrmHorariosDia
       Left = 2
       Top = 17
@@ -284,7 +291,7 @@ object frmPrincipal: TfrmPrincipal
     HeaderFont.Name = 'Segoe UI'
     HeaderFont.Style = [fsBold]
     ParentFont = False
-    TabOrder = 5
+    TabOrder = 6
     inline frmQuinta: TfrmHorariosDia
       Left = 2
       Top = 17
@@ -316,7 +323,7 @@ object frmPrincipal: TfrmPrincipal
     HeaderFont.Name = 'Segoe UI'
     HeaderFont.Style = [fsBold]
     ParentFont = False
-    TabOrder = 6
+    TabOrder = 7
     inline frmSexta: TfrmHorariosDia
       Left = 2
       Top = 17
@@ -348,7 +355,7 @@ object frmPrincipal: TfrmPrincipal
     HeaderFont.Name = 'Segoe UI'
     HeaderFont.Style = [fsBold]
     ParentFont = False
-    TabOrder = 7
+    TabOrder = 8
     inline frmSabado: TfrmHorariosDia
       Left = 2
       Top = 17
@@ -394,7 +401,7 @@ object frmPrincipal: TfrmPrincipal
     CanUndoSelText = True
     ReadOnly = True
     ShowHint = False
-    TabOrder = 9
+    TabOrder = 10
   end
   object btnNovoRegistro: TButton
     Tag = 1
@@ -411,7 +418,7 @@ object frmPrincipal: TfrmPrincipal
     ImageIndex = 2
     Images = dtmPrincipal.imglistIcones
     ParentFont = False
-    TabOrder = 10
+    TabOrder = 13
     OnClick = btnNovoRegistroClick
   end
   object btnCarregarHist: TButton
@@ -432,7 +439,7 @@ object frmPrincipal: TfrmPrincipal
     ParentBiDiMode = False
     ParentDoubleBuffered = False
     ParentFont = False
-    TabOrder = 11
+    TabOrder = 12
     OnClick = btnCarregarHistClick
   end
   object btnGerSalHist: TButton
@@ -449,7 +456,7 @@ object frmPrincipal: TfrmPrincipal
     ImageIndex = 0
     Images = dtmPrincipal.imglistIcones
     ParentFont = False
-    TabOrder = 12
+    TabOrder = 11
     OnClick = btnGerSalHistClick
   end
   object btnConfiguracoes: TBitBtn
@@ -459,8 +466,7 @@ object frmPrincipal: TfrmPrincipal
     Height = 25
     ImageIndex = 3
     Images = dtmPrincipal.imglistIcones
-    TabOrder = 13
-    Visible = False
+    TabOrder = 1
     OnClick = btnConfiguracoesClick
   end
   object tmrHorario: TTimer

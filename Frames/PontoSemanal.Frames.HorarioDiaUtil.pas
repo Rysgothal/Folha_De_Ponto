@@ -9,7 +9,7 @@ uses
   PontoSemanal.Classes.Base.Horarios, PontoSemanal.Helpers.TiposAuxiliares,
   PontoSemanal.Interfaces.Observer.Sujeito, PontoSemanal.Frames.SaldoHorasDia, 
   PontoSemanal.Helpers.Componentes, System.RegularExpressions, System.StrUtils,
-  System.Generics.Collections, PontoSemanal.Helpers.Strings;
+  System.Generics.Collections, PontoSemanal.Helpers.Strings, Vcl.Buttons;
 
 type
   TProcInserirHorario = procedure(const pValor: string) of object;
@@ -41,7 +41,7 @@ type
   public
     FDadoAlterado: Boolean;
     constructor Create(AOwner: TComponent); reintroduce; overload;
-    procedure AtivarEventosOnExit;
+    procedure AlimentarCampos;
     function VerificarSePossuiValoresAnotados: Boolean;
     function VerificarTodosValoresAnotados: Boolean;
     procedure Limpar;
@@ -50,6 +50,7 @@ type
     procedure AlterarEditHorarioViolado(pHorario: TRegistroHorario);
     function ProcurarHorarioIncorreto: Boolean;
     function RetornarEditsNaoVerificados: TArray<TMaskEdit>;
+    procedure HabilitarAjusteHorario(pHabilitar: Boolean);
     { Public declarations }
   end;
 
@@ -75,12 +76,20 @@ begin
   lEdit.Color := $006969D6;
 end;
 
-procedure TfrmHorariosDia.AtivarEventosOnExit;
+procedure TfrmHorariosDia.AlimentarCampos;
+var
+  lDiaSemana: THorariosDia;
 begin
-  medEntrada.OnExit(medEntrada);
-  medSaidaAlmoco.OnExit(medSaidaAlmoco);
-  medRetornoAlmoco.OnExit(medRetornoAlmoco);
-  medSaidaFinal.OnExit(medSaidaFinal);
+  lDiaSemana := RetornarDiaSemana;
+  SairCampo(lDiaSemana.InserirEntrada, lDiaSemana, medEntrada);
+  SairCampo(lDiaSemana.InserirSaidaAlmoco, lDiaSemana, medSaidaAlmoco);
+  SairCampo(lDiaSemana.InserirRetornoAlmoco, lDiaSemana, medRetornoAlmoco);
+  SairCampo(lDiaSemana.InserirSaidaFinal, lDiaSemana, medSaidaFinal);
+
+//  medEntrada.OnExit(medEntrada);
+//  medSaidaAlmoco.OnExit(medSaidaAlmoco);
+//  medRetornoAlmoco.OnExit(medRetornoAlmoco);
+//  medSaidaFinal.OnExit(medSaidaFinal);
 end;
 
 constructor TfrmHorariosDia.Create(AOwner: TComponent);
@@ -107,11 +116,36 @@ begin
   end;
 end;
 
-procedure TfrmHorariosDia.FrameExit(Sender: TObject);
+procedure TfrmHorariosDia.HabilitarAjusteHorario(pHabilitar: Boolean);
 var
   lDiaSemana: THorariosDia;
 begin
+  Limpar;
   lDiaSemana := RetornarDiaSemana;
+  frmSaldoHorasDia.HabilitarAjusteHorario(pHabilitar);
+
+  if not pHabilitar then
+  begin
+    medEntrada.Text := lDiaSemana.Entrada;
+    medSaidaAlmoco.Text := lDiaSemana.SaidaAlmoco;
+    medRetornoAlmoco.Text := lDiaSemana.RetornoAlmoco;
+    medSaidaFinal.Text := lDiaSemana.SaidaFinal;
+    AlimentarCampos;
+  end;
+end;
+
+procedure TfrmHorariosDia.FrameExit(Sender: TObject);
+var
+  lDiaSemana: THorariosDia;
+  lPontoSemanal: TFolhaPontoSemanalSingleton;
+begin
+  lPontoSemanal := TFolhaPontoSemanalSingleton.ObterInstancia;
+  lDiaSemana := RetornarDiaSemana;
+
+  if not lPontoSemanal.Configuracao.AutoCompletar then
+  begin
+    Exit;
+  end;
 
   if TComponenteHelpers.VerificarTodosCamposVazio([medSaidaAlmoco, medRetornoAlmoco]) and
     not TComponenteHelpers.VerificarTodosCamposVazio([medEntrada, medSaidaFinal]) then
@@ -122,8 +156,8 @@ begin
     SairCampo(lDiaSemana.InserirRetornoAlmoco, lDiaSemana, medRetornoAlmoco);
   end;
 
-  if (lDiaSemana.Tag = dsSabado) and (lDiaSemana.Jornada = 0) and
-    TComponenteHelpers.VerificarTodosCamposVazio([medEntrada, medSaidaFinal]) then
+  if (lDiaSemana.Jornada = 0) and TComponenteHelpers.VerificarTodosCamposVazio([medEntrada, medSaidaFinal])
+    and not TComponenteHelpers.VerificarTodosCamposVazio([medSaidaAlmoco, medRetornoAlmoco]) then
   begin
     medEntrada.Text := '00:00';
     medSaidaFinal.text := '00:00';
@@ -147,6 +181,11 @@ var
 begin
   lDiaSemana := RetornarDiaSemana;
 
+  if medEntrada.Text = lDiaSemana.Entrada then
+  begin
+    Exit;
+  end;
+
   FDadoAlterado := VerificarDadoAlterado(medEntrada.Text, lDiaSemana.Entrada);
   SairCampo(lDiaSemana.InserirEntrada, lDiaSemana, medEntrada);
 end;
@@ -156,6 +195,12 @@ var
   lDiaSemana: THorariosDia;
 begin
   lDiaSemana := RetornarDiaSemana;
+
+  if medRetornoAlmoco.Text = lDiaSemana.RetornoAlmoco then
+  begin
+    Exit;
+  end;
+
   FDadoAlterado := VerificarDadoAlterado(medRetornoAlmoco.Text, lDiaSemana.RetornoAlmoco);
   SairCampo(lDiaSemana.InserirRetornoAlmoco, lDiaSemana, medRetornoAlmoco);
 end;
@@ -165,6 +210,12 @@ var
   lDiaSemana: THorariosDia;
 begin
   lDiaSemana := RetornarDiaSemana;
+
+  if medSaidaAlmoco.Text = lDiaSemana.SaidaAlmoco then
+  begin
+    Exit;
+  end;
+
   FDadoAlterado := VerificarDadoAlterado(medSaidaAlmoco.Text, lDiaSemana.SaidaAlmoco);
   SairCampo(lDiaSemana.InserirSaidaAlmoco, lDiaSemana, medSaidaAlmoco);
 end;
@@ -174,6 +225,12 @@ var
   lDiaSemana: THorariosDia;
 begin
   lDiaSemana := RetornarDiaSemana;
+
+  if medSaidaFinal.Text = lDiaSemana.SaidaFinal then
+  begin
+    Exit;
+  end;
+
   FDadoAlterado := VerificarDadoAlterado(medSaidaFinal.Text, lDiaSemana.SaidaFinal);
   SairCampo(lDiaSemana.InserirSaidaFinal, lDiaSemana, medSaidaFinal);
 end;
@@ -276,15 +333,13 @@ begin
   lPontoSemanal := TFolhaPontoSemanalSingleton.ObterInstancia;
 
   try
-    pProcInserirHorario(lEdit.Text);
-
-    for var lComponente in RetornarEditsNaoVerificados do
+    if lPontoSemanal.Configuracao.AutoCompletar and VerificarSePossuiValoresAnotados then
     begin
-      if lComponente = lEdit then
-      begin
-        lComponente.Color := clWindow;
-      end;
+      lEdit.Repor;
     end;
+
+    pProcInserirHorario(lEdit.Text);
+    lEdit.Color := clWindow;
 
     if RetornarEditsNaoVerificados = nil then
     begin

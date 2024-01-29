@@ -11,7 +11,7 @@ uses
   PontoSemanal.Classes.Builder.Diretor,
   PontoSemanal.Interfaces.Builder.FolhaDePonto,
   PontoSemanal.Classes.Builder.Construtor, PontoSemanal.Helpers.Constantes, Vcl.Buttons,
-  PontoSemanal.Forms.Configuracoes;
+  PontoSemanal.Forms.Configuracoes, PontoSemanal.Classes.Base.Configuracoes;
 
 type
   TfrmPrincipal = class(TForm)
@@ -76,7 +76,9 @@ type
     function VerificarAlteracaoDeValorFolhaPonto: Boolean;
     function VerificarViolacaoFolhaDePonto: Boolean;
     function VerificarHashNaFolhaComAtual(pHashAtual: string): Boolean;
+    procedure AbrirConfiguracoes;
   public
+    procedure AplicarConfiguracoes;
     { Public declarations }
   end;
 
@@ -103,12 +105,12 @@ end;
 procedure TfrmPrincipal.frmDadosFuncionarioedtJornadaSemanalExit(Sender: TObject);
 begin
   frmDadosFuncionario.edtJornadaSemanalExit(Sender);
-  frmSegunda.AtivarEventosOnExit;
-  frmTerca.AtivarEventosOnExit;
-  frmQuarta.AtivarEventosOnExit;
-  frmQuinta.AtivarEventosOnExit;
-  frmSexta.AtivarEventosOnExit;
-  frmSabado.AtivarEventosOnExit;
+  frmSegunda.AlimentarCampos;
+  frmTerca.AlimentarCampos;
+  frmQuarta.AlimentarCampos;
+  frmQuinta.AlimentarCampos;
+  frmSexta.AlimentarCampos;
+  frmSabado.AlimentarCampos;
 end;
 
 procedure TfrmPrincipal.GravarFolhaDePontoSemanal;
@@ -197,12 +199,7 @@ end;
 
 procedure TfrmPrincipal.btnConfiguracoesClick(Sender: TObject);
 begin
-  if not Assigned(frmConfiguracoes) then
-  begin
-    frmConfiguracoes := TfrmConfiguracoes.Create(Self);
-  end;
-
-  frmConfiguracoes.ShowModal;
+  AbrirConfiguracoes;
 end;
 
 procedure TfrmPrincipal.btnGerSalHistClick(Sender: TObject);
@@ -355,6 +352,16 @@ begin
   end;
 end;
 
+procedure TfrmPrincipal.AbrirConfiguracoes;
+begin
+  if not Assigned(frmConfiguracoes) then
+  begin
+    frmConfiguracoes := TfrmConfiguracoes.Create(Self);
+  end;
+
+  frmConfiguracoes.Show;
+end;
+
 procedure TfrmPrincipal.AnalisarDadosFuncionarioAlterados;
 var
   lPontoSemanal: TFolhaPontoSemanalSingleton;
@@ -443,6 +450,18 @@ begin
   AnalisarDiaDaSemanaAlterado(lPontoSemanal.Quinta);
   AnalisarDiaDaSemanaAlterado(lPontoSemanal.Sexta);
   AnalisarDiaDaSemanaAlterado(lPontoSemanal.Sabado);
+end;
+
+procedure TfrmPrincipal.AplicarConfiguracoes;
+var
+  lConfiguracoes: TConfiguracao;
+begin
+  lConfiguracoes := TFolhaPontoSemanalSingleton.ObterInstancia.Configuracao;
+
+  frmSabado.medSaidaAlmoco.Enabled := lConfiguracoes.PossuiAlmocoSabado;
+  frmSabado.lblSaidaAlmoco.Enabled := lConfiguracoes.PossuiAlmocoSabado;
+  frmSabado.medRetornoAlmoco.Enabled := lConfiguracoes.PossuiAlmocoSabado;
+  frmSabado.lblRetornoAlmoco.Enabled := lConfiguracoes.PossuiAlmocoSabado;
 end;
 
 procedure TfrmPrincipal.AplicarDadoNaoAlterado;

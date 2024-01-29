@@ -41,6 +41,14 @@ object frmHorariosDia: TfrmHorariosDia
     Height = 15
     Caption = 'Entrada'
   end
+  inline frmSaldoHorasDia: TfrmSaldoHorasDia
+    Left = 382
+    Top = 0
+    Width = 149
+    Height = 48
+    TabOrder = 4
+    ExplicitLeft = 382
+  end
   object medEntrada: TMaskEdit
     Left = 7
     Top = 21
@@ -112,13 +120,5 @@ object frmHorariosDia: TfrmHorariosDia
     TabOrder = 3
     Text = '  :  '
     OnExit = medSaidaFinalExit
-  end
-  inline frmSaldoHorasDia: TfrmSaldoHorasDia
-    Left = 382
-    Top = 0
-    Width = 149
-    Height = 48
-    TabOrder = 4
-    ExplicitLeft = 382
   end
 end

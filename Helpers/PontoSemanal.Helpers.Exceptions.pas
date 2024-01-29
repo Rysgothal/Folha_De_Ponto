@@ -36,6 +36,9 @@ type
   EHorarioInvalido = class(Exception);
   EHorarioZeradoNaoPermitido = class(Exception);
 
+  { Geral }
+  ETotalTrabalhadoMaisDeUmDia = class(Exception);
+
   TExceptionHelpers = class abstract
   private
     class function VerificarHorarioAtualMaiorQuePosterior(pHoraAtual, pHoraPosterior: string): Boolean;

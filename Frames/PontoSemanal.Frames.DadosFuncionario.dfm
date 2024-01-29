@@ -202,7 +202,6 @@ object frmDadosFuncionario: TfrmDadosFuncionario
     Font.Height = -12
     Font.Name = 'Segoe UI'
     Font.Style = []
-    MaxLength = 2
     ParentFont = False
     TabOrder = 3
     TextHint = 'hh'

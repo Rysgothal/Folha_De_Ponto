@@ -34,7 +34,6 @@ type
     procedure SetDataAdmissao(const pValor: string);
     procedure SetJornadaSemanal(const pValor: string);
     procedure SetIntervaloAlmoco(const pValor: string);
-    procedure DistribuirHorarios(pValor: Integer);
   public
     class function ObterInstancia: TFolhaPontoSemanalSingleton;
     destructor Destroy; override;
@@ -56,6 +55,8 @@ type
     property ConverterHora: IConverter read FConverterHora write FConverterHora;
     property Configuracao: TConfiguracao read FConfiguracao write FConfiguracao;
     procedure AdicionarObservador(pDiaSemana: TDiaSemana; pObservador: IObservador);
+    procedure DistribuirHorarios(pDiaSemana: TDiaSemana; pValor: Integer); overload;
+    procedure DistribuirHorarios; overload;
     procedure CalcularTempoAdmissao;
     procedure CalcularDesempenho;
     procedure Limpar;
@@ -119,18 +120,51 @@ begin
   inherited;
 end;
 
-procedure TFolhaPontoSemanalSingleton.DistribuirHorarios(pValor: Integer);
+procedure TFolhaPontoSemanalSingleton.DistribuirHorarios(pDiaSemana: TDiaSemana; pValor: Integer);
+var
+  lNovaJornada, lJornadaAnterior: Integer;
+begin
+  lJornadaAnterior := JornadaSemanal.ToInteger;
+
+  case pDiaSemana of
+    dsSegunda: Segunda.Jornada := pValor;
+    dsTerca: Terca.Jornada := pValor;
+    dsQuarta: Quarta.Jornada := pValor;
+    dsQuinta: Quinta.Jornada := pValor;
+    dsSexta: Sexta.Jornada := pValor;
+    dsSabado: Sabado.Jornada := pValor;
+  end;
+
+  lNovaJornada := Segunda.Jornada + Terca.Jornada + Quarta.Jornada + Quinta.Jornada + Sexta.Jornada + Sabado.Jornada;
+
+  try
+    JornadaSemanal := lNovaJornada.ToString;
+  except
+    on E: Exception do
+    begin
+      JornadaSemanal := lJornadaAnterior.ToString;
+      DistribuirHorarios;
+      raise ExceptClass(E.ClassType).Create(E.Message);
+    end;
+  end;
+end;
+
+procedure TFolhaPontoSemanalSingleton.DistribuirHorarios;
 var
   lJornadaDiaria: Integer;
 begin
-  lJornadaDiaria := pValor div 5;
+  if FJornadaSemanal.IsEmpty then
+  begin
+    raise EJornadaSemanalInvalida.Create('A jornada semanal não foi preenchida');
+  end;
 
+  lJornadaDiaria := FJornadaSemanal.ToInteger div 5;
   Segunda.Jornada := lJornadaDiaria;
   Terca.Jornada := lJornadaDiaria;
   Quarta.Jornada := lJornadaDiaria;
   Quinta.Jornada := lJornadaDiaria;
   Sexta.Jornada := lJornadaDiaria;
-  Sabado.Jornada := pValor mod 5;
+  Sabado.Jornada := FJornadaSemanal.ToInteger mod 5;
 end;
 
 procedure TFolhaPontoSemanalSingleton.Limpar;
@@ -162,7 +196,6 @@ begin
 
   if TStringHelpers.VerificarCampoVazio(pValor) then
   begin
-//    CalcularTempoAdmissao;
     Exit;
   end;
 
@@ -182,7 +215,6 @@ begin
   end;
 
   FDataAdmissao := pValor;
-//  CalcularTempoAdmissao;
 end;
 
 procedure TFolhaPontoSemanalSingleton.SetID(const pValor: string);
@@ -238,13 +270,12 @@ begin
     raise EJornadaSemanalInvalida.Create('A jornada semanal inserida está incorreta, verifique.');
   end;
 
-  if lValor > 44 then // Fazer Confg
+  if lValor > Configuracao.MaxJornadaSemanalLei.ToInteger then
   begin
     raise EJornadaSemanalNaoPermitidaLei.Create('A jornada semanal informada não é aceita pela Lei, verifique...');
   end;
 
   FJornadaSemanal := pValor;
-  DistribuirHorarios(lValor);
 end;
 
 procedure TFolhaPontoSemanalSingleton.AdicionarObservador(pDiaSemana: TDiaSemana; pObservador: IObservador);
