@@ -41,7 +41,7 @@ type
   public
     FDadoAlterado: Boolean;
     constructor Create(AOwner: TComponent); reintroduce; overload;
-    procedure AtivarEventosOnExit;
+    procedure AlimentarCampos;
     function VerificarSePossuiValoresAnotados: Boolean;
     function VerificarTodosValoresAnotados: Boolean;
     procedure Limpar;
@@ -76,12 +76,20 @@ begin
   lEdit.Color := $006969D6;
 end;
 
-procedure TfrmHorariosDia.AtivarEventosOnExit;
+procedure TfrmHorariosDia.AlimentarCampos;
+var
+  lDiaSemana: THorariosDia;
 begin
-  medEntrada.OnExit(medEntrada);
-  medSaidaAlmoco.OnExit(medSaidaAlmoco);
-  medRetornoAlmoco.OnExit(medRetornoAlmoco);
-  medSaidaFinal.OnExit(medSaidaFinal);
+  lDiaSemana := RetornarDiaSemana;
+  SairCampo(lDiaSemana.InserirEntrada, lDiaSemana, medEntrada);
+  SairCampo(lDiaSemana.InserirSaidaAlmoco, lDiaSemana, medSaidaAlmoco);
+  SairCampo(lDiaSemana.InserirRetornoAlmoco, lDiaSemana, medRetornoAlmoco);
+  SairCampo(lDiaSemana.InserirSaidaFinal, lDiaSemana, medSaidaFinal);
+
+//  medEntrada.OnExit(medEntrada);
+//  medSaidaAlmoco.OnExit(medSaidaAlmoco);
+//  medRetornoAlmoco.OnExit(medRetornoAlmoco);
+//  medSaidaFinal.OnExit(medSaidaFinal);
 end;
 
 constructor TfrmHorariosDia.Create(AOwner: TComponent);
@@ -122,7 +130,7 @@ begin
     medSaidaAlmoco.Text := lDiaSemana.SaidaAlmoco;
     medRetornoAlmoco.Text := lDiaSemana.RetornoAlmoco;
     medSaidaFinal.Text := lDiaSemana.SaidaFinal;
-    AtivarEventosOnExit;
+    AlimentarCampos;
   end;
 end;
 
@@ -173,6 +181,11 @@ var
 begin
   lDiaSemana := RetornarDiaSemana;
 
+  if medEntrada.Text = lDiaSemana.Entrada then
+  begin
+    Exit;
+  end;
+
   FDadoAlterado := VerificarDadoAlterado(medEntrada.Text, lDiaSemana.Entrada);
   SairCampo(lDiaSemana.InserirEntrada, lDiaSemana, medEntrada);
 end;
@@ -182,6 +195,12 @@ var
   lDiaSemana: THorariosDia;
 begin
   lDiaSemana := RetornarDiaSemana;
+
+  if medRetornoAlmoco.Text = lDiaSemana.RetornoAlmoco then
+  begin
+    Exit;
+  end;
+
   FDadoAlterado := VerificarDadoAlterado(medRetornoAlmoco.Text, lDiaSemana.RetornoAlmoco);
   SairCampo(lDiaSemana.InserirRetornoAlmoco, lDiaSemana, medRetornoAlmoco);
 end;
@@ -191,6 +210,12 @@ var
   lDiaSemana: THorariosDia;
 begin
   lDiaSemana := RetornarDiaSemana;
+
+  if medSaidaAlmoco.Text = lDiaSemana.SaidaAlmoco then
+  begin
+    Exit;
+  end;
+
   FDadoAlterado := VerificarDadoAlterado(medSaidaAlmoco.Text, lDiaSemana.SaidaAlmoco);
   SairCampo(lDiaSemana.InserirSaidaAlmoco, lDiaSemana, medSaidaAlmoco);
 end;
@@ -200,6 +225,12 @@ var
   lDiaSemana: THorariosDia;
 begin
   lDiaSemana := RetornarDiaSemana;
+
+  if medSaidaFinal.Text = lDiaSemana.SaidaFinal then
+  begin
+    Exit;
+  end;
+
   FDadoAlterado := VerificarDadoAlterado(medSaidaFinal.Text, lDiaSemana.SaidaFinal);
   SairCampo(lDiaSemana.InserirSaidaFinal, lDiaSemana, medSaidaFinal);
 end;
@@ -302,7 +333,7 @@ begin
   lPontoSemanal := TFolhaPontoSemanalSingleton.ObterInstancia;
 
   try
-    if lPontoSemanal.Configuracao.AutoCompletar then
+    if lPontoSemanal.Configuracao.AutoCompletar and VerificarSePossuiValoresAnotados then
     begin
       lEdit.Repor;
     end;

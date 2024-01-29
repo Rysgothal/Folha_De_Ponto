@@ -50,6 +50,7 @@ end;
 
 procedure TfrmConfiguracoes.btnDistribuirHorariosClick(Sender: TObject);
 begin
+  AlphaBlend := not AlphaBlend;
   AjustarTelaParaConfigurarHorarios;
 end;
 
@@ -58,7 +59,6 @@ var
   lPontoSemanal: TFolhaPontoSemanalSingleton;
 begin
   lPontoSemanal := TFolhaPontoSemanalSingleton.ObterInstancia;
-  AlphaBlend := not AlphaBlend;
 
   case AlphaBlend of
     True: btnDistribuirHorarios.Caption := 'Confirmar';
@@ -118,6 +118,7 @@ end;
 procedure TfrmConfiguracoes.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   ActiveControl := nil;
+  frmPrincipal.AplicarConfiguracoes;
   Action := TCloseAction.caFree;
   frmConfiguracoes := nil;
 end;

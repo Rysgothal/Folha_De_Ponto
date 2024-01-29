@@ -77,8 +77,8 @@ type
     function VerificarViolacaoFolhaDePonto: Boolean;
     function VerificarHashNaFolhaComAtual(pHashAtual: string): Boolean;
     procedure AbrirConfiguracoes;
-    procedure AplicarConfiguracoes;
   public
+    procedure AplicarConfiguracoes;
     { Public declarations }
   end;
 
@@ -105,12 +105,12 @@ end;
 procedure TfrmPrincipal.frmDadosFuncionarioedtJornadaSemanalExit(Sender: TObject);
 begin
   frmDadosFuncionario.edtJornadaSemanalExit(Sender);
-  frmSegunda.AtivarEventosOnExit;
-  frmTerca.AtivarEventosOnExit;
-  frmQuarta.AtivarEventosOnExit;
-  frmQuinta.AtivarEventosOnExit;
-  frmSexta.AtivarEventosOnExit;
-  frmSabado.AtivarEventosOnExit;
+  frmSegunda.AlimentarCampos;
+  frmTerca.AlimentarCampos;
+  frmQuarta.AlimentarCampos;
+  frmQuinta.AlimentarCampos;
+  frmSexta.AlimentarCampos;
+  frmSabado.AlimentarCampos;
 end;
 
 procedure TfrmPrincipal.GravarFolhaDePontoSemanal;
@@ -200,7 +200,6 @@ end;
 procedure TfrmPrincipal.btnConfiguracoesClick(Sender: TObject);
 begin
   AbrirConfiguracoes;
-  AplicarConfiguracoes;
 end;
 
 procedure TfrmPrincipal.btnGerSalHistClick(Sender: TObject);

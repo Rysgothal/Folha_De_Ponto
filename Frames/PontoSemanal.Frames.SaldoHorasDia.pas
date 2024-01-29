@@ -123,6 +123,11 @@ begin
   lHorariosDia := RetornarDiaSemana;
 
   try
+    if (pValor < 0) then
+    begin
+      Exit;
+    end;
+
     lPontoSemanal.DistribuirHorarios(lHorariosDia.Tag, pValor);
     edtSaldoHora.Text := lHorariosDia.Jornada.ToString.PadLeft(2, '0') + ':00';
     frmPrincipal.frmDadosFuncionario.edtJornadaSemanal.Text := lPontoSemanal.JornadaSemanal;
