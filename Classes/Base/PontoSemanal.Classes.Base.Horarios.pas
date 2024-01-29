@@ -65,34 +65,26 @@ uses
 procedure THorariosDia.CalcularHorasTrabalhadas;
 var
   lHorasCalculo, lSaldoCalculo: THorarioSeparado;
-  lJornada: TTime;
-  lEntrada, lSaidaAlmoco, lRetornoAlmoco, lSaidaFinal, lHorasTrabalhadas, lSaldoHoras: TDateTime;
-  lVerificarPeriodoManha, lVerificarPeriodoTarde, lSemAlmoco, lSaidaAlmocoNulo, lRetornoAlmocoNulo: Boolean;
+  lEntrada, lSaidaAlmoco, lRetornoAlmoco, lSaidaFinal: TDateTime;
+  lVerificarPeriodoManha, lVerificarPeriodoTarde, lSemAlmoco: Boolean;
 begin
   lEntrada := RetornarHorario(Entrada);
   lSaidaAlmoco := RetornarHorario(SaidaAlmoco);
   lRetornoAlmoco := RetornarHorario(RetornoAlmoco);
   lSaidaFinal := RetornarHorario(SaidaFinal);
 
-  lHorasTrabalhadas := 0;
-  lJornada := 0;
-  lJornada := IncHour(lJornada, Jornada);
+  lVerificarPeriodoManha := not Entrada.Trim.IsEmpty and not SaidaAlmoco.Trim.IsEmpty;
+  lVerificarPeriodoTarde := not SaidaFinal.Trim.IsEmpty and not RetornoAlmoco.Trim.IsEmpty;
+  lSemAlmoco := (Entrada <> EmptyStr) and (SaidaFinal <> EmptyStr) and (RetornoAlmoco = '00:00') and (SaidaAlmoco = '00:00');
 
-  lSaidaAlmocoNulo := (SaidaAlmoco = EmptyStr) or (SaidaAlmoco = '00:00');
-  lRetornoAlmocoNulo := (RetornoAlmoco = EmptyStr) or (RetornoAlmoco = '00:00');
-
-  lVerificarPeriodoManha := (Entrada <> EmptyStr) and not lSaidaAlmocoNulo;
-  lVerificarPeriodoTarde := (SaidaFinal <> EmptyStr) and not lRetornoAlmocoNulo;
-  lSemAlmoco := (Entrada <> EmptyStr) and (SaidaFinal <> EmptyStr) and lSaidaAlmocoNulo and lRetornoAlmocoNulo;
-
-  if (lEntrada > lSaidaAlmoco) and not lSemAlmoco then
+  if (lEntrada > lSaidaAlmoco) and not SaidaAlmoco.Trim.IsEmpty and not Entrada.Trim.IsEmpty then
   begin
     lSaidaAlmoco := lSaidaAlmoco.IncDay;
     lRetornoAlmoco := lRetornoAlmoco.IncDay;
     lSaidaFinal := lSaidaFinal.IncDay;
   end;
 
-  if (lSaidaAlmoco > lRetornoAlmoco) and not lSemAlmoco then
+  if (lSaidaAlmoco > lRetornoAlmoco) and not SaidaAlmoco.Trim.isEmpty and not RetornoAlmoco.Trim.isEmpty then
   begin
     lRetornoAlmoco := lRetornoAlmoco.IncDay;
     lSaidaFinal := lSaidaFinal.IncDay;
@@ -103,10 +95,14 @@ begin
     lSaidaFinal := lSaidaFinal.IncDay;
   end;
 
-  if HoursBetween(lSaidaFinal, lEntrada) > 20 then
+  if (DaysBetween(lSaidaFinal, lEntrada) = 1) and (lSaidaFinal > lEntrada) and lSemAlmoco then
   begin
-    raise ETotalTrabalhadoMaisDeUmDia.Create('O total trabalhado ao longo do dia foi além do permitido, ' +
-      'verifique seu horário');
+    lSaidaFinal := lSaidaFinal.IncDay(-1);
+  end;
+
+  if (HoursBetween(lSaidaFinal, lEntrada) > 24) and not SaidaFinal.Trim.IsEmpty then
+  begin
+    raise ETotalTrabalhadoMaisDeUmDia.Create('Seus horários do dia somam mais de 24 horas, verifique.');
   end;
 
   if lVerificarPeriodoManha then
@@ -119,30 +115,26 @@ begin
     lHorasCalculo.Minutos := lHorasCalculo.Minutos + MinutesBetween(lSaidaFinal, lRetornoAlmoco);
   end;
 
-  if lSemAlmoco then
-  begin
-    lHorasCalculo.Minutos := MinutesBetween(lSaidaFinal, lEntrada);
-  end;
-
   lHorasCalculo.Horas := lHorasCalculo.Minutos div 60;
   lHorasCalculo.Minutos := lHorasCalculo.Minutos mod 60;
 
-  if (lEntrada <> 0) or (lSaidaFinal <> 0) then
+  if lSemAlmoco or ((lEntrada <> 0) and (lSaidaAlmoco = 0) and (lRetornoAlmoco = 0) and (lSaidaFinal <> 0)) then
   begin
-    lHorasTrabalhadas := StrToDateTime(
-      lHorasCalculo.Horas.ToString.PadLeft(2, '0') + ':' + lHorasCalculo.Minutos.ToString.PadLeft(2, '0')
-    );
+    lEntrada := RetornarHorario(Entrada);
+    lSaidaFinal := RetornarHorario(SaidaFinal);
+    lSaidaFinal := IfThen(lEntrada >= lSaidaFinal, lSaidaFinal.IncDay, lSaidaFinal);
+
+    lHorasCalculo.Horas := HoursBetween(lSaidaFinal, lEntrada);
+    lHorasCalculo.Minutos := MinutesBetween(lSaidaFinal, lEntrada) mod 60;
   end;
 
-  lSaldoCalculo.Horas := MinutesBetween(lJornada, lHorasTrabalhadas) div 60;
-  lSaldoCalculo.Minutos := MinutesBetween(lJornada, lHorasTrabalhadas) mod 60;
+  lSaldoCalculo.Minutos := ABS((Jornada * 60) - (lHorasCalculo.Horas * 60 + lHorasCalculo.Minutos));
 
-  lSaldoHoras := StrToDateTime(
-    lSaldoCalculo.Horas.ToString.PadLeft(2, '0') + ':' + lSaldoCalculo.Minutos.ToString.PadLeft(2, '0')
-  );
+  lSaldoCalculo.Horas := lSaldoCalculo.Minutos div 60;
+  lSaldoCalculo.Minutos := lSaldoCalculo.Minutos mod 60;
 
-  Desempenho.TotalTrabalhado := FormatDateTime('hh:mm', lHorasTrabalhadas);
-  Desempenho.SaldoHoras := FormatDateTime('hh:mm', lSaldoHoras);
+  Desempenho.TotalTrabalhado := lHorasCalculo.Horas.ToString.PadLeft(2, '0') + ':' + lHorasCalculo.Minutos.ToString.PadLeft(2, '0');
+  Desempenho.SaldoHoras := lSaldoCalculo.Horas.ToString.PadLeft(2, '0') + ':' + lSaldoCalculo.Minutos.ToString.PadLeft(2, '0');
   FDesempenho.AtualizarCumprimento(Jornada);
 end;
 
@@ -379,7 +371,7 @@ end;
 
 procedure THorariosDia.SetRetornoAlmoco(const pValor: string);
 var
-  lValor: TDateTime;
+  lValor, lSaidaAlmoco: TDateTime;
 begin
   if VerificarHorarioVazio(pValor) then
   begin
@@ -390,9 +382,20 @@ begin
   AbortarCasoHorarioInvalido(pValor);
   lValor := StrToDateTime(pValor);
 
-  if not SaidaAlmoco.IsEmpty and (HoursBetween(StrToTime(SaidaAlmoco), lValor) >= 3) then
+  if not SaidaAlmoco.Trim.IsEmpty and TurnoNoturno then
   begin
-    AbortarCasoHorarioAtualMenorQueSaidaAlmoco(pValor);
+    lSaidaAlmoco := StrToTime(SaidaAlmoco);
+    lValor := IfThen(lSaidaAlmoco > lValor, lValor.IncDay, lValor);
+
+    if HoursBetween(lValor, lSaidaAlmoco) > 3 then // Assim ele me comprova que ficou "Além do horario de almoço"
+    begin
+      try
+        AbortarCasoHorarioAtualMenorQueSaidaAlmoco(pValor);
+      except
+        CriarException(EHorarioAtualMenorQueSaidaAlmoco, 'O horário inserido está bem distante do horário "Saída-Almoço"'+
+          ', verifique.');
+      end;
+    end;
   end;
 
   if not TurnoNoturno then
@@ -405,7 +408,7 @@ end;
 
 procedure THorariosDia.SetSaidaAlmoco(const pValor: string);
 var
-  lValor: TDateTime;
+  lValor, lRetornoAlmoco: TDateTime;
 begin
   if VerificarHorarioVazio(pValor) then
   begin
@@ -416,9 +419,20 @@ begin
   AbortarCasoHorarioInvalido(pValor);
   lValor := StrToDateTime(pValor);
 
-  if not RetornoAlmoco.IsEmpty and (HoursBetween(StrToTime(RetornoAlmoco), lValor) >= 3) then
+  if not RetornoAlmoco.Trim.IsEmpty and TurnoNoturno then
   begin
-    AbortarCasoHorarioAtualMaiorQueRetornoAlmoco(pValor);
+    lRetornoAlmoco := StrToTime(RetornoAlmoco);
+    lRetornoAlmoco := IfThen(lRetornoAlmoco < lValor, lRetornoAlmoco.IncDay, lRetornoAlmoco);
+
+    if HoursBetween(lValor, lRetornoAlmoco) > 3 then
+    begin
+      try
+        AbortarCasoHorarioAtualMaiorQueRetornoAlmoco(pValor);
+      except
+        CriarException(EHorarioAtualMaiorQueRetornoAlmoco, 'O horário inserido está bem distante do horário "Retorno-Almoço"' +
+          ', verifique.');
+      end;
+    end;
   end;
 
   if not TurnoNoturno then
