@@ -412,22 +412,33 @@ end;
 procedure TfrmPrincipal.DestacarHorariosAlterados(pHorarios: THorariosDia);
 var
   lHashIguais: TArray<Boolean>;
+  lHorarios: TArray<string>;
+  lEntrada, lSaidaAlmoco, lRetornoAlmoco, lSaidaFinal: string;
   lFrame: TfrmHorariosDia;
 begin
+  lHorarios := [
+    pHorarios.Entrada, pHorarios.SaidaAlmoco, pHorarios.RetornoAlmoco, pHorarios.SaidaFinal
+  ];
+
+  lEntrada := TStringHelpers.HashMD5(Ord(pHorarios.Tag).ToString + Ord(rhEntrada).ToString + pHorarios.Entrada); 
+  lSaidaAlmoco := TStringHelpers.HashMD5(Ord(pHorarios.Tag).ToString + Ord(rhSaidaAlmoco).ToString + pHorarios.SaidaAlmoco); 
+  lRetornoAlmoco := TStringHelpers.HashMD5(Ord(pHorarios.Tag).ToString + Ord(rhRetornoAlmoco).ToString + pHorarios.RetornoAlmoco); 
+  lSaidaFinal := TStringHelpers.HashMD5(Ord(pHorarios.Tag).ToString + Ord(rhSaidaFinal).ToString + pHorarios.SaidaFinal);
+  
   lHashIguais := [
-    VerificarHashNaFolhaComAtual(TStringHelpers.HashMD5(pHorarios.Entrada)),
-    VerificarHashNaFolhaComAtual(TStringHelpers.HashMD5(pHorarios.SaidaAlmoco)),
-    VerificarHashNaFolhaComAtual(TStringHelpers.HashMD5(pHorarios.RetornoAlmoco)),
-    VerificarHashNaFolhaComAtual(TStringHelpers.HashMD5(pHorarios.SaidaFinal))
+    VerificarHashNaFolhaComAtual(lEntrada),
+    VerificarHashNaFolhaComAtual(lSaidaAlmoco),
+    VerificarHashNaFolhaComAtual(lRetornoAlmoco),
+    VerificarHashNaFolhaComAtual(lSaidaFinal)
   ];
 
   lFrame := RetornarFrameDia(pHorarios.Tag);
 
   for var I := 0 to Pred(Length(lHashIguais)) do
   begin
-    if (pHorarios.Tag = dsSabado) and (I in [1, 2]) then
+    if lHorarios[I].Trim.IsEmpty then
     begin
-      Break;
+      Continue;
     end;
 
     if not lHashIguais[I] then
@@ -454,14 +465,21 @@ end;
 
 procedure TfrmPrincipal.AplicarConfiguracoes;
 var
-  lConfiguracoes: TConfiguracao;
+  lFolhaPonto: TFolhaPontoSemanalSingleton;
+  lConfiguracao: TConfiguracao;
 begin
-  lConfiguracoes := TFolhaPontoSemanalSingleton.ObterInstancia.Configuracao;
+  lFolhaPonto := TFolhaPontoSemanalSingleton.ObterInstancia;
+  lConfiguracao := lFolhaPonto.Configuracao;
 
-  frmSabado.medSaidaAlmoco.Enabled := lConfiguracoes.PossuiAlmocoSabado;
-  frmSabado.lblSaidaAlmoco.Enabled := lConfiguracoes.PossuiAlmocoSabado;
-  frmSabado.medRetornoAlmoco.Enabled := lConfiguracoes.PossuiAlmocoSabado;
-  frmSabado.lblRetornoAlmoco.Enabled := lConfiguracoes.PossuiAlmocoSabado;
+  if lConfiguracao.MaxJornadaSemanalLei.ToInteger < lFolhaPonto.JornadaSemanal.ToInteger then
+  begin
+    frmDadosFuncionario.edtJornadaSemanal.Text := lConfiguracao.MaxJornadaSemanalLei;
+  end;
+
+  frmSabado.medSaidaAlmoco.Enabled := lConfiguracao.PossuiAlmocoSabado;
+  frmSabado.lblSaidaAlmoco.Enabled := lConfiguracao.PossuiAlmocoSabado;
+  frmSabado.medRetornoAlmoco.Enabled := lConfiguracao.PossuiAlmocoSabado;
+  frmSabado.lblRetornoAlmoco.Enabled := lConfiguracao.PossuiAlmocoSabado;
 end;
 
 procedure TfrmPrincipal.AplicarDadoNaoAlterado;

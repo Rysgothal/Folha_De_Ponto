@@ -23,7 +23,7 @@ type
     procedure AceitarSomenteNumeros;
     procedure AceitarSomenteLetras;
     procedure Completar(pQuantidade: Integer; pValorAPreencher: Char = ' ');
-    procedure Repor(pValorAPreencher: Char = '0');
+    procedure Repor(pValorAPreencher: Char = '0'; pValorAntigo: Char = '_');
     function CampoVazio: Boolean;
     procedure FormatarData;
     procedure MoverFinal;
@@ -135,9 +135,9 @@ begin
   SelStart := Length(Text);
 end;
 
-procedure TCustomEditHelper.Repor(pValorAPreencher: Char);
+procedure TCustomEditHelper.Repor(pValorAPreencher: Char = '0'; pValorAntigo: Char = '_');
 begin
-  Text := StringReplace(Text, '_', pValorAPreencher, [rfReplaceAll]);
+  Text := StringReplace(Text, pValorAntigo, pValorAPreencher, [rfReplaceAll]);
 end;
 
 end.

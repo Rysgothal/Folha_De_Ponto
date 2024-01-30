@@ -208,7 +208,7 @@ begin
     rhSaidaFinal: lHorario := pDia.SaidaFinal;
   end;
 
-  Result := TStringHelpers.HashMD5(lHorario);
+  Result := TStringHelpers.HashMD5(Ord(pDia.Tag).ToString + Ord(pRegistroHorario).ToString + lHorario);
 end;
 
 procedure TConstrutor.AdicionarLinhaHash(pDia: THorariosDia);

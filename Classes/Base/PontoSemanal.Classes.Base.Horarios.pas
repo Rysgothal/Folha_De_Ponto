@@ -118,6 +118,11 @@ begin
   lHorasCalculo.Horas := lHorasCalculo.Minutos div 60;
   lHorasCalculo.Minutos := lHorasCalculo.Minutos mod 60;
 
+  if (lEntrada = 0) and (lSaidaAlmoco = 0) and (lRetornoAlmoco = 0) and (lSaidaFinal = 0) then
+  begin
+    lHorasCalculo.Horas := 0;
+    lHorasCalculo.Minutos := 0;
+  end else
   if lSemAlmoco or ((lEntrada <> 0) and (lSaidaAlmoco = 0) and (lRetornoAlmoco = 0) and (lSaidaFinal <> 0)) then
   begin
     lEntrada := RetornarHorario(Entrada);

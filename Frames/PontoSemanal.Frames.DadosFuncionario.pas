@@ -107,7 +107,7 @@ procedure TfrmDadosFuncionario.edtCodigoExit(Sender: TObject);
 var
   lFolhaPonto: TFolhaPontoSemanalSingleton;
 begin
-   try
+  try
     lFolhaPonto := TFolhaPontoSemanalSingleton.ObterInstancia;
     FDadoAlterado := VerificarDadoAlterado(edtCodigo.Text, lFolhaPonto.ID);
     lFolhaPonto.ID := edtCodigo.Text;

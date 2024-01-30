@@ -406,7 +406,7 @@ object frmPrincipal: TfrmPrincipal
   object btnNovoRegistro: TButton
     Tag = 1
     Left = 952
-    Top = 87
+    Top = 85
     Width = 228
     Height = 34
     Caption = '&Novo Registro'
@@ -423,7 +423,7 @@ object frmPrincipal: TfrmPrincipal
   end
   object btnCarregarHist: TButton
     Left = 952
-    Top = 51
+    Top = 48
     Width = 228
     Height = 34
     BiDiMode = bdLeftToRight
@@ -444,7 +444,7 @@ object frmPrincipal: TfrmPrincipal
   end
   object btnGerSalHist: TButton
     Left = 952
-    Top = 16
+    Top = 11
     Width = 228
     Height = 34
     Caption = '&Gerar e Salvar Hist'#243'rico'

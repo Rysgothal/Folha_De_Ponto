@@ -85,11 +85,6 @@ begin
   SairCampo(lDiaSemana.InserirSaidaAlmoco, lDiaSemana, medSaidaAlmoco);
   SairCampo(lDiaSemana.InserirRetornoAlmoco, lDiaSemana, medRetornoAlmoco);
   SairCampo(lDiaSemana.InserirSaidaFinal, lDiaSemana, medSaidaFinal);
-
-//  medEntrada.OnExit(medEntrada);
-//  medSaidaAlmoco.OnExit(medSaidaAlmoco);
-//  medRetornoAlmoco.OnExit(medRetornoAlmoco);
-//  medSaidaFinal.OnExit(medSaidaFinal);
 end;
 
 constructor TfrmHorariosDia.Create(AOwner: TComponent);
@@ -339,7 +334,11 @@ begin
     end;
 
     pProcInserirHorario(lEdit.Text);
-    lEdit.Color := clWindow;
+
+    if lEdit.Color = clGray then
+    begin
+      lEdit.Color := clWindow;
+    end;
 
     if RetornarEditsNaoVerificados = nil then
     begin
@@ -394,6 +393,16 @@ begin
   case TDiaSemana(Self.Tag) of
     dsSabado: lEdits := [medEntrada, medSaidaFinal];
     else lEdits := [medEntrada, medSaidaAlmoco, medRetornoAlmoco, medSaidaFinal];
+  end;
+
+  if RetornarDiaSemana.Jornada = 0 then
+  begin
+    for var lEdit in lEdits do
+    begin
+      lEdit.Repor;
+    end;
+
+    AlimentarCampos;
   end;
 
   Result := TComponenteHelpers.VerificarEditVazio(lEdits) = nil;
