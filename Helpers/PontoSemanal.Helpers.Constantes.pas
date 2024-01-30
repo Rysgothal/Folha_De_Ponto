@@ -2,9 +2,21 @@ unit PontoSemanal.Helpers.Constantes;
 
 interface
 
+uses
+  PontoSemanal.Helpers.TiposAuxiliares;
+
 type
   TConstantes = class abstract
   public
+    const LINHAS_LAYOUT_DADOS_FUNCIONARIOS = [
+      Ord(llCodigo), Ord(llFuncionario), Ord(llAdmissao), Ord(llJornada), Ord(llIntervalo)
+    ];
+
+    const LINHAS_LAYOUT_HORARIOS_SEMANA = [
+      Ord(llSegunda), Ord(llTerca), Ord(llQuarta), Ord(llQuinta), Ord(llSexta), Ord(llSabado)
+    ];
+
+    const HASH_SALTING = '3175634@0733b$66ç723464335&d5d5*b5d5ód~2d5b2d3d5b';
     const REGEX_PEGAR_HASH = '[a-zA-Z0-9]{32}';
     const REGEX_NAO_PALAVRAS = '\W{0,}?';
     const REGEX_NAO_DIGITOS = '\D{0,}?';
@@ -15,13 +27,11 @@ type
     const REGEX_QUINTA = 'Quinta';
     const REGEX_SEXTA = 'Sexta';
     const REGEX_SABADO = 'S[a|á]bado';
-
     const REGEX_CODIGO_FUNCIONARIO = '(C[ó|o]digo)\W{0,}(\d{0,7})';
     const REGEX_NOME_FUNCIONARIO = '(Funcion[á|a]rio)\W{0,}(.*)\R';
     const REGEX_ADMISSAO_FUNCIONARIO = '(Admiss[ã|a]o)\W{0,}(\d{2}[\/]\d{2}[\/]\d{4})';
     const REGEX_JORNADA_FUNCIONARIO = '(Jornada\sSemanal)\W{0,}(\d{0,3})';
     const REGEX_INTERVALO_FUNCIONARIO = '(Intervalo\s?Almo[ç|c]o)\W{0,}(\d{2}[\:]\d{2})';
-    const HASH_SALTING = '3175634@0733b$66ç723464335&d5d5*b5d5ód~2d5b2d3d5b';
 
     const REGEX_FOLHA_HORARIOS_DIA_UTIL = REGEX_NAO_DIGITOS + REGEX_NAO_PALAVRAS + REGEX_HORARIO_VALIDO +
       REGEX_NAO_PALAVRAS + REGEX_HORARIO_VALIDO + REGEX_NAO_PALAVRAS + REGEX_HORARIO_VALIDO + REGEX_NAO_PALAVRAS +

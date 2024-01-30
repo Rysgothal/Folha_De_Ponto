@@ -8,14 +8,15 @@ uses
 type
   IConstrutor = interface
     procedure ConstruirCabecalho;
-    procedure ConstruirDadosFuncionario;
-    procedure ConstruirTituloHorarios;
-    procedure ConstruirHorarioSegunda;
-    procedure ConstruirHorarioTerca;
-    procedure ConstruirHorarioQuarta;
-    procedure ConstruirHorarioQuinta;
-    procedure ConstruirHorarioSexta;
-    procedure ConstruirHorarioSabado;
+//    procedure ConstruirDadosFuncionario;
+//    procedure ConstruirTituloHorarios;
+    procedure ConstruirHorarios;
+//    procedure ConstruirHorarioSegunda;
+//    procedure ConstruirHorarioTerca;
+//    procedure ConstruirHorarioQuarta;
+//    procedure ConstruirHorarioQuinta;
+//    procedure ConstruirHorarioSexta;
+//    procedure ConstruirHorarioSabado;
     procedure ConstruirSaldoDeHoras;
     procedure ConstruirRodape;
     function GetFolhaDePonto: TStringList;

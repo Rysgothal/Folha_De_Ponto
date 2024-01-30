@@ -609,6 +609,12 @@ begin
     else Exit;
   end;
 
+  if (pDiaSemana = dsSabado) and (TRegEx.IsMatch(memHistHorario.Text, TConstantes.REGEX_SABADO +
+    TConstantes.REGEX_FOLHA_HORARIOS_DIA_UTIL, [roIgnoreCase])) then
+  begin
+    lRegex := TConstantes.REGEX_SABADO + TConstantes.REGEX_FOLHA_HORARIOS_DIA_UTIL;
+  end;
+
   Result := TRegex.Matches(memHistHorario.Text, lRegex, [roIgnoreCase]);
 end;
 

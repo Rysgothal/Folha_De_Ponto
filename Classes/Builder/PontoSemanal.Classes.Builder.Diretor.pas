@@ -18,14 +18,14 @@ implementation
 procedure TDiretor.Construir(pConstrutor: IConstrutor);
 begin
   pConstrutor.ConstruirCabecalho;
-  pConstrutor.ConstruirDadosFuncionario;
-  pConstrutor.ConstruirTituloHorarios;
-  pConstrutor.ConstruirHorarioSegunda;
-  pConstrutor.ConstruirHorarioTerca;
-  pConstrutor.ConstruirHorarioQuarta;
-  pConstrutor.ConstruirHorarioQuinta;
-  pConstrutor.ConstruirHorarioSexta;
-  pConstrutor.ConstruirHorarioSabado;
+//  pConstrutor.ConstruirDadosFuncionario;
+//  pConstrutor.ConstruirTituloHorarios;
+  pConstrutor.ConstruirHorarios;
+//  pConstrutor.ConstruirHorarioTerca;
+//  pConstrutor.ConstruirHorarioQuarta;
+//  pConstrutor.ConstruirHorarioQuinta;
+//  pConstrutor.ConstruirHorarioSexta;
+//  pConstrutor.ConstruirHorarioSabado;
   pConstrutor.ConstruirSaldoDeHoras;
   pConstrutor.ConstruirRodape;
 end;

@@ -392,7 +392,7 @@ begin
     lSaidaAlmoco := StrToTime(SaidaAlmoco);
     lValor := IfThen(lSaidaAlmoco > lValor, lValor.IncDay, lValor);
 
-    if HoursBetween(lValor, lSaidaAlmoco) > 3 then // Assim ele me comprova que ficou "Além do horario de almoço"
+    if HoursBetween(lValor, lSaidaAlmoco) > 5 then // Assim ele me comprova que ficou "Além do horario de almoço"
     begin
       try
         AbortarCasoHorarioAtualMenorQueSaidaAlmoco(pValor);
@@ -429,7 +429,7 @@ begin
     lRetornoAlmoco := StrToTime(RetornoAlmoco);
     lRetornoAlmoco := IfThen(lRetornoAlmoco < lValor, lRetornoAlmoco.IncDay, lRetornoAlmoco);
 
-    if HoursBetween(lValor, lRetornoAlmoco) > 3 then
+    if HoursBetween(lValor, lRetornoAlmoco) > 5 then
     begin
       try
         AbortarCasoHorarioAtualMaiorQueRetornoAlmoco(pValor);

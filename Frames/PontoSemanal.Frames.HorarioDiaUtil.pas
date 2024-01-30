@@ -411,16 +411,25 @@ end;
 procedure TfrmHorariosDia.PreencherValoresHorarios(pGroupCollection: TGroupCollection);
 begin
   medEntrada.Text := pGroupCollection[1].Value;
+  medSaidaFinal.Text := pGroupCollection[2].Value;
 
-  if TDiaSemana(Self.Tag) = dsSabado then
+  if pGroupCollection.Count > 3 then
   begin
-    medSaidaFinal.Text := pGroupCollection[2].Value;
-    Exit;
+    medSaidaFinal.Text := pGroupCollection[4].Value;
+    medRetornoAlmoco.Text := pGroupCollection[3].Value;
+    medSaidaAlmoco.Text := pGroupCollection[2].Value;
+    medEntrada.Text := pGroupCollection[1].Value;
   end;
 
-  medSaidaAlmoco.Text := pGroupCollection[2].Value;
-  medRetornoAlmoco.Text := pGroupCollection[3].Value;
-  medSaidaFinal.Text := pGroupCollection[4].Value;
+//  try
+//    medSaidaFinal.Text := pGroupCollection[4].Value;
+//    medRetornoAlmoco.Text := pGroupCollection[3].Value;
+//    medSaidaAlmoco.Text := pGroupCollection[2].Value;
+//    medEntrada.Text := pGroupCollection[1].Value;
+//  except
+//    medEntrada.Text := pGroupCollection[1].Value;
+//    medSaidaFinal.Text := pGroupCollection[2].Value;
+//  end;
 end;
 
 function TfrmHorariosDia.ProcurarHorarioIncorreto: Boolean;
