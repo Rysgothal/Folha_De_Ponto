@@ -8,13 +8,17 @@ uses
 type
   TConstantes = class abstract
   public
-    const LINHAS_LAYOUT_DADOS_FUNCIONARIOS = [
+    const LINHAS_LAYOUT_DADOS_FUNCIONARIOS: array[0..4] of Integer = (
       Ord(llCodigo), Ord(llFuncionario), Ord(llAdmissao), Ord(llJornada), Ord(llIntervalo)
-    ];
+    );
 
-    const LINHAS_LAYOUT_HORARIOS_SEMANA = [
+    const LINHAS_LAYOUT_HORARIOS_SEMANA: array[0..5] of Integer = (
       Ord(llSegunda), Ord(llTerca), Ord(llQuarta), Ord(llQuinta), Ord(llSexta), Ord(llSabado)
-    ];
+    );
+
+    const LINHAS_LAYOUT_SALDO_HORAS_SEMANA: array[0..2] of Integer = (
+      Ord(llTotalHorasSemana), Ord(llHorasFaltantes), Ord(llHorasExcedentes)
+    );
 
     const HASH_SALTING = '3175634@0733b$66ç723464335&d5d5*b5d5ód~2d5b2d3d5b';
     const REGEX_PEGAR_HASH = '[a-zA-Z0-9]{32}';

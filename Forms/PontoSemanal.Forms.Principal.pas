@@ -274,7 +274,7 @@ begin
       while lPassWord <> 'gansodeterno' do
       begin
         lPassWord := InputBox('Arquivo violado!', #9'A Folha de Ponto foi violada, alguns dados podem ter sido' +
-          sLineBreak + 'alterados, estarão descatados caso tenham inconformidade. Digite a Palavra-Chave:', '');
+          sLineBreak + 'alterados, estarão destacados caso tenham alguma inconformidade. Digite a Palavra-Chave:', '');
 
         if TStringHelpers.VerificarCampoVazio(lPassWord) then
         begin
